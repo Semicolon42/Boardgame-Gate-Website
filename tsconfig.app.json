@@ -29,8 +29,11 @@
 		"strict": true,
 		"target": "esnext",
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-		"types": ["vitest/globals","node_modules/@awesome.me/webawesome/dist/custom-elements-jsx.d.ts"],
+		"types": [
+			"vitest/globals",
+			"node_modules/@awesome.me/webawesome/dist/custom-elements-jsx.d.ts"
+		],
 		"verbatimModuleSyntax": true
 	},
-	"include": ["src"]
+	"include": ["src", "src/custom.d.ts"]
 }

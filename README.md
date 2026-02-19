@@ -45,5 +45,6 @@ pnpm install
 ## Running Locally
 ```
 pnpm install
-pnpm dev
+pnpm dev -- Run the seb service locally
+pnpm add?
 ```

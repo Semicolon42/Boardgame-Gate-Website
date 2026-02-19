@@ -1,0 +1,31 @@
+{
+	"0": {
+		"name": "farmer",
+		"type": "Starter",
+		"cost": 0,
+		"coins": 1,
+		"repair": 1,
+		"calm": 0,
+		"fight": 0,
+		"effect": "Farmer"
+	},
+	"1": {
+		"name": "baker",
+		"type": "Starter",
+		"cost": 0,
+		"coins": 1,
+		"repair": 1,
+		"calm": 0,
+		"fight": 0,
+		"effect": null
+	},
+	"2": {
+		"name": "candlestickmaker",
+		"cost": 0,
+		"coins": 1,
+		"repair": 1,
+		"calm": 0,
+		"fight": 0,
+		"effect": null
+	}
+}
