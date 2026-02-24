@@ -70,7 +70,7 @@ export function GET_CITIZEN_CARD(id: number): iCitizenCard {
 		actionRepair: 1,
 		actionCalm: 1,
 		actionFight: 1,
-		actionBonusText: 'id=' + id
+		actionBonusText: `id=${id}`
 	}
 
 	return CITIZEN_CARD_LIST.find(it => it.id === id) ?? cardNotFound

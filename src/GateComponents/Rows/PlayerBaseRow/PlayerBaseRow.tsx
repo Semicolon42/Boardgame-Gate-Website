@@ -1,5 +1,3 @@
-import {XCard} from '@/GateComponents/Cards/XCard'
-
 function PlayerBaseCard(props: {name: string; image: any; health: number}) {
 	const {name, image, health} = props
 	return (
@@ -15,7 +13,7 @@ function Fearamid(props: {fear: number}) {
 	const {fear} = props
 	return (
 		<div class='block h-[150px] w-[100px] bg-black text-white'>
-			<div>Fearaid</div>
+			<div>Fearamid</div>
 			<div>{`Fear: ${fear}`}</div>
 		</div>
 	)
