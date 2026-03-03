@@ -51,3 +51,8 @@ pnpm add?
 - `service docker start`
 - `service docker restart`
 - `docker build . -t "gate_game_website:v1.0"` - builds the docker image for the project
+- `docker run -d -p 127.0.0.1:3000:3000 gate_game_website` - Run the image locally on the given port
+
+
+## AWS
+- `https://443427140374.signin.aws.amazon.com/console` aws user login link

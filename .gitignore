@@ -1,7 +1,12 @@
+## Ignore common files
 node_modules
 .DS_Store
+
+## Ignore react build folders
 dist
 dist-ssr
+
+# ignore test related artifacts
 *.local
 coverage
 .nyc_output
@@ -9,3 +14,6 @@ coverage
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+## Ignore Miscelaneous
+CDK-TEMP/*
