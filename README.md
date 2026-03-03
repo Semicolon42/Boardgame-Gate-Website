@@ -39,8 +39,6 @@ pnpm install
 - `pnpm lint` - runs TypeScript and Biome.
 - `pnpm validate` - runs `lint`, `test:ci` and `test:e2e:ci`.
 
-
-
 # Brendan's Notes
 ## Running Locally
 ```
@@ -48,3 +46,8 @@ pnpm install
 pnpm dev -- Run the seb service locally
 pnpm add?
 ```
+
+## Building the Docker Image
+- `service docker start`
+- `service docker restart`
+- `docker build . -t "gate_game_website:v1.0"` - builds the docker image for the project
