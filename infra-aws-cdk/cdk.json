@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/cdk-temp.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/gate-static-website-s3.ts",
   "watch": {
     "include": [
       "**"
