@@ -10,6 +10,7 @@ export class GateStaticWebsiteS3Stack extends cdk.Stack {
     super(scope, id, props);
 
     const siteBucket = new s3.Bucket(this, 'ViteSiteBucket', {
+      bucketName: 'website-static-gate-game-${this.account}-${this.region}',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
