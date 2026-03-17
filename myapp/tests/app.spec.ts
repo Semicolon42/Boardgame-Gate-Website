@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test'
 
 test('renders the fruit gallery and choose one', async ({page}) => {
-	await page.goto('/')
+	await page.goto('/gallery')
 
 	await expect(page.getByRole('link')).toHaveCount(6)
 

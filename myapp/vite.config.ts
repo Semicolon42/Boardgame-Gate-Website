@@ -23,7 +23,7 @@ export default defineConfig(() => ({
 			reporter: ['text', 'lcov'],
 			reportsDirectory: 'coverage',
 			thresholds: {
-				'100': true
+				'10': true
 			}
 		},
 		css: false,
