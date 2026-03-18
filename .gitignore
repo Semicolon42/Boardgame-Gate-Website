@@ -2,6 +2,9 @@
 node_modules
 .DS_Store
 
+## ignore cdk generated folders
+cdk.out
+
 ## Ignore react build folders
 dist
 dist-ssr

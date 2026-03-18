@@ -20,7 +20,7 @@ export function App() {
 				<Routes>
 					<Route element={<GameBoard />} index={true} />
 					<Route element={<Gallery />} path='gallery' />
-					<Route element={<Details />} path=':fruitName' />
+					<Route element={<Details />} path='gallery/:fruitName' />
 				</Routes>
 			</Suspense>
 		</ErrorBoundary>
