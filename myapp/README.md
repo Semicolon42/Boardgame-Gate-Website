@@ -53,6 +53,15 @@ pnpm add?
 - `docker build . -t "gate_game_website:v1.0"` - builds the docker image for the project
 - `docker run -d -p 127.0.0.1:3000:3000 gate_game_website` - Run the image locally on the given port
 
+// get all s3 buckets
+aws s3 ls
+// push the latest up to the bucket
+aws s3 sync myapp/dist s3://<BUCKET_NAME> --delete
+
+// Get the cloudfront id
+aws cloudfront list-distributions --query "DistributionList.Items[*].{Id:Id,DomainName:DomainName}" --output table
+// invalidate the cloudfront cache for all path for the given cloudfront
+aws cloudfront create-invalidation --distribution-id <CLOUDFRONT_ID> --paths "/*"
 
 ## AWS
 - `https://443427140374.signin.aws.amazon.com/console` aws user login link
