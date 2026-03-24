@@ -1,0 +1,117 @@
+// ---------------------------------------------------------------------------
+// Layer 3: UI/animation orchestration — wires game logic + animation together
+// ---------------------------------------------------------------------------
+//
+// This hook is the single entry point for GameBoard. It wires together:
+//   - Layer 1: gameStateReducer (pure state machine)
+//   - Layer 2: useSubActionQueue (animated sub-action sequencing)
+
+import {useReducer, useRef} from 'react'
+import {
+	type BuildingType,
+	gameStateReducer,
+	initialState
+} from './gameStateReducer'
+import {useSubActionQueue} from './useSubActionQueue'
+
+export function useGameActions() {
+	const [state, dispatch] = useReducer(gameStateReducer, initialState)
+
+	const deckRef = useRef<HTMLDivElement>(null)
+	const discardRef = useRef<HTMLDivElement>(null)
+
+	const {enqueue, signalAnimationComplete, isProcessing, animatingCard} =
+		useSubActionQueue(state, dispatch, deckRef, discardRef)
+
+	const gameDrawCards = (n: number): void => {
+		enqueue([{type: 'PLAYER_DRAW_N', count: n}])
+	}
+
+	const gameEndTurn = (): void => {
+		enqueue([{type: 'END_TURN'}])
+	}
+
+	const clearActionLogs = (): void => {
+		dispatch({type: 'ACTION_LOGS_CLEAR'})
+	}
+
+	/** TODO: implement buy card logic */
+	const buyCard = (_cardId: number): void => {
+		// TODO
+	}
+
+	/** TODO: implement play card logic */
+	const playCard = (_cardId: number): void => {
+		// TODO
+	}
+
+	/** TODO: implement player attack enemy logic */
+	const playerAttackEnemy = (_enemyId: number): void => {
+		// TODO
+	}
+
+	/** TODO: implement player repair building logic */
+	const playerRepairBuilding = (_building: BuildingType): void => {
+		// TODO
+	}
+
+	/** TODO: implement player spend coin logic */
+	const playerSpendCoin = (
+		_coinAction: 'CALM' | 'ATTACK' | 'REPAIR' | 'REPLACE_BUY_ROW'
+	): void => {
+		// TODO
+	}
+
+	/** TODO: implement enemy attack building logic */
+	const enemyAttackBuilding = (_building: BuildingType): void => {
+		// TODO
+	}
+
+	/** TODO: implement enemy raise fear logic */
+	const enemyRaiseFear = (): void => {
+		// TODO
+	}
+
+	/** TODO: implement trigger fear effect logic */
+	const triggerFearEffect = (): void => {
+		// TODO
+	}
+
+	/** TODO: implement draw new enemy logic */
+	const drawNewEnemy = (): void => {
+		// TODO
+	}
+
+	/** TODO: implement enemy dies logic */
+	const enemyDies = (_enemyId: number): void => {
+		// TODO
+	}
+
+	/** TODO: implement add hero card to discard logic */
+	const addHeroCardToDiscard = (): void => {
+		// TODO
+	}
+
+	return {
+		state,
+		deckRef,
+		discardRef,
+		isProcessing,
+		animatingCard,
+		signalAnimationComplete,
+		gameDrawCards,
+		gameEndTurn,
+		buyCard,
+		playCard,
+		playerAttackEnemy,
+		playerRepairBuilding,
+		playerSpendCoin,
+		enemyAttackBuilding,
+		enemyRaiseFear,
+		triggerFearEffect,
+		drawNewEnemy,
+		enemyDies,
+		addHeroCardToDiscard,
+		clearActionLogs
+	}
+}

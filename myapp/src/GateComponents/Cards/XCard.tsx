@@ -2,26 +2,30 @@ import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import {useLayoutEffect, useRef} from 'react'
 import {GET_CITIZEN_CARD} from '../Data/PlayerCards'
 
-// Import CSS — defines the `card-draw-animate` class and `draw-card` keyframe animation
+// Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
 
 interface XcardProps {
 	cardId: number
 	// biome-ignore lint/suspicious/noExplicitAny: can't find a simple enough type
 	onClick?: any
-	isNewlyDrawn?: boolean
 	onAnimationEnd?: () => void
-	// Top-left position of the deck element at draw time (measured in GameBoard).
-	// When provided, the card animates FROM the deck TO its hand position.
-	drawOrigin?: {x: number; y: number}
+	// Enter animation: card is already at its destination in the DOM.
+	// Animates FROM this position TO the card's self-measured DOM position.
+	// Used for draw (deck → hand).
+	moveFrom?: {x: number; y: number}
+	// Exit animation: card is at its current DOM position.
+	// Animates FROM the card's self-measured DOM position TO this position.
+	// Used for discard (hand → discard pile).
+	moveTo?: {x: number; y: number}
 }
 
 export function XCard({
 	cardId,
 	onClick,
-	isNewlyDrawn,
 	onAnimationEnd,
-	drawOrigin
+	moveFrom,
+	moveTo
 }: XcardProps) {
 	const info = GET_CITIZEN_CARD(cardId)
 
@@ -31,53 +35,46 @@ export function XCard({
 
 	// useLayoutEffect fires synchronously after the DOM is updated but BEFORE the
 	// browser paints. This is critical for animation setup: we need to measure the
-	// card's final rendered position (getBoundingClientRect) and set CSS custom
-	// properties before the frame is painted, so the animation starts from the
-	// correct position with no visible flash or jump.
+	// card's position (getBoundingClientRect) and set CSS custom properties before
+	// the frame is painted, so the animation starts from the correct position with
+	// no visible flash or jump.
+	//
+	// moveFrom (enter): card is at its destination — animate from external position to self.
+	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(delta) → translate(0,0)
+	//
+	// moveTo (exit): card is at its source — animate from self to external position.
+	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(0,0) → translate(delta)
 	useLayoutEffect(() => {
 		const el = ref.current
 		if (!el) return
 
-		// Always remove the class first to reset any in-progress animation.
-		// This ensures re-drawing the same card triggers a fresh animation.
-		el.classList.remove('card-draw-animate')
+		el.classList.remove('card-move-from-animate', 'card-move-to-animate')
 
-		if (isNewlyDrawn) {
-			// Measure where the card currently sits in the viewport after layout.
-			// This is the card's FINAL (resting) position in the player's hand.
-			const rect = el.getBoundingClientRect()
+		const rect = el.getBoundingClientRect()
 
-			// Compute how far the card must travel to reach its resting position.
-			// The CSS keyframe animates FROM translate(--slide-x, --slide-y) TO translate(0,0),
-			// so these values represent the offset from the card's final position back to the origin.
-			//
-			// If drawOrigin is provided (deck position measured in GameBoard at draw time):
-			//   --slide-x = deck.left - card.left  → card appears to start at the deck's x
-			//   --slide-y = deck.top  - card.top   → card appears to start at the deck's y
-			//
-			// Fallback (no deck ref available): slide in from the top-right of the viewport.
-			const originX = drawOrigin?.x ?? window.innerWidth
-			const originY = drawOrigin?.y ?? 0
-			el.style.setProperty('--slide-x', `${originX - rect.left}px`)
-			el.style.setProperty('--slide-y', `${originY - rect.top}px`)
-
-			// Adding the class triggers the CSS animation defined in XCard.css.
-			// The `onAnimationEnd` prop (wired to the button below) lets the parent
-			// know when the animation has finished so it can clear the `isNewlyDrawn` flag.
-			el.classList.add('card-draw-animate')
+		if (moveFrom) {
+			el.style.setProperty('--slide-x', `${moveFrom.x - rect.left}px`)
+			el.style.setProperty('--slide-y', `${moveFrom.y - rect.top}px`)
+			el.classList.add('card-move-from-animate')
+		} else if (moveTo) {
+			el.style.setProperty('--slide-x', `${moveTo.x - rect.left}px`)
+			el.style.setProperty('--slide-y', `${moveTo.y - rect.top}px`)
+			el.classList.add('card-move-to-animate')
 		}
-	}, [isNewlyDrawn, drawOrigin])
+	}, [moveFrom, moveTo])
 
 	return (
 		<button
-			className='flex h-[140px] w-[100px] rounded-xl bg-blue-300'
+			className='flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD'
 			onAnimationEnd={onAnimationEnd}
 			onClick={onClick}
 			ref={ref}
 			type='button'
 		>
-			<div className='w-100'>
-				<div className=''>{info.name}</div>
+			<div className='w-full'>
+				<div className=''>
+					{info.id}:{info.name}
+				</div>
 				<div className='@cardCost flex items-center gap-1'>
 					<WaIcon name='circle' />
 					{info.cost}
@@ -87,7 +84,7 @@ export function XCard({
 				<div className='@cardCalm'>{info.actionCalm}</div>
 				<div className='@cardFight'>{info.actionFight}</div>
 				{info.actionBonusText && (
-					<div className='@cardBonus'>{info.actionBonusText}</div>
+					<div className='@cardBonus wrap-anywhere'>{info.actionBonusText}</div>
 				)}
 			</div>
 		</button>
