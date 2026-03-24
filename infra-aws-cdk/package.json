@@ -1,8 +1,8 @@
 {
-  "name": "cdk-temp",
+  "name": "gate-static-website-s3",
   "version": "0.1.0",
   "bin": {
-    "cdk-temp": "bin/cdk-temp.js"
+    "gate-static-website-s3": "bin/gate-static-website-s3.js"
   },
   "scripts": {
     "build": "tsc",
@@ -13,14 +13,14 @@
   "devDependencies": {
     "@types/jest": "^30",
     "@types/node": "^24.10.1",
+    "aws-cdk": "2.1108.0",
     "jest": "^30",
     "ts-jest": "^29",
-    "aws-cdk": "2.1108.0",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.3"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.240.0",
-    "constructs": "^10.5.0"
+    "aws-cdk-lib": "^2.241.0",
+    "constructs": "^10.5.1"
   }
 }
