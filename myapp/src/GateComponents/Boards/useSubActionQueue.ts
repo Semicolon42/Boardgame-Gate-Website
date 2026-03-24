@@ -59,10 +59,12 @@ function expandSubAction(
 	switch (action.type) {
 		case 'END_TURN':
 			return [
-				...state.pHand.map<SubAction>(cardId => ({
-					type: 'DISCARD_SINGLE_CARD',
-					cardId
-				})).reverse(),
+				...state.pHand
+					.map<SubAction>(cardId => ({
+						type: 'DISCARD_SINGLE_CARD',
+						cardId
+					}))
+					.reverse(),
 				{type: 'PLAYER_DRAW_N', count: 3}
 			]
 		case 'DISCARD_HAND':
