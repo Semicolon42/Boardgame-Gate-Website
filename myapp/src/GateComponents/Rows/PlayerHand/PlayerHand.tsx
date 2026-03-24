@@ -30,6 +30,7 @@ export function PlayerHand({
 					<XCard
 						cardId={cardId}
 						key={`card-${cardId}`}
+						
 						onClick={() => {
 							alert(`yo dude ${cardId}`)
 						}}
@@ -38,6 +39,7 @@ export function PlayerHand({
 						{...(spec !== null && onAnimationEnd !== undefined
 							? {onAnimationEnd}
 							: {})}
+						
 					/>
 				)
 			})}

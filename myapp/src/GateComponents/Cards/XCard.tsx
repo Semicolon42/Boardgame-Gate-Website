@@ -5,6 +5,11 @@ import {GET_CITIZEN_CARD} from '../Data/PlayerCards'
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
 
+
+export type CardPlayType ='COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
+
+
+type CardPlayHandler = (cardId: number, type: CardPlayType, amount: number, actionBonusId?: string) => void
 interface XcardProps {
 	cardId: number
 	// biome-ignore lint/suspicious/noExplicitAny: can't find a simple enough type
@@ -18,6 +23,8 @@ interface XcardProps {
 	// Animates FROM the card's self-measured DOM position TO this position.
 	// Used for discard (hand → discard pile).
 	moveTo?: {x: number; y: number}
+
+	onPlayCard?: CardPlayHandler
 }
 
 export function XCard({
@@ -25,13 +32,14 @@ export function XCard({
 	onClick,
 	onAnimationEnd,
 	moveFrom,
-	moveTo
+	moveTo,
+	onPlayCard
 }: XcardProps) {
 	const info = GET_CITIZEN_CARD(cardId)
 
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
-	const ref = useRef<HTMLButtonElement>(null)
+	const ref = useRef<HTMLDivElement>(null)
 
 	// useLayoutEffect fires synchronously after the DOM is updated but BEFORE the
 	// browser paints. This is critical for animation setup: we need to measure the
@@ -64,12 +72,11 @@ export function XCard({
 	}, [moveFrom, moveTo])
 
 	return (
-		<button
+		<div
 			className='flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD'
 			onAnimationEnd={onAnimationEnd}
 			onClick={onClick}
 			ref={ref}
-			type='button'
 		>
 			<div className='w-full'>
 				<div className='flex justify-between px-[5px]'>
@@ -78,10 +85,26 @@ export function XCard({
 				</div>
 				<div className='flex'>
 					<div className='block w-[40px]'>
-						<div className='@cardCoins'><WaIcon name='circle' variant='regular'/>{info.actionCoins}</div>
-						<div className='@cardRepair'><WaIcon name='plus' />{info.actionRepair}</div>
-						<div className='@cardCalm'><WaIcon name='eye' variant='regular' />{info.actionCalm}</div>
-						<div className='@cardFight'><WaIcon name='arrow-trend-up' />{info.actionFight}</div>
+						<div className='card-action-btn @cardCoins' role='button' 
+							onClick={()=>onPlayCard?.(cardId, 'COINS', info.actionCoins, info.actionBonusId)}
+						>
+							<WaIcon name='circle' variant='regular'/>{info.actionCoins}
+						</div>
+						<div className='card-action-btn @cardRepair' role='button' 
+							onClick={()=>onPlayCard?.(cardId, 'REPAIR', info.actionRepair, info.actionBonusId)}
+						>
+							<WaIcon name='plus' />{info.actionRepair}
+						</div>
+						<div className='card-action-btn @cardCalm' role='button' 
+							onClick={()=>onPlayCard?.(cardId, 'CALM', info.actionCalm, info.actionBonusId)}
+						>
+							<WaIcon name='eye' variant='regular' />{info.actionCalm}
+						</div>
+						<div className='card-action-btn @cardFight' role='button' 
+							onClick={()=>onPlayCard?.(cardId, 'ATTACK', info.actionFight, info.actionBonusId)}
+						>
+							<WaIcon name='arrow-trend-up' />{info.actionFight}
+						</div>
 					</div>
 					<div className='block'>
 						<div className='w-[50px] h-[50px] border-1'></div>
@@ -91,6 +114,6 @@ export function XCard({
 					</div>
 				</div>
 			</div>
-		</button>
+		</div>
 	)
 }
