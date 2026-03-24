@@ -72,20 +72,24 @@ export function XCard({
 			type='button'
 		>
 			<div className='w-full'>
-				<div className=''>
-					{info.id}:{info.name}
+				<div className='flex justify-between px-[5px]'>
+					<div>{info.name}</div>
+					<div className='@cardCost'>{info.cost}</div>
 				</div>
-				<div className='@cardCost flex items-center gap-1'>
-					<WaIcon name='circle' />
-					{info.cost}
+				<div className='flex'>
+					<div className='block w-[40px]'>
+						<div className='@cardCoins'><WaIcon name='circle' variant='regular'/>{info.actionCoins}</div>
+						<div className='@cardRepair'><WaIcon name='plus' />{info.actionRepair}</div>
+						<div className='@cardCalm'><WaIcon name='eye' variant='regular' />{info.actionCalm}</div>
+						<div className='@cardFight'><WaIcon name='arrow-trend-up' />{info.actionFight}</div>
+					</div>
+					<div className='block'>
+						<div className='w-[50px] h-[50px] border-1'></div>
+						{info.actionBonusText && (
+							<div className='@cardBonus break-words text-xs w-[50px] h-[50px]'>{info.actionBonusText}</div>
+						)}
+					</div>
 				</div>
-				<div className='@cardCoins'>{info.actionCoins}</div>
-				<div className='@cardRepair'>{info.actionRepair}</div>
-				<div className='@cardCalm'>{info.actionCalm}</div>
-				<div className='@cardFight'>{info.actionFight}</div>
-				{info.actionBonusText && (
-					<div className='@cardBonus wrap-anywhere'>{info.actionBonusText}</div>
-				)}
 			</div>
 		</button>
 	)
