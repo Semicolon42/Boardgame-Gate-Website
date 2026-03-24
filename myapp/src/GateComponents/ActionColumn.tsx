@@ -2,16 +2,16 @@ import type {ReactElement} from 'react'
 import type {GameAction} from './Boards/gameStateReducer'
 
 function ActionCard(display: string): ReactElement {
-	return <div className='rounded-xl border-2 bg-blue-200'>{display}</div>
+	return <div className='rounded-xl border-2 bg-blue-200 text-xs'>{display}</div>
 }
 
 function convertActionCards(action: GameAction): ReactElement[] {
 	switch (action.type) {
 		case 'MULTI_ACTION': {
 			return [
-				ActionCard(' --- MULTIACTION START'),
+				ActionCard(' --- MULTI_ACTION START'),
 				...action.actions.flatMap(act => convertActionCards(act)),
-				ActionCard(' --- MULTIACTION END')
+				ActionCard(' --- MULTI_ACTION END')
 			]
 		}
 		case 'STACK_ADD_CARDS':
@@ -22,7 +22,7 @@ function convertActionCards(action: GameAction): ReactElement[] {
 		case 'ACTION_LOGS_CLEAR':
 			return [ActionCard(JSON.stringify(action))]
 	}
-	return [ActionCard(`ERROR -- ${JSON.stringify(action)}`)]
+	return [ActionCard(`UNHANDLED LOG -- ${JSON.stringify(action)}`)]
 }
 
 export interface ActionColumnProps {

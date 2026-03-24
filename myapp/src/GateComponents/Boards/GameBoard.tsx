@@ -19,8 +19,8 @@ export function GameBoard() {
 	} = useGameActions()
 
 	return (
-		<div className='block'>
-			<div className='flex'>
+		<div className='flex	'>
+			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
@@ -37,6 +37,15 @@ export function GameBoard() {
 						Deck
 						{gameState?.pDeck?.length ?? 'XXX'}
 					</div>
+					<WaButton
+						disabled={isProcessing}
+						onClick={() => {
+							gameEndTurn()
+						}}
+						variant='brand'
+					>
+						End Turn
+					</WaButton>
 				</div>
 
 				{/* Middle column: all game rows */}
@@ -48,7 +57,7 @@ export function GameBoard() {
 						updateEnemyState={{}}
 					/>
 					{/* Second Row Village cards to buy */}
-					<VillageRow villageCards={[7, 8, 9, 10]} />
+					<VillageRow villageCards={gameState.vBuyRow} />
 					{/* Third Base and Health */}
 					<PlayerBaseRow />
 					{/* Fourth Row Player Hand */}
@@ -58,35 +67,22 @@ export function GameBoard() {
 						onAnimationEnd={signalAnimationComplete}
 					/>
 				</div>
-
-				<div className='flex-1'>
-					{/* Top of column for some elements */}
-					<div />
-					{/* bottom of column to show the action list for the current turn */}
-					<div className='flex-1'>
-						<WaButton
-							onClick={() => {
-								clearActionLogs()
-							}}
-							variant='brand'
-						>
-							Clear Log
-						</WaButton>
-						<ActionColumn actionLog={gameState.actionLogs} />
-					</div>
-				</div>
 			</div>
-
-			<div className='block'>
-				<WaButton
-					disabled={isProcessing}
-					onClick={() => {
-						gameEndTurn()
-					}}
-					variant='brand'
-				>
-					End Turn
-				</WaButton>
+			<div className='flex-1'>
+				{/* Top of column for some elements */}
+				<div />
+				{/* bottom of column to show the action list for the current turn */}
+				<div className='flex-1'>
+					<WaButton
+						onClick={() => {
+							clearActionLogs()
+						}}
+						variant='brand'
+					>
+						Clear Log
+					</WaButton>
+					<ActionColumn actionLog={gameState.actionLogs} />
+				</div>
 			</div>
 		</div>
 	)

@@ -69,15 +69,13 @@ export function gameStateReducer(
 	state: GameState,
 	action: GameAction
 ): GameState {
-	const loggableAction =
-		action.type === 'MULTI_ACTION' ? {type: action.type, actions: []} : action
-	const newActionLog = [...state.actionLogs, loggableAction]
+	const newActionLog = [...state.actionLogs, action]
 
 	switch (action.type) {
 		case 'ACTION_LOGS_CLEAR':
 			return {
 				...state,
-				actionLogs: [loggableAction]
+				actionLogs: [action]
 			}
 
 		case 'STACK_ADD_CARDS': {
@@ -144,13 +142,9 @@ export function gameStateReducer(
 			for (const a of action.actions) {
 				currentState = gameStateReducer(currentState, a)
 			}
-			// Append a MULTI_ACTION -- END sentinel so the log reflects the boundary
 			return {
 				...currentState,
-				actionLogs: [
-					...currentState.actionLogs,
-					{type: 'MULTI_ACTION', actions: []} as GameAction
-				]
+				actionLogs: newActionLog
 			}
 		}
 	}
@@ -168,6 +162,7 @@ export const initialState: GameState = {
 	pDiscard: [],
 	hDeck: GetRange('HERO').sort(() => 0.5 - Math.random()),
 	vDeck: GetRange('VILLAGER').sort(() => 0.5 - Math.random()),
+	vBuyRow: GetRange('VILLAGER').sort(() => 0.5 - Math.random()).slice(-4),
 	actionLogs: [],
 
 	bFarmHealth: 6,
