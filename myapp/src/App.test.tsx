@@ -1,7 +1,7 @@
 import {HttpResponse, http} from 'msw'
 import {App} from './App'
 import {server} from './mocks/server'
-import {queryClient, render, screen} from './test-utils'
+import {queryClient, render} from './test-utils'
 
 const widths = [360, 1280]
 
