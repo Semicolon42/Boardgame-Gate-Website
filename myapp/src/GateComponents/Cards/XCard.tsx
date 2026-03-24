@@ -65,7 +65,7 @@ export function XCard({
 
 	return (
 		<button
-			className='flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300'
+			className='flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD'
 			onAnimationEnd={onAnimationEnd}
 			onClick={onClick}
 			ref={ref}

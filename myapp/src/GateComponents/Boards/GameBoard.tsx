@@ -1,23 +1,22 @@
-import {WaButton, WaCheckbox} from '@awesome.me/webawesome/dist/react'
+import {WaButton} from '@awesome.me/webawesome/dist/react'
+import {ActionColumn} from '../ActionColumn'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
-import {gameStateReducer, HAND_SIZE, initialState} from './gameStateReducer'
 import {useGameActions} from './useGameActions'
-import { ActionColumn } from '../ActionColumn'
-import { useReducer } from 'react'
 
 export function GameBoard() {
 	const {
 		state: gameState,
 		deckRef,
 		discardRef,
-		gameDrawCards,
+		isProcessing,
+		animatingCard,
+		signalAnimationComplete,
 		gameEndTurn,
 		clearActionLogs
 	} = useGameActions()
-	const [state, dispatch] = useReducer(gameStateReducer, initialState)
 
 	return (
 		<div className='block'>
@@ -45,7 +44,7 @@ export function GameBoard() {
 					{/* First Row Enemies / Hero deck */}
 					<EnemyRow
 						enemyState={{}}
-						heroCardsRemaining={gameState?.hDeck?.length ?? "XXX"}
+						heroCardsRemaining={gameState?.hDeck?.length ?? 'XXX'}
 						updateEnemyState={{}}
 					/>
 					{/* Second Row Village cards to buy */}
@@ -54,33 +53,36 @@ export function GameBoard() {
 					<PlayerBaseRow />
 					{/* Fourth Row Player Hand */}
 					<PlayerHand
+						animatingCard={animatingCard}
 						cardIds={gameState.pHand}
+						onAnimationEnd={signalAnimationComplete}
 					/>
 				</div>
 
 				<div className='flex-1'>
 					{/* Top of column for some elements */}
-					<div></div>
+					<div />
 					{/* bottom of column to show the action list for the current turn */}
 					<div className='flex-1'>
 						<WaButton
 							onClick={() => {
 								clearActionLogs()
-							}} 
+							}}
 							variant='brand'
 						>
 							Clear Log
 						</WaButton>
-						<ActionColumn actionLog={gameState.actionLogs}/>
+						<ActionColumn actionLog={gameState.actionLogs} />
 					</div>
 				</div>
 			</div>
 
 			<div className='block'>
-				<WaButton 
+				<WaButton
+					disabled={isProcessing}
 					onClick={() => {
 						gameEndTurn()
-					}} 
+					}}
 					variant='brand'
 				>
 					End Turn

@@ -1,7 +1,7 @@
 export type CitizenCardType = 'VILLAGER' | 'HERO' | 'STARTER' | 'DEBUG'
 
 export function GetRange(type: CitizenCardType) {
-	return CITIZEN_CARD_LIST.filter((c)=>c.type===type).map((c)=>c.id)
+	return CITIZEN_CARD_LIST.filter(c => c.type === type).map(c => c.id)
 }
 
 export interface iCitizenCard {

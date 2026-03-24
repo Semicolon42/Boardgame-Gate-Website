@@ -4,11 +4,15 @@
 //
 // This hook is the single entry point for GameBoard. It wires together:
 //   - Layer 1: gameStateReducer (pure state machine)
-//   - Layer 2: useGameStateActions (pure game logic)
-//   - Animation: useDrawAnimation (animation state, scheduling, cleanup)
+//   - Layer 2: useSubActionQueue (animated sub-action sequencing)
 
 import {useReducer, useRef} from 'react'
-import {type BuildingType, type GameAction, type GameState, gameStateReducer, initialState} from './gameStateReducer'
+import {
+	type BuildingType,
+	gameStateReducer,
+	initialState
+} from './gameStateReducer'
+import {useSubActionQueue} from './useSubActionQueue'
 
 export function useGameActions() {
 	const [state, dispatch] = useReducer(gameStateReducer, initialState)
@@ -16,91 +20,19 @@ export function useGameActions() {
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
 
+	const {enqueue, signalAnimationComplete, isProcessing, animatingCard} =
+		useSubActionQueue(state, dispatch, deckRef, discardRef)
 
-/**
- * Computes the GameActions required to draw `n` cards from the player's deck,
- * including a discard-to-deck replenishment shuffle if needed.
- *
- * Returns:
- *   prepActions  — deck replenishment + STACK_REMOVE_CARDS (everything except
- *                  ADD_CARD_TO_HAND, which callers dispatch separately so they
- *                  can stagger animated draws or batch non-animated ones)
- *   drawnCardIds — ordered card IDs that will be drawn
- */
- function computeDrawCards(
-		state: GameState,
-		n: number
-	): {
-		prepActions: GameAction[]
-		drawnCardIds: number[]
-	} {
-		const prepActions: GameAction[] = []
-
-		// Take snapshots so we can compute without mutating state
-		let deckSnapshot = [...state.pDeck]
-		const discardSnapshot = [...state.pDiscard]
-
-		// If deck can't satisfy the draw and discard has cards, shuffle discard
-		// into deck. Shuffle is computed here (Math.random) — not via STACK_SHUFFLE
-		// reducer action — to keep the reducer pure/deterministic.
-		if (deckSnapshot.length < n && discardSnapshot.length > 0) {
-			const shuffledDiscard = [...discardSnapshot].sort(() => Math.random() - 0.5)
-			deckSnapshot = [...deckSnapshot, ...shuffledDiscard]
-
-			prepActions.push({type: 'STACK_ADD_CARDS', stack: 'DECK', cardIds: shuffledDiscard})
-			prepActions.push({type: 'STACK_CLEAR_ALL_CARDS', stack: 'DISCARD'})
-		}
-
-		// Draw up to n cards from front of (possibly replenished) deck
-		const drawnCardIds = deckSnapshot.slice(0, n)
-
-		if (drawnCardIds.length === 0) {
-			return {prepActions: [], drawnCardIds: []}
-		}
-
-		prepActions.push({type: 'STACK_REMOVE_CARDS', stack: 'DECK', cardIds: drawnCardIds})
-
-		return {prepActions, drawnCardIds}
-	}
-
-	/**
-	 * drawCards (animated) — dispatches deck prep atomically, then hands off
-	 * to useCardMoveFromAnimation to stagger ADD_CARD_TO_HAND actions so each
-	 * card gets its own render and XCard moveFrom animation.
-	 */
 	const gameDrawCards = (n: number): void => {
-		const {prepActions, drawnCardIds} = computeDrawCards(state, n)
-		if (drawnCardIds.length === 0) return
-
-		if (prepActions.length > 0) {
-			dispatch({type: 'MULTI_ACTION', actions: prepActions})
-		}
-		dispatch({type: 'STACK_ADD_CARDS', stack: 'HAND', cardIds: drawnCardIds})
+		enqueue([{type: 'PLAYER_DRAW_N', count: n}])
 	}
 
 	const gameEndTurn = (): void => {
-		const START_HAND_SIZE = 3;
-		let deck = []
-		let actions: GameAction[] = [
-				{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cardIds: state.pHand},
-				{type: 'STACK_CLEAR_ALL_CARDS', stack: 'HAND'}
-			]
-		if (state.pDeck.length < START_HAND_SIZE) { 
-			deck = [...state.pDeck, ...state.pDiscard]
-			actions.push({type: 'STACK_REMOVE_CARDS', stack: 'DISCARD', cardIds: state.pDiscard})
-			actions.push({type: 'STACK_ADD_CARDS', stack: 'DECK', cardIds: state.pDiscard})
-		} else {
-			deck = [...state.pDeck]
-		}
-		deck = deck.sort(()=>.5-Math.random())
-		let drawnCards = deck.slice(START_HAND_SIZE)
-		actions.push({type: 'STACK_REMOVE_CARDS', stack: 'DECK', cardIds: drawnCards})
-		actions.push({type: 'STACK_ADD_CARDS', stack: 'HAND', cardIds: drawnCards})
-		dispatch({type: 'MULTI_ACTION', actions})
+		enqueue([{type: 'END_TURN'}])
 	}
 
 	const clearActionLogs = (): void => {
-		dispatch({type:'ACTION_LOGS_CLEAR'})
+		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
 	/** TODO: implement buy card logic */
@@ -163,6 +95,10 @@ export function useGameActions() {
 	return {
 		state,
 		deckRef,
+		discardRef,
+		isProcessing,
+		animatingCard,
+		signalAnimationComplete,
 		gameDrawCards,
 		gameEndTurn,
 		buyCard,
@@ -176,7 +112,6 @@ export function useGameActions() {
 		drawNewEnemy,
 		enemyDies,
 		addHeroCardToDiscard,
-		clearActionLogs,
+		clearActionLogs
 	}
 }
-

@@ -5,7 +5,7 @@
 // see useGameStateActions.ts for the rationale).
 // ---------------------------------------------------------------------------
 
-import { GetRange } from "../Data/PlayerCards"
+import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
 // State & action types
@@ -74,7 +74,6 @@ export function gameStateReducer(
 	const newActionLog = [...state.actionLogs, loggableAction]
 
 	switch (action.type) {
-
 		case 'ACTION_LOGS_CLEAR':
 			return {
 				...state,
@@ -154,7 +153,6 @@ export function gameStateReducer(
 				]
 			}
 		}
-
 	}
 }
 
