@@ -8,8 +8,8 @@ export function VillageRow(props: {villageCards: number[]}) {
 				<XCard
 					cardId={cardId}
 					key={cardId}
-					onClick={() => {
-						alert('yo dude')
+					onBuyCard={id => {
+						alert(`buy card ${id}`)
 					}}
 				/>
 			))}

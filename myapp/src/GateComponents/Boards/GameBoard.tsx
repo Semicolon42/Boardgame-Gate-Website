@@ -5,6 +5,7 @@ import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {useGameActions} from './useGameActions'
+import type { CardPlayHandler, CardPlayType } from '../Cards/XCard'
 
 export function GameBoard() {
 	const {
@@ -18,8 +19,17 @@ export function GameBoard() {
 		clearActionLogs
 	} = useGameActions()
 
+	const onPlayCard: CardPlayHandler = (
+		cardId: number,
+		type: CardPlayType,
+		amount: number,
+		actionBonusId?: string
+	) => {
+		alert(`${type} ${amount} : ${actionBonusId}`)
+	}
+
 	return (
-		<div className='flex	'>
+		<div className='flex'>
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
@@ -65,6 +75,7 @@ export function GameBoard() {
 						animatingCard={animatingCard}
 						cardIds={gameState.pHand}
 						onAnimationEnd={signalAnimationComplete}
+						onPlayCard={onPlayCard}
 					/>
 				</div>
 			</div>

@@ -2,7 +2,9 @@ import type {ReactElement} from 'react'
 import type {GameAction} from './Boards/gameStateReducer'
 
 function ActionCard(display: string): ReactElement {
-	return <div className='rounded-xl border-2 bg-blue-200 text-xs'>{display}</div>
+	return (
+		<div className='rounded-xl border-2 bg-blue-200 text-xs'>{display}</div>
+	)
 }
 
 function convertActionCards(action: GameAction): ReactElement[] {
