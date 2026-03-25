@@ -28,7 +28,7 @@ export function PlayerHand({
 					// biome-ignore lint/suspicious/noArrayIndexKey: empty slots are positional placeholders
 					return <CardSlot key={`slot-${slotIndex}`} />
 				}
-				const spec = animatingCard?.cardId === cardId ? animatingCard : null
+				const spec = (animatingCard?.type === 'PLAYER' && animatingCard?.cardId === cardId) ? animatingCard : null
 				return (
 					<XCard
 						cardId={cardId}

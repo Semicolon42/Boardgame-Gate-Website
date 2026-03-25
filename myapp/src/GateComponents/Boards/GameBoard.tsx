@@ -12,10 +12,13 @@ export function GameBoard() {
 		state: gameState,
 		deckRef,
 		discardRef,
+		villageDeckRef,
 		isProcessing,
 		animatingCard,
+		animatingClearVillagerRow,
 		signalAnimationComplete,
 		gameEndTurn,
+		gameVillagerRowClear,
 		clearActionLogs
 	} = useGameActions()
 
@@ -33,18 +36,34 @@ export function GameBoard() {
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
+					<WaButton className='text-xs'
+						disabled={isProcessing}
+						onClick={() => {
+							gameVillagerRowClear()
+						}}
+						variant='brand'
+					>
+						Clear Village
+					</WaButton>
+					<div
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+						ref={villageDeckRef}
+					>
+						Village: 
+						{gameState?.vDeck?.length ?? 'XXX'}
+					</div>
 					<div
 						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-400 text-white'
 						ref={discardRef}
 					>
-						Discard
+						Discard:
 						{gameState?.pDiscard?.length ?? 'XXX'}
 					</div>
 					<div
 						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
 						ref={deckRef}
 					>
-						Deck
+						Deck:
 						{gameState?.pDeck?.length ?? 'XXX'}
 					</div>
 					<WaButton
@@ -67,7 +86,11 @@ export function GameBoard() {
 						updateEnemyState={{}}
 					/>
 					{/* Second Row Village cards to buy */}
-					<VillageRow villageCards={gameState.vBuyRow} />
+					<VillageRow 
+						animatingClearVillagerRow={animatingClearVillagerRow}
+						onAnimationEnd={signalAnimationComplete}
+						villageCards={gameState.vRow} 
+					/>
 					{/* Third Base and Health */}
 					<PlayerBaseRow />
 					{/* Fourth Row Player Hand */}
