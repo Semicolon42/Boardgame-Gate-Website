@@ -63,5 +63,6 @@ aws cloudfront list-distributions --query "DistributionList.Items[*].{Id:Id,Doma
 // invalidate the cloudfront cache for all path for the given cloudfront
 aws cloudfront create-invalidation --distribution-id <CLOUDFRONT_ID> --paths "/*"
 
+
 ## AWS
 - `https://443427140374.signin.aws.amazon.com/console` aws user login link

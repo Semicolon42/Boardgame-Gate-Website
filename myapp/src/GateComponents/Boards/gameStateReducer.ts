@@ -24,17 +24,22 @@ export interface GameState {
 	cCoins: number
 	cCalm: number
 	cRepair: number
-	cBonusRepair: {type: BuildingType, amount: number}[]
+	cBonusRepair: {type: BuildingType; amount: number}[]
 	cAttack: number
 
-	
 	actionLogs: GameAction[]
 	bGateHealth: number
 	bFarmHealth: number
 	bTowerHealth: number
 }
 
-export type StackType = 'HAND' | 'DECK' | 'DISCARD' | 'VILLAGER_DECK' | 'VILLAGER_ROW' | 'VILLAGER_DISCARD'
+export type StackType =
+	| 'HAND'
+	| 'DECK'
+	| 'DISCARD'
+	| 'VILLAGER_DECK'
+	| 'VILLAGER_ROW'
+	| 'VILLAGER_DISCARD'
 export type BuildingType = 'FARM' | 'GATE' | 'TOWER'
 
 export type GameAction =
@@ -54,7 +59,13 @@ export type GameAction =
 // Reducer helpers
 // ---------------------------------------------------------------------------
 
-export type StackKey = 'pHand' | 'pDeck' | 'pDiscard' | 'vDeck' | 'vRow' | 'vDiscard'
+export type StackKey =
+	| 'pHand'
+	| 'pDeck'
+	| 'pDiscard'
+	| 'vDeck'
+	| 'vRow'
+	| 'vDiscard'
 
 export function stackKey(stack: StackType): StackKey {
 	switch (stack) {
@@ -70,6 +81,10 @@ export function stackKey(stack: StackType): StackKey {
 			return 'vRow'
 		case 'VILLAGER_DISCARD':
 			return 'vDiscard'
+		default: {
+			const _exhaustive: never = stack
+			throw new Error(`Unknown stack: ${_exhaustive}`)
+		}
 	}
 }
 
@@ -104,7 +119,7 @@ export function gameStateReducer(
 			const toRemove = new Set(action.cardIds)
 			return {
 				...state,
-				[key]: state[key].filter(cid => !toRemove.has(cid)),
+				[key]: state[key].filter((cid: number) => !toRemove.has(cid)),
 				actionLogs: newActionLog
 			}
 		}
@@ -159,6 +174,12 @@ export function gameStateReducer(
 				actionLogs: newActionLog
 			}
 		}
+
+		default:
+			return {
+				...state,
+				actionLogs: newActionLog
+			}
 	}
 }
 
@@ -189,5 +210,5 @@ export const initialState: GameState = {
 	cCalm: 0,
 	cAttack: 0,
 
-	actionLogs: [],
+	actionLogs: []
 }

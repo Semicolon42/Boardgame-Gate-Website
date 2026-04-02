@@ -21,8 +21,14 @@ export function useGameActions() {
 	const discardRef = useRef<HTMLDivElement>(null)
 	const villageDeckRef = useRef<HTMLDivElement>(null)
 
-	const {enqueue, queue, signalAnimationComplete, isProcessing, animatingCard, animatingClearVillagerRow} =
-		useSubActionQueue(state, dispatch, deckRef, discardRef, villageDeckRef)
+	const {
+		enqueue,
+		queue,
+		signalAnimationComplete,
+		isProcessing,
+		animatingCard,
+		animatingClearVillagerRow
+	} = useSubActionQueue(state, dispatch, deckRef, discardRef, villageDeckRef)
 
 	const gameDrawCards = (n: number): void => {
 		enqueue([{type: 'ENQ_PLAYER_DRAW_N', count: n}])

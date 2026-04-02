@@ -26,7 +26,6 @@ export type SubActionType =
 	| 'ENQ_VILLAGER_ROW_CLEAR'
 	| 'ENQ_VILLAGER_ROW_FILL'
 	| 'ENQ_END_TURN'
-	
 	| 'PLAYER_DRAW_CARD'
 	| 'PLAYER_DISCARD_SINGLE_CARD'
 	| 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'
@@ -107,31 +106,23 @@ function expandSubAction(
 				]
 			}
 			const cardToDraw = state.pDeck[0]
-			return [
-				{type: 'PLAYER_DRAW_CARD', cardId: cardToDraw}
-			]
+			return [{type: 'PLAYER_DRAW_CARD', cardId: cardToDraw}]
 		}
 		case 'ENQ_VILLAGER_DRAW_SINGLE_CARD': {
-			console.log(`${state.vDeck.length}:${state.vDiscard.length}`)
 			if (state.vDeck.length === 0) {
 				if (state.vDiscard.length === 0) return [] // nothing to draw
 				// Deck empty — shuffle discard in, then retry the draw
 				return [
 					{type: 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK'},
 					{type: 'VILLAGER_SHUFFLE_DECK'},
-					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
+					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 				]
 			}
 			const cardToDraw = state.vDeck[0]
-			return [
-				{type: 'VILLAGER_ROW_DRAW_CARD', cardId: cardToDraw}
-			]
+			return [{type: 'VILLAGER_ROW_DRAW_CARD', cardId: cardToDraw}]
 		}
 		case 'ENQ_VILLAGER_ROW_CLEAR': {
-			return [
-				{type: 'VILLAGER_ROW_CLEAR'},
-				{type: 'ENQ_VILLAGER_ROW_FILL'},
-			]
+			return [{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}]
 		}
 		case 'ENQ_VILLAGER_ROW_FILL': {
 			if (state.vRow.length < 4) {
@@ -156,16 +147,15 @@ export function useSubActionQueue(
 	dispatch: Dispatch<GameAction>,
 	deckRef: RefObject<HTMLDivElement | null>,
 	discardRef: RefObject<HTMLDivElement | null>,
-	villagerDeckRef: RefObject<HTMLDivElement | null>,
+	villagerDeckRef: RefObject<HTMLDivElement | null>
 ) {
 	const [queue, setQueue] = useState<SubAction[]>([])
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(
 		null
 	)
-	const [animatingClearVillagerRow, setAnimatingClearVillagerRow] = useState<AnimatingVillagerRowSpec | null>(
-		null
-	)
+	const [animatingClearVillagerRow, setAnimatingClearVillagerRow] =
+		useState<AnimatingVillagerRowSpec | null>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -196,9 +186,6 @@ export function useSubActionQueue(
 		const head = queue[0]
 		if (head === undefined) return
 		const currentState = stateRef.current
-
-		// Expanders: replace head with expanded actions; effect re-runs immediately
-		console.log(`SUB_ACTION -- ${JSON.stringify(head)}`)
 		const expanded = expandSubAction(head, currentState)
 		if (expanded !== null) {
 			setQueue(q => [...expanded, ...q.slice(1)])
@@ -218,10 +205,13 @@ export function useSubActionQueue(
 					return
 				}
 				// Dispatch immediately — card appears in hand, then animates FROM deck
-				dispatch({type: 'MULTI_ACTION', actions: [
-					{type: 'STACK_REMOVE_CARDS', stack: 'DECK', cardIds: [cardToDraw]},
-					{type: 'STACK_ADD_CARDS', stack: 'HAND', cardIds: [cardToDraw]}
-				]})
+				dispatch({
+					type: 'MULTI_ACTION',
+					actions: [
+						{type: 'STACK_REMOVE_CARDS', stack: 'DECK', cardIds: [cardToDraw]},
+						{type: 'STACK_ADD_CARDS', stack: 'HAND', cardIds: [cardToDraw]}
+					]
+				})
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'PLAYER',
@@ -267,21 +257,34 @@ export function useSubActionQueue(
 				break
 			}
 
-			case 'VILLAGER_ROW_DRAW_CARD': { 
+			case 'VILLAGER_ROW_DRAW_CARD': {
 				if (head.cardId === undefined) {
 					setQueue(q => q.slice(1))
 					return
 				}
 				// Dispatch immediately — card appears in hand, then animates FROM deck
-				dispatch({type: 'MULTI_ACTION', actions: [
-					{type: 'STACK_REMOVE_CARDS', stack: 'VILLAGER_DECK', cardIds: [head.cardId]},
-					{type: 'STACK_ADD_CARDS', stack: 'VILLAGER_ROW', cardIds: [head.cardId]}
-				]})
+				dispatch({
+					type: 'MULTI_ACTION',
+					actions: [
+						{
+							type: 'STACK_REMOVE_CARDS',
+							stack: 'VILLAGER_DECK',
+							cardIds: [head.cardId]
+						},
+						{
+							type: 'STACK_ADD_CARDS',
+							stack: 'VILLAGER_ROW',
+							cardIds: [head.cardId]
+						}
+					]
+				})
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'VILLAGER',
 					cardId: head.cardId,
-					moveFrom: villagerDeckPos ? {x: villagerDeckPos.left, y: villagerDeckPos.top} : undefined
+					moveFrom: villagerDeckPos
+						? {x: villagerDeckPos.left, y: villagerDeckPos.top}
+						: undefined
 				})
 				break
 			}
@@ -310,7 +313,7 @@ export function useSubActionQueue(
 						? {x: villagerDeckPos.left, y: villagerDeckPos.top}
 						: undefined
 				})
-				break;
+				break
 			}
 
 			case 'PLAYER_SHUFFLE_DISCARD_INTO_DECK': {
@@ -337,7 +340,11 @@ export function useSubActionQueue(
 				const shuffled = [...currentState.vDiscard].sort(
 					() => Math.random() - 0.5
 				)
-				dispatch({type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DECK', cardIds: shuffled})
+				dispatch({
+					type: 'STACK_ADD_CARDS',
+					stack: 'VILLAGER_DECK',
+					cardIds: shuffled
+				})
 				dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_DISCARD'})
 				setQueue(q => q.slice(1))
 				break
@@ -348,8 +355,20 @@ export function useSubActionQueue(
 				setQueue(q => q.slice(1))
 				break
 			}
+
+			default:
+				setQueue(q => q.slice(1))
+				break
 		}
-	}, [queue, isAnimating, dispatch, deckRef, discardRef])
+	}, [
+		queue,
+		isAnimating,
+		dispatch,
+		deckRef,
+		discardRef,
+		state.vRow,
+		villagerDeckRef.current?.getBoundingClientRect
+	])
 
 	const enqueue = useCallback((actions: SubAction[]) => {
 		setQueue(q => [...q, ...actions])

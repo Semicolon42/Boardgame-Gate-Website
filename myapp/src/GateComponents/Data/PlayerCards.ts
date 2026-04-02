@@ -4,7 +4,7 @@ export function GetRange(type: CitizenCardType) {
 	return CITIZEN_CARD_LIST.filter(c => c.type === type).map(c => c.id)
 }
 
-export interface iCitizenCard {
+export interface IntCitizenCard {
 	id: number
 	name: string
 	image: string
@@ -19,7 +19,7 @@ export interface iCitizenCard {
 	actionBonusText?: string
 }
 
-export const CITIZEN_CARD_LIST: iCitizenCard[] = [
+export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 	{
 		id: 0,
 		name: 'Generic',
@@ -338,11 +338,12 @@ export const CITIZEN_CARD_LIST: iCitizenCard[] = [
 	}
 ]
 
-export function GET_CITIZEN_CARD(id: number): iCitizenCard {
-	const cardNotFound: iCitizenCard = {
+export function getCitizenCard(id: number): IntCitizenCard {
+	const cardNotFound: IntCitizenCard = {
 		id,
 		name: 'Not Found',
 		image: 'not_found',
+		type: 'DEBUG',
 
 		cost: 3,
 		actionCoins: 1,

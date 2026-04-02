@@ -1,11 +1,10 @@
 import {WaButton} from '@awesome.me/webawesome/dist/react'
-import {ActionColumn} from '../ActionColumn'
+import type {CardPlayHandler, CardPlayType} from '../Cards/XCard'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {useGameActions} from './useGameActions'
-import type { CardPlayHandler, CardPlayType } from '../Cards/XCard'
 
 export function GameBoard() {
 	const {
@@ -24,12 +23,12 @@ export function GameBoard() {
 	} = useGameActions()
 
 	const onPlayCard: CardPlayHandler = (
-		cardId: number,
-		type: CardPlayType,
-		amount: number,
-		actionBonusId?: string
+		_cardId: number,
+		_type: CardPlayType,
+		_amount: number,
+		_actionBonusId?: string
 	) => {
-		alert(`${type} ${amount} : ${actionBonusId}`)
+		console.log(`CARD PLAYER ${_cardId} ${_type} ${_amount} ${_actionBonusId}`)
 	}
 
 	return (
@@ -37,8 +36,8 @@ export function GameBoard() {
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
-					
-					<WaButton className='text-xs'
+					<WaButton
+						className='text-xs'
 						disabled={isProcessing}
 						onClick={() => {
 							gameVillagerRowClear()
@@ -51,7 +50,7 @@ export function GameBoard() {
 						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
 						ref={villageDeckRef}
 					>
-						Village: 
+						Village:
 						{gameState?.vDeck?.length ?? 'XXX'}
 					</div>
 					<div
@@ -82,17 +81,13 @@ export function GameBoard() {
 				{/* Middle column: all game rows */}
 				<div className='flex-1'>
 					{/* First Row Enemies / Hero deck */}
-					<EnemyRow
-						enemyState={{}}
-						heroCardsRemaining={gameState?.hDeck?.length ?? 'XXX'}
-						updateEnemyState={{}}
-					/>
+					<EnemyRow heroCardsRemaining={gameState?.hDeck?.length ?? 'XXX'} />
 					{/* Second Row Village cards to buy */}
-					<VillageRow 
+					<VillageRow
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
 						onAnimationEnd={signalAnimationComplete}
-						villageCards={gameState.vRow} 
+						villageCards={gameState.vRow}
 					/>
 					{/* Third Base and Health */}
 					<PlayerBaseRow />
@@ -119,10 +114,8 @@ export function GameBoard() {
 						Clear Log
 					</WaButton>
 					{/* <ActionColumn actionLog={gameState.actionLogs} /> */}
-					{queue.map((it)=>{
-						return (<div>
-							{JSON.stringify(it)}
-						</div>)
+					{queue.map(it => {
+						return <div key={crypto.randomUUID()}>{JSON.stringify(it)}</div>
 					})}
 				</div>
 			</div>
