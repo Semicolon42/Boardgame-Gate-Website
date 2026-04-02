@@ -1,3 +1,6 @@
+# Link to Board Game Website Deployed
+- https://d2vck93dqj5a30.cloudfront.net/
+
 # Vitamin 2.0
 
 ![Test workflow](https://github.com/wtchnm/Vitamin/actions/workflows/test.yml/badge.svg) [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wtchnm/Vitamin/blob/main/LICENSE)
@@ -53,16 +56,10 @@ pnpm add?
 - `docker build . -t "gate_game_website:v1.0"` - builds the docker image for the project
 - `docker run -d -p 127.0.0.1:3000:3000 gate_game_website` - Run the image locally on the given port
 
-// get all s3 buckets
-aws s3 ls
-// push the latest up to the bucket
-aws s3 sync myapp/dist s3://<BUCKET_NAME> --delete
-
-// Get the cloudfront id
-aws cloudfront list-distributions --query "DistributionList.Items[*].{Id:Id,DomainName:DomainName}" --output table
-// invalidate the cloudfront cache for all path for the given cloudfront
-aws cloudfront create-invalidation --distribution-id <CLOUDFRONT_ID> --paths "/*"
-
-
-## AWS
-- `https://443427140374.signin.aws.amazon.com/console` aws user login link
+## Deploying to aws via command line
+- `aws login`
+- `aws s3 ls` - get all s3 buckets
+- `aws s3 sync myapp/dist s3://<BUCKET_NAME> --delete` push the latest up to the bucket
+- 
+`aws cloudfront list-distributions --query "DistributionList.Items[*].{Id:Id,DomainName:DomainName}" --output table` Get the cloudfront id
+- `aws cloudfront create-invalidation --distribution-id <CLOUDFRONT_ID> --paths "/*"` invalidate the cloudfront cache for all path for the given cloudfront
