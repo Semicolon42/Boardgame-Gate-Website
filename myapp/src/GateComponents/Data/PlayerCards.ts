@@ -82,7 +82,7 @@ export const CITIZEN_CARD_LIST: iCitizenCard[] = [
 		actionCalm: 0,
 		actionFight: 0,
 		actionBonusId: 'tax_collector',
-		actionBonusText: 'You may trash this card if it is in the discard'
+		actionBonusText: 'May trash this card from discard'
 	},
 	{
 		id: 11,

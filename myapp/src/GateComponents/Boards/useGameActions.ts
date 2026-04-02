@@ -21,15 +21,15 @@ export function useGameActions() {
 	const discardRef = useRef<HTMLDivElement>(null)
 	const villageDeckRef = useRef<HTMLDivElement>(null)
 
-	const {enqueue, signalAnimationComplete, isProcessing, animatingCard, animatingClearVillagerRow} =
+	const {enqueue, queue, signalAnimationComplete, isProcessing, animatingCard, animatingClearVillagerRow} =
 		useSubActionQueue(state, dispatch, deckRef, discardRef, villageDeckRef)
 
 	const gameDrawCards = (n: number): void => {
-		enqueue([{type: 'PLAYER_DRAW_N', count: n}])
+		enqueue([{type: 'ENQ_PLAYER_DRAW_N', count: n}])
 	}
 
 	const gameEndTurn = (): void => {
-		enqueue([{type: 'END_TURN'}])
+		enqueue([{type: 'ENQ_END_TURN'}])
 	}
 
 	const clearActionLogs = (): void => {
@@ -37,7 +37,7 @@ export function useGameActions() {
 	}
 
 	const gameVillagerRowClear = (): void => {
-		enqueue([{type: 'VILLAGER_ROW_CLEAR'}])
+		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR'}])
 	}
 
 	/** TODO: implement buy card logic */
@@ -108,7 +108,7 @@ export function useGameActions() {
 		signalAnimationComplete,
 		gameDrawCards,
 		gameEndTurn,
-		gameVillagerRowClear: gameVillagerRowClear,
+		gameVillagerRowClear,
 		buyCard,
 		playCard,
 		playerAttackEnemy,
@@ -120,6 +120,8 @@ export function useGameActions() {
 		drawNewEnemy,
 		enemyDies,
 		addHeroCardToDiscard,
-		clearActionLogs
+		clearActionLogs,
+
+		queue
 	}
 }
