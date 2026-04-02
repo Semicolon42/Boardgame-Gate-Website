@@ -1,7 +1,7 @@
-function PlayerBaseCard(props: {name: string; image: any; health: number}) {
+function PlayerBaseCard(props: {name: string; image: string; health: number}) {
 	const {name, image, health} = props
 	return (
-		<div class='block h-[150px] w-[100px] bg-black text-white'>
+		<div className='block h-[150px] w-[100px] bg-black text-white'>
 			<div>{name}</div>
 			<div>{image}</div>
 			<div>{health}</div>
@@ -12,7 +12,7 @@ function PlayerBaseCard(props: {name: string; image: any; health: number}) {
 function Fearamid(props: {fear: number}) {
 	const {fear} = props
 	return (
-		<div class='block h-[150px] w-[100px] bg-black text-white'>
+		<div className='block h-[150px] w-[100px] bg-black text-white'>
 			<div>Fearamid</div>
 			<div>{`Fear: ${fear}`}</div>
 		</div>

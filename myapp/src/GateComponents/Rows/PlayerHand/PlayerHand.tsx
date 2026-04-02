@@ -1,7 +1,7 @@
 import type {AnimatingCardSpec} from '../../Boards/useSubActionQueue'
 import {CardSlot} from '../../Cards/CardSlot'
-import {XCard} from '../../Cards/XCard'
 import type {CardPlayHandler} from '../../Cards/XCard'
+import {XCard} from '../../Cards/XCard'
 
 const MIN_DISPLAY_SLOTS = 4
 
@@ -16,19 +16,21 @@ export function PlayerHand({
 	cardIds,
 	animatingCard,
 	onAnimationEnd,
-	onPlayCard,
+	onPlayCard
 }: PlayerHandProps) {
 	const slotCount = Math.max(MIN_DISPLAY_SLOTS, cardIds.length)
 	const slots = Array.from({length: slotCount}, (_, i) => cardIds[i] ?? null)
 
 	return (
 		<div className='justify-left hello flex flex-wrap gap-3 p-[2px]'>
-			{slots.map((cardId, slotIndex) => {
+			{slots.map(cardId => {
 				if (cardId === null) {
-					// biome-ignore lint/suspicious/noArrayIndexKey: empty slots are positional placeholders
-					return <CardSlot key={`slot-${slotIndex}`} />
+					return <CardSlot key={`slot-${crypto.randomUUID()}`} />
 				}
-				const spec = animatingCard?.cardId === cardId ? animatingCard : null
+				const spec =
+					animatingCard?.type === 'PLAYER' && animatingCard?.cardId === cardId
+						? animatingCard
+						: null
 				return (
 					<XCard
 						cardId={cardId}

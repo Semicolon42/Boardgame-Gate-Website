@@ -16,15 +16,30 @@ export interface GameState {
 	pHand: number[]
 	pDiscard: number[]
 	hDeck: number[]
+
 	vDeck: number[]
-	vBuyRow: number[]
+	vRow: number[]
+	vDiscard: number[]
+
+	cCoins: number
+	cCalm: number
+	cRepair: number
+	cBonusRepair: {type: BuildingType; amount: number}[]
+	cAttack: number
+
 	actionLogs: GameAction[]
 	bGateHealth: number
 	bFarmHealth: number
 	bTowerHealth: number
 }
 
-export type StackType = 'HAND' | 'DECK' | 'DISCARD' | 'V_DECK' | 'V_BUY_ROW'
+export type StackType =
+	| 'HAND'
+	| 'DECK'
+	| 'DISCARD'
+	| 'VILLAGER_DECK'
+	| 'VILLAGER_ROW'
+	| 'VILLAGER_DISCARD'
 export type BuildingType = 'FARM' | 'GATE' | 'TOWER'
 
 export type GameAction =
@@ -44,7 +59,13 @@ export type GameAction =
 // Reducer helpers
 // ---------------------------------------------------------------------------
 
-export type StackKey = 'pHand' | 'pDeck' | 'pDiscard' | 'vDeck' | 'vBuyRow'
+export type StackKey =
+	| 'pHand'
+	| 'pDeck'
+	| 'pDiscard'
+	| 'vDeck'
+	| 'vRow'
+	| 'vDiscard'
 
 export function stackKey(stack: StackType): StackKey {
 	switch (stack) {
@@ -54,10 +75,16 @@ export function stackKey(stack: StackType): StackKey {
 			return 'pDeck'
 		case 'DISCARD':
 			return 'pDiscard'
-		case 'V_DECK':
+		case 'VILLAGER_DECK':
 			return 'vDeck'
-		case 'V_BUY_ROW':
-			return 'vBuyRow'
+		case 'VILLAGER_ROW':
+			return 'vRow'
+		case 'VILLAGER_DISCARD':
+			return 'vDiscard'
+		default: {
+			const _exhaustive: never = stack
+			throw new Error(`Unknown stack: ${_exhaustive}`)
+		}
 	}
 }
 
@@ -92,7 +119,7 @@ export function gameStateReducer(
 			const toRemove = new Set(action.cardIds)
 			return {
 				...state,
-				[key]: state[key].filter(cid => !toRemove.has(cid)),
+				[key]: state[key].filter((cid: number) => !toRemove.has(cid)),
 				actionLogs: newActionLog
 			}
 		}
@@ -147,6 +174,12 @@ export function gameStateReducer(
 				actionLogs: newActionLog
 			}
 		}
+
+		default:
+			return {
+				...state,
+				actionLogs: newActionLog
+			}
 	}
 }
 
@@ -162,10 +195,20 @@ export const initialState: GameState = {
 	pDiscard: [],
 	hDeck: GetRange('HERO').sort(() => 0.5 - Math.random()),
 	vDeck: GetRange('VILLAGER').sort(() => 0.5 - Math.random()),
-	vBuyRow: GetRange('VILLAGER').sort(() => 0.5 - Math.random()).slice(-4),
-	actionLogs: [],
+	vRow: GetRange('VILLAGER')
+		.sort(() => 0.5 - Math.random())
+		.slice(-4),
+	vDiscard: [],
 
 	bFarmHealth: 6,
 	bTowerHealth: 6,
-	bGateHealth: 12
+	bGateHealth: 12,
+
+	cCoins: 0,
+	cRepair: 0,
+	cBonusRepair: [],
+	cCalm: 0,
+	cAttack: 0,
+
+	actionLogs: []
 }

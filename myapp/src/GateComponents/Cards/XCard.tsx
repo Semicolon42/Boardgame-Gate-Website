@@ -1,7 +1,61 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {RefObject} from 'react'
 import {useLayoutEffect, useRef} from 'react'
-import {GET_CITIZEN_CARD} from '../Data/PlayerCards'
+import {getCitizenCard} from '../Data/PlayerCards'
+
+/** Scales font down until the name fits on one line within its flex container. */
+function ScaledName({text}: {text: string}) {
+	const outerRef = useRef<HTMLDivElement>(null)
+	const innerRef = useRef<HTMLSpanElement>(null)
+
+	useLayoutEffect(() => {
+		const outer = outerRef.current
+		const inner = innerRef.current
+		if (!(outer && inner)) return
+		inner.style.fontSize = '14px'
+		while (
+			inner.scrollWidth > outer.clientWidth &&
+			Number.parseFloat(inner.style.fontSize) > 6
+		) {
+			inner.style.fontSize = `${Number.parseFloat(inner.style.fontSize) - 0.5}px`
+		}
+	}, [])
+
+	return (
+		<div className='min-w-0 flex-1 overflow-hidden' ref={outerRef}>
+			<span className='whitespace-nowrap' ref={innerRef}>
+				{text}
+			</span>
+		</div>
+	)
+}
+
+/** Renders text inside a fixed 50×50 box, scaling font down until it fits. */
+function FitText({text}: {text: string}) {
+	const outerRef = useRef<HTMLDivElement>(null)
+	const innerRef = useRef<HTMLDivElement>(null)
+
+	useLayoutEffect(() => {
+		const outer = outerRef.current
+		const inner = innerRef.current
+		if (!(outer && inner)) return
+		inner.style.fontSize = '12px'
+		while (
+			inner.scrollHeight > outer.clientHeight &&
+			Number.parseFloat(inner.style.fontSize) > 6
+		) {
+			inner.style.fontSize = `${Number.parseFloat(inner.style.fontSize) - 0.5}px`
+		}
+	}, [])
+
+	return (
+		<div className='h-[50px] w-[50px] overflow-hidden' ref={outerRef}>
+			<div className='w-full whitespace-normal break-words' ref={innerRef}>
+				{text}
+			</div>
+		</div>
+	)
+}
 
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
@@ -21,11 +75,11 @@ interface XcardProps {
 	// Enter animation: card is already at its destination in the DOM.
 	// Animates FROM this position TO the card's self-measured DOM position.
 	// Used for draw (deck → hand).
-	moveFrom?: {x: number; y: number}
+	moveFrom?: {x: number; y: number} | undefined
 	// Exit animation: card is at its current DOM position.
 	// Animates FROM the card's self-measured DOM position TO this position.
 	// Used for discard (hand → discard pile).
-	moveTo?: {x: number; y: number}
+	moveTo?: {x: number; y: number} | undefined
 	// Hand mode: individual action buttons are clickable.
 	onPlayCard?: CardPlayHandler | undefined
 	// Village mode: the whole card is one button to buy it.
@@ -41,7 +95,7 @@ export function XCard({
 	onPlayCard,
 	onBuyCard
 }: XcardProps) {
-	const info = GET_CITIZEN_CARD(cardId)
+	const info = getCitizenCard(cardId)
 
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -87,9 +141,11 @@ export function XCard({
 
 	const cardInner = (
 		<div className='w-full'>
-			<div className='flex justify-between px-[5px]'>
-				<div>{info.name}</div>
-				<div className='@cardCost'>{info.cost}</div>
+			<div className='flex items-center gap-[4px] px-[5px]'>
+				<ScaledName text={info.name} />
+				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'>
+					{info.cost}
+				</div>
 			</div>
 			<div className='flex'>
 				<div className='block w-[40px]'>
@@ -166,13 +222,14 @@ export function XCard({
 						{info.actionFight}
 					</div>
 				</div>
-				<div className='block'>
+				<div className='block min-w-0'>
 					<div className='h-[50px] w-[50px] border-1' />
-					{info.actionBonusText && (
-						<div className='@cardBonus h-[50px] w-[50px] break-words text-xs'>
+					{info.actionBonusText && <FitText text={info.actionBonusText} />}
+					{/* {info.actionBonusText && (
+						<div className='w-[50px] break-words'>
 							{info.actionBonusText}
 						</div>
-					)}
+					)} */}
 				</div>
 			</div>
 		</div>

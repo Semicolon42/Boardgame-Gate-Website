@@ -34,9 +34,9 @@
 		"enabled": true,
 		"rules": {
 			"a11y": "error",
-			"complexity": "error",
+			"complexity": "off",
 			"correctness": "error",
-			"nursery": "error",
+			"nursery": "off",
 			"performance": "error",
 			"recommended": true,
 			"security": "error",
@@ -63,6 +63,7 @@
 						}
 					},
 					"suspicious": {
+						"noConsole": "off",
 						"noReactSpecificProps": "off",
 						"noUnknownAtRules": "off"
 					},

@@ -23,8 +23,9 @@ function convertActionCards(action: GameAction): ReactElement[] {
 		case 'BUILDING_CHANGE_HEALTH':
 		case 'ACTION_LOGS_CLEAR':
 			return [ActionCard(JSON.stringify(action))]
+		default:
+			return [ActionCard(`UNHANDLED LOG -- ${JSON.stringify(action)}`)]
 	}
-	return [ActionCard(`UNHANDLED LOG -- ${JSON.stringify(action)}`)]
 }
 
 export interface ActionColumnProps {

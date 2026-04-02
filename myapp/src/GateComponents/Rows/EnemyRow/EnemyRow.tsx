@@ -1,5 +1,4 @@
-function EnemyCard(props: {enemyState: any}) {
-	const {enemyState} = props
+function EnemyCard() {
 	return (
 		<div className='h-[140px] w-[100px] rounded-xl bg-blue-300'>Enemy Card</div>
 	)
@@ -15,18 +14,14 @@ export function HeroDeck(props: {cardsRemaining: number}) {
 	)
 }
 
-export function EnemyRow(props: {
-	enemyState: any
-	updateEnemyState: any
-	heroCardsRemaining: number
-}) {
-	const {enemyState, updateEnemyState, heroCardsRemaining} = props
+export function EnemyRow(props: {heroCardsRemaining: number}) {
+	const {heroCardsRemaining} = props
 	return (
 		<div className='flex space-x-3 p-[2px]'>
 			{/* First Enemy Card */}
-			{<EnemyCard enemyState={{}} />}
+			{<EnemyCard />}
 			{/* Second Enemy Card */}
-			{<EnemyCard enemyState={{}} />}
+			{<EnemyCard />}
 			{/* Enemy Deck */}
 			<div className='h-[140px] w-[100px] rounded-xl bg-blue-300'>
 				Enemy DECK
