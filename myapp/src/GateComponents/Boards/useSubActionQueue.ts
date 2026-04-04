@@ -85,9 +85,9 @@ function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
 						coins: action.cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
 						attack: action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
 						repair: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
-						bonusRepairFarm: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
-						bonusRepairGate: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
-						bonusRepairTower: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairFarm: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusFarm ?? 0 : 0,
+						bonusRepairGate: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusGate ?? 0 : 0,
+						bonusRepairTower: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusTower ?? 0 : 0,
 						calm: action.cardPlayType === 'CALM' ? cardInfo.actionCalm : 0,
 					},
 					{

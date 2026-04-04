@@ -94,15 +94,36 @@ export function GameBoard() {
 					{/* Third Base and Health */}
 					<div className={statusBarClass}>
 						<ValueBadge
-							type='REPAIR'
-							value={`${gameState.cRepair}`}
-							variant={gameState.cRepair > 0 ? 'success' : 'neutral'}
-						/>
-						<ValueBadge
 							type='CALM'
 							value={`${gameState.cCalm}`}
 							variant={gameState.cCalm > 0 ? 'success' : 'neutral'}
 						/>
+						<ValueBadge
+							type='REPAIR'
+							value={`${gameState.cRepair}`}
+							variant={gameState.cRepair > 0 ? 'success' : 'neutral'}
+						/>
+						{gameState.cRepair > 0 && gameState.cBonusRepairFarm > 0 && (
+							<ValueBadge
+								type='REPAIR'
+								value={`${gameState.cBonusRepairFarm} F`}
+								variant={gameState.cRepair > 0 ? 'success' : 'neutral'}
+							/>
+						)}
+						{gameState.cRepair > 0 && gameState.cBonusRepairGate > 0 && (
+							<ValueBadge
+								type='REPAIR'
+								value={`${gameState.cBonusRepairGate} G`}
+								variant={gameState.cRepair > 0 ? 'success' : 'neutral'}
+							/>
+						)}
+						{gameState.cRepair > 0 && gameState.cBonusRepairTower > 0 && (
+							<ValueBadge
+								type='REPAIR'
+								value={`${gameState.cBonusRepairTower} T`}
+								variant={gameState.cRepair > 0 ? 'success' : 'neutral'}
+							/>
+						)}
 					</div>
 					<PlayerBaseRow />
 					{/* Fourth Row Player Hand */}

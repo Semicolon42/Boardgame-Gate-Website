@@ -189,9 +189,9 @@ export function gameStateReducer(
 				cRepair: state.cRepair + (action.repair ?? 0),
 				
 				cCalm: state.cCalm + (action.calm ?? 0),
-				cBonusRepairFarm: state.cCalm + (action.bonusRepairFarm ?? 0),
-				cBonusRepairGate: state.cCalm + (action.bonusRepairGate ?? 0),
-				cBonusRepairTower: state.cCalm + (action.bonusRepairTower ?? 0),
+				cBonusRepairFarm: state.cBonusRepairFarm + (action.bonusRepairFarm ?? 0),
+				cBonusRepairGate: state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
+				cBonusRepairTower: state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
 				actionLogs: newActionLog
 			}
 			return newState
