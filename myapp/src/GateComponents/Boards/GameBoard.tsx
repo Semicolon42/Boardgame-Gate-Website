@@ -87,11 +87,11 @@ export function GameBoard() {
 						/>
 					</div>
 					<VillageRow
-						currentCoins={gameState.cCoins}
-						onBuyCard={gameBuyCard}
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
+						currentCoins={gameState.cCoins}
 						onAnimationEnd={signalAnimationComplete}
+						onBuyCard={gameBuyCard}
 						villageCards={gameState.vRow}
 					/>
 					{/* Third Base and Health */}
@@ -161,7 +161,7 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 1}
 							onClick={() => {
-								gameVillagerRowClear()
+								gameVillagerRowClear(1)
 							}}
 							type='button'
 						>

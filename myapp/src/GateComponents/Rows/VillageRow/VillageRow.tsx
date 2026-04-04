@@ -4,7 +4,7 @@ import type {
 } from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
 import {XCard} from '@/GateComponents/Cards/XCard'
-import { getCitizenCard } from '@/GateComponents/Data/PlayerCards'
+import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 
 interface VillageRowProps {
 	currentCoins: number
@@ -12,7 +12,7 @@ interface VillageRowProps {
 	onAnimationEnd?: () => void
 	animatingClearVillagerRow?: AnimatingVillagerRowSpec | null
 	animatingCard?: AnimatingCardSpec | null
-	onBuyCard?: (cardId: number) => void
+	onBuyCard?: (cardId: number, cost: number) => void
 }
 
 export function VillageRow({
@@ -50,23 +50,21 @@ export function VillageRow({
 				// to avoid signalling completion once per card (which drops draw actions).
 				const isSignalCard = !rowAnimSpec?.moveTo || slotIndex === 0
 				return (
-					<div>
-						<XCard
-							cardId={cardId}
-							key={`villager-${cardId}`}
-							onBuyCard={() => {
-								if (buyable) {
-									onBuyCard?.(cardId)
-								}
-							}}
-							disabled={!buyable}
-							{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
-							{...(moveToAnim ? {moveTo: moveToAnim} : {})}
-							{...(isSignalCard && onAnimationEnd !== undefined
-								? {onAnimationEnd}
-								: {})}
-						/>
-					</div>
+					<XCard
+						cardId={cardId}
+						disabled={!buyable}
+						key={`villager-${cardId}`}
+						onBuyCard={() => {
+							if (buyable) {
+								onBuyCard?.(cardId, cardInfo.cost)
+							}
+						}}
+						{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
+						{...(moveToAnim ? {moveTo: moveToAnim} : {})}
+						{...(isSignalCard && onAnimationEnd !== undefined
+							? {onAnimationEnd}
+							: {})}
+					/>
 				)
 			})}
 		</div>

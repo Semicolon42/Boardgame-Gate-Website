@@ -30,7 +30,6 @@ export type SubActionType =
 	| 'ENQ_VILLAGER_ROW_FILL'
 	| 'ENQ_VILLAGER_ROW_BUY_CARD'
 	| 'ENQ_END_TURN'
-
 	| 'PLAYER_DRAW_CARD'
 	| 'PLAYER_DISCARD_SINGLE_CARD'
 	| 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'
@@ -54,6 +53,8 @@ export interface SubAction {
 	cardPlayType?: CardPlayType | undefined
 	/** used for resource changes */
 	gameStateAction?: GameAction | undefined
+	/** for things when they have option cost */
+	cost?: number | undefined
 }
 
 /** Animation spec passed down to the component tree. */
@@ -195,20 +196,31 @@ function expandSubAction(
 			return [{type: 'VILLAGER_ROW_DRAW_CARD', cardId: cardToDraw}]
 		}
 		case 'ENQ_VILLAGER_ROW_BUY_CARD': {
+			const cost = action.cost ?? 0
 			return [
+				{type: 'EXECUTE_GAMTE_STATE_UPDATE', 
+					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
+				},
 				{type: 'VILLAGER_ROW_BUY_CARD', cardId: action.cardId},
-				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
+				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
 			]
 		}
 
 		case 'ENQ_VILLAGER_ROW_CLEAR': {
-			return [{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}]
+			const cost = action.cost ?? 0
+			return [
+				{type: 'EXECUTE_GAMTE_STATE_UPDATE', 
+					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
+				},
+				{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}
+			]
 		}
 		case 'ENQ_VILLAGER_ROW_FILL': {
+			
 			if (state.vRow.length < 4) {
 				return [
 					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
-					{type: 'ENQ_VILLAGER_ROW_FILL'}
+					{type: 'ENQ_VILLAGER_ROW_FILL'},
 				]
 			}
 			return [] // atomic
@@ -229,7 +241,7 @@ export function useSubActionQueue(
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>
 ) {
-	const [queue, setQueue] = useState<SubAction[]>([])
+	const [queue, setQueue] = useState<SubAction[]>([{type:'ENQ_PLAYER_DRAW_N', count: 3}])
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(
 		null
@@ -406,7 +418,7 @@ export function useSubActionQueue(
 						? {x: discardPos.left, y: discardPos.top}
 						: undefined
 				})
-				break;
+				break
 			}
 
 			case 'VILLAGER_ROW_CLEAR': {
@@ -423,6 +435,10 @@ export function useSubActionQueue(
 								type: 'STACK_ADD_CARDS',
 								stack: 'VILLAGER_DISCARD',
 								cardIds: cardIds ?? state.vRow
+							},
+							{
+								type: 'UPADTE_RESOURCES',
+								coins: -(head.count ?? 0)
 							}
 						]
 					})

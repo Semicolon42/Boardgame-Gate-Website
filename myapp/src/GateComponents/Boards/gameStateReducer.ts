@@ -62,9 +62,9 @@ export type GameAction =
 			attack?: number
 			repair?: number
 			calm?: number
-			bonusRepairFarm: number
-			bonusRepairGate: number
-			bonusRepairTower: number
+			bonusRepairFarm?: number
+			bonusRepairGate?: number
+			bonusRepairTower?: number
 	  }
 	| {
 			type: 'MARK_CARD_PLAYED'

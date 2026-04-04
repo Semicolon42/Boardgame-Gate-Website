@@ -197,8 +197,8 @@ export function XCard({
 				className={containerClass}
 				onAnimationEnd={onAnimationEnd}
 				onClick={() => {
-					onBuyCard(cardId)}
-				}
+					onBuyCard(cardId)
+				}}
 				ref={ref as RefObject<HTMLButtonElement>}
 				type='button'
 			>

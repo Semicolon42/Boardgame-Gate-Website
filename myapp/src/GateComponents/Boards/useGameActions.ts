@@ -43,12 +43,12 @@ export function useGameActions() {
 		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
-	const gameVillagerRowClear = (): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR'}])
+	const gameVillagerRowClear = (cost?: number): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR', cost: cost}])
 	}
 
-	const gameBuyCard = (_cardId: number): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', cardId: _cardId}])
+	const gameBuyCard = (_cardId: number, cost: number): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', cardId: _cardId, cost: cost}])
 	}
 
 	/** TODO: implement play card logic */
