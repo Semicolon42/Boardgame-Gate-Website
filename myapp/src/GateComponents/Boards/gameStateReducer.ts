@@ -14,6 +14,7 @@ import {GetRange} from '../Data/PlayerCards'
 export interface GameState {
 	pDeck: number[]
 	pHand: number[]
+	pPlayed: number[]
 	pDiscard: number[]
 	hDeck: number[]
 
@@ -24,7 +25,7 @@ export interface GameState {
 	cCoins: number
 	cCalm: number
 	cRepair: number
-	cBonusRepair: {type: BuildingType; amount: number}[]
+	cBonusRepair: Record<BuildingType, number>
 	cAttack: number
 
 	actionLogs: GameAction[]
@@ -52,6 +53,9 @@ export type GameAction =
 			building: BuildingType
 			healthChange: number
 	  }
+	| {type: 'UPADTE_RESOURCES'; coins?: number; attack?: number; repair?: number; calm?: number; bonusRepair?: Partial<Record<BuildingType, number>>}
+	| {type: 'MARK_CARD_PLAYED'; cardId: number}
+	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
 
@@ -164,6 +168,38 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'UPADTE_RESOURCES': {
+			const cBonusRepair: Record<BuildingType, number> = {...state.cBonusRepair};
+			// TODO bonus repair
+			
+			const newState = {
+				...state,
+				cCoins:  state.cCoins  + (action.coins ?? 0),
+				cAttack: state.cAttack + (action.attack ?? 0),
+				cRepair: state.cRepair + (action.repair ?? 0),
+				cCalm:   state.cCalm   + (action.calm ?? 0),
+				cBonusRepair,
+				actionLogs: newActionLog
+			}
+			return newState
+		}
+
+		case 'MARK_CARD_PLAYED': {
+			return {
+				...state,
+				pPlayed: [...(state.pPlayed ?? []), action.cardId],
+				actionLogs: newActionLog
+			}
+		}
+
+		case 'CLEAR_PLAYED_CARDS': {
+			return {
+				...state,
+				pPlayed: [],
+				actionLogs: newActionLog
+			}
+		}
+
 		case 'MULTI_ACTION': {
 			let currentState = state
 			for (const a of action.actions) {
@@ -192,6 +228,7 @@ export const HAND_SIZE = 3
 export const initialState: GameState = {
 	pDeck: [1, 2, 3],
 	pHand: [],
+	pPlayed: [],
 	pDiscard: [],
 	hDeck: GetRange('HERO').sort(() => 0.5 - Math.random()),
 	vDeck: GetRange('VILLAGER').sort(() => 0.5 - Math.random()),

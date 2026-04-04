@@ -7,6 +7,7 @@ const MIN_DISPLAY_SLOTS = 4
 
 interface PlayerHandProps {
 	cardIds: number[]
+	playedCardIds?: number[]
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
 	onPlayCard?: CardPlayHandler
@@ -14,6 +15,7 @@ interface PlayerHandProps {
 
 export function PlayerHand({
 	cardIds,
+	playedCardIds,
 	animatingCard,
 	onAnimationEnd,
 	onPlayCard
@@ -34,6 +36,7 @@ export function PlayerHand({
 				return (
 					<XCard
 						cardId={cardId}
+						disabled={playedCardIds?.includes(cardId) ?? false}
 						key={`card-${cardId}`}
 						{...(spec?.moveFrom ? {moveFrom: spec.moveFrom} : {})}
 						{...(spec?.moveTo ? {moveTo: spec.moveTo} : {})}

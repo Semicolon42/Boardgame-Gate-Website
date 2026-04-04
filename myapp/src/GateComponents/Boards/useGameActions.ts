@@ -13,6 +13,7 @@ import {
 	initialState
 } from './gameStateReducer'
 import {useSubActionQueue} from './useSubActionQueue'
+import type { CardPlayHandler, CardPlayType } from '../Cards/XCard'
 
 export function useGameActions() {
 	const [state, dispatch] = useReducer(gameStateReducer, initialState)
@@ -52,8 +53,8 @@ export function useGameActions() {
 	}
 
 	/** TODO: implement play card logic */
-	const playCard = (_cardId: number): void => {
-		// TODO
+	const playCard: CardPlayHandler = (_cardId: number, cardPlayType: CardPlayType): void => {
+		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', cardId: _cardId, cardPlayType: cardPlayType}])
 	}
 
 	/** TODO: implement player attack enemy logic */
