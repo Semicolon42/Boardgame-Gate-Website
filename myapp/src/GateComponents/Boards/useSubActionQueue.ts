@@ -12,9 +12,9 @@
 
 import type {Dispatch, RefObject} from 'react'
 import {useCallback, useEffect, useRef, useState} from 'react'
+import type {CardPlayType} from '../Cards/XCard'
+import {getCitizenCard} from '../Data/PlayerCards'
 import type {GameAction, GameState} from './gameStateReducer'
-import type { CardPlayType } from '../Cards/XCard'
-import { getCitizenCard } from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,9 +37,7 @@ export type SubActionType =
 	| 'VILLAGER_SHUFFLE_DECK'
 	| 'VILLAGER_ROW_CLEAR'
 	| 'VILLAGER_ROW_DRAW_CARD'
-	| 'PLAYER_RESOURCE_CHANGE'
-	| 'PLAYER_MARK_CARD_PLAYED'
-	| 'PLAYER_CLEARD_CARD_PLAYED'
+	| 'EXECUTE_GAMTE_STATE_UPDATE'
 
 export interface SubAction {
 	type: SubActionType
@@ -52,7 +50,7 @@ export interface SubAction {
 	/** used for playing cards, how the card was played */
 	cardPlayType?: CardPlayType | undefined
 	/** used for resource changes */
-	resourceChange?: {coins?: number, attack?: number, repair?: number, calm?: number}
+	gameStateAction?: GameAction | undefined
 }
 
 /** Animation spec passed down to the component tree. */
@@ -74,31 +72,31 @@ export interface AnimatingVillagerRowSpec {
 // Pure expander
 // ---------------------------------------------------------------------------
 
-function subactionPlayCard(action: SubAction, state: GameState): SubAction[] {
-	const cardInfo = getCitizenCard(action.cardId ?? -1);
-	const resourceChange = {coins: 0, attack: 0, repair: 0, calm: 0}
-	switch(action.cardPlayType){
-		case 'COINS':
-			resourceChange.coins = cardInfo.actionCoins
-			break;
-		case 'ATTACK':
-			resourceChange.attack = cardInfo.actionAttack
-			break;
-		case 'REPAIR':
-			resourceChange.repair = cardInfo.actionRepair
-			break;
-		case 'CALM':
-			resourceChange.calm = cardInfo.actionCalm
-			break;
-	}
+function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
+	const cardInfo = getCitizenCard(action.cardId ?? -1)
 	return [
 		{
-			type: 'PLAYER_RESOURCE_CHANGE', 
-			resourceChange: resourceChange
-		},
-		{
-			type: 'PLAYER_MARK_CARD_PLAYED', 
-			cardId: action.cardId
+			type: 'EXECUTE_GAMTE_STATE_UPDATE',
+			gameStateAction: {
+				type: 'MULTI_ACTION',
+				actions: [
+					{
+						type: 'UPADTE_RESOURCES',
+						coins: action.cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
+						attack: action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
+						repair: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairFarm: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairGate: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairTower: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						calm: action.cardPlayType === 'CALM' ? cardInfo.actionCalm : 0,
+					},
+					{
+						type: 'MARK_CARD_PLAYED',
+						cardId: action.cardId ?? -1,
+						cardPlayType: action.cardPlayType
+					}
+				]
+			}
 		}
 	]
 }
@@ -123,16 +121,26 @@ function expandSubAction(
 						cardId
 					}))
 					.reverse(),
-				{type: 'PLAYER_RESOURCE_CHANGE',
-					resourceChange: {
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {
+						type: 'UPADTE_RESOURCES',
 						coins: -state.cCoins,
 						attack: -state.cAttack,
 						repair: -state.cRepair,
-						calm: -state.cCalm
+						bonusRepairFarm: -state.cBonusRepairFarm,
+						bonusRepairGate: -state.cBonusRepairGate,
+						bonusRepairTower: -state.cBonusRepairTower,
+						calm: -state.cCalm,
 					}
 				},
-				{type: 'PLAYER_CLEARD_CARD_PLAYED'},
-				{type: 'ENQ_PLAYER_DRAW_N', count: 3},
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {
+						type: 'CLEAR_PLAYED_CARDS',
+					}
+				},
+				{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 			]
 		case 'ENQ_DISCARD_HAND':
 			return state.pHand.map<SubAction>(cardId => ({
@@ -272,34 +280,12 @@ export function useSubActionQueue(
 				break
 			}
 
-			case 'PLAYER_MARK_CARD_PLAYED': {
-				dispatch({
-					type: 'MARK_CARD_PLAYED',
-					cardId: head.cardId ?? -1
-				})
+			case 'EXECUTE_GAMTE_STATE_UPDATE': {
+				if (head.gameStateAction) {
+					dispatch(head.gameStateAction)
+				}
 				setQueue(q => q.slice(1))
-				break;
-			}
-
-			case 'PLAYER_CLEARD_CARD_PLAYED': {
-				dispatch({
-					type: 'CLEAR_PLAYED_CARDS'
-				})
-				setQueue(q => q.slice(1))
-				break;
-			}
-
-			case 'PLAYER_RESOURCE_CHANGE': {
-				dispatch({
-					type: 'UPADTE_RESOURCES',
-					coins: head.resourceChange?.coins ?? 0,
-					attack: head.resourceChange?.attack ?? 0,
-					repair: head.resourceChange?.repair ?? 0,
-					calm: head.resourceChange?.calm ?? 0,
-					// bonusRepair: undefined
-				})
-				setQueue(q => q.slice(1))
-				break;
+				break
 			}
 
 			case 'PLAYER_DISCARD_SINGLE_CARD': {

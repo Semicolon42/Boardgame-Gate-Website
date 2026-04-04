@@ -1,10 +1,9 @@
-import {WaBadge, WaButton, WaIcon} from '@awesome.me/webawesome/dist/react'
-import {useState, type ReactElement} from 'react'
-import type {CardPlayHandler, CardPlayType} from '../Cards/XCard'
+import {WaButton, WaIcon} from '@awesome.me/webawesome/dist/react'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
+import {ValueBadge} from '../UIComponents/ValueBadge'
 import {useGameActions} from './useGameActions'
 
 export function GameBoard() {
@@ -25,45 +24,10 @@ export function GameBoard() {
 	} = useGameActions()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
-	const buttonClass = 'items-center rounded-lg bg-blue-100 p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 enabled:cursor-pointer enabled:hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-40'
-	const costCircleClass='flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
-
-	function ValueBadge(props: {
-		value: string
-		type: CardPlayType
-		variant: 'brand' | 'neutral' | 'success' | 'warning' | 'danger' | 'none'
-	}): ReactElement {
-		const {value, type, variant} = props
-		let icon: ReactElement | undefined = undefined
-		switch (type) {
-			case 'ATTACK':
-				icon = <WaIcon name='arrow-trend-up' />
-				break
-			case 'COINS':
-				icon = <WaIcon name='circle' variant='regular' />
-				break
-			case 'REPAIR':
-				icon = <WaIcon name='plus' />
-				break
-			case 'CALM':
-				icon = <WaIcon name='eye' variant='regular' />
-				break
-			default:
-				icon = <WaIcon name='circle-question' variant='regular' />
-		}
-
-		return (
-			<WaBadge
-				appearance={variant === 'none' ? 'outlined' : 'filled'}
-				className='text-base pl-2 pr-2'
-				pill={true}
-				variant={variant !== 'none' ? variant : 'neutral'}
-			>
-				{value}
-				{icon}
-			</WaBadge>
-		)
-	}
+	const buttonClass =
+		'items-center rounded-lg bg-blue-100 p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 enabled:cursor-pointer enabled:hover:bg-blue-200 disabled:cursor-not-allowed disabled:opacity-40'
+	const costCircleClass =
+		'flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
 
 	return (
 		<div className='flex'>
@@ -146,6 +110,7 @@ export function GameBoard() {
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							type='button'
 						>
 							<div className='flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'>
 								2
@@ -155,40 +120,37 @@ export function GameBoard() {
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							type='button'
 						>
-							<div className={costCircleClass}>
-								2
-							</div>
+							<div className={costCircleClass}>2</div>
 							<ValueBadge type='REPAIR' value='1' variant='none' />
 						</button>
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							type='button'
 						>
-							<div className={costCircleClass}>
-								2
-							</div>
+							<div className={costCircleClass}>2</div>
 							<ValueBadge type='CALM' value='1' variant='none' />
 						</button>
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 1}
-							onClick={()=>{
+							onClick={() => {
 								gameVillagerRowClear()
 							}}
+							type='button'
 						>
-							<div className={costCircleClass}>
-								1
-							</div>
+							<div className={costCircleClass}>1</div>
 							<WaIcon name='arrow-rotate-right' />
 						</button>
 					</div>
 					<PlayerHand
 						animatingCard={animatingCard}
 						cardIds={gameState.pHand}
-						playedCardIds={gameState.pPlayed}
 						onAnimationEnd={signalAnimationComplete}
 						onPlayCard={playCard}
+						playedCardIds={gameState.pPlayed}
 					/>
 				</div>
 			</div>

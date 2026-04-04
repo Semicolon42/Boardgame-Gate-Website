@@ -17,6 +17,9 @@ export interface IntCitizenCard {
 	actionAttack: number
 	actionBonusId?: string
 	actionBonusText?: string
+	actionRepairBonusFarm?: number | undefined
+	actionRepairBonusGate?: number | undefined
+	actionRepairBonusTower?: number | undefined
 }
 
 export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
@@ -65,6 +68,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		cost: 0,
 		actionCoins: 1,
 		actionRepair: 1,
+		actionRepairBonusFarm: 1,
 		actionCalm: 0,
 		actionAttack: 0,
 		actionBonusId: 'farmer',
@@ -117,6 +121,8 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		cost: 3,
 		actionCoins: 1,
 		actionRepair: 2,
+		actionRepairBonusFarm: 1,
+		actionRepairBonusGate: 1,
 		actionCalm: 0,
 		actionAttack: 1,
 		actionBonusId: 'craftsman',
@@ -133,6 +139,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 2,
 		actionCalm: 0,
 		actionAttack: 1,
+		actionRepairBonusTower: 1,
 		actionBonusId: 'mason',
 		actionBonusText: '+1 when repairing TOWER'
 	},

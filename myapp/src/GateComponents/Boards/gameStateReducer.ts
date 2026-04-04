@@ -5,6 +5,7 @@
 // see useGameStateActions.ts for the rationale).
 // ---------------------------------------------------------------------------
 
+import type { CardPlayType } from '../Cards/XCard'
 import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
@@ -25,7 +26,9 @@ export interface GameState {
 	cCoins: number
 	cCalm: number
 	cRepair: number
-	cBonusRepair: Record<BuildingType, number>
+	cBonusRepairFarm: number
+	cBonusRepairGate: number
+	cBonusRepairTower: number
 	cAttack: number
 
 	actionLogs: GameAction[]
@@ -53,8 +56,17 @@ export type GameAction =
 			building: BuildingType
 			healthChange: number
 	  }
-	| {type: 'UPADTE_RESOURCES'; coins?: number; attack?: number; repair?: number; calm?: number; bonusRepair?: Partial<Record<BuildingType, number>>}
-	| {type: 'MARK_CARD_PLAYED'; cardId: number}
+	| {
+			type: 'UPADTE_RESOURCES'
+			coins?: number
+			attack?: number
+			repair?: number
+			calm?: number
+			bonusRepairFarm: number
+			bonusRepairGate: number
+			bonusRepairTower: number
+	  }
+	| {type: 'MARK_CARD_PLAYED'; cardId: number; cardPlayType: CardPlayType | undefined}
 	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
@@ -169,16 +181,17 @@ export function gameStateReducer(
 		}
 
 		case 'UPADTE_RESOURCES': {
-			const cBonusRepair: Record<BuildingType, number> = {...state.cBonusRepair};
 			// TODO bonus repair
-			
 			const newState = {
 				...state,
-				cCoins:  state.cCoins  + (action.coins ?? 0),
+				cCoins: state.cCoins + (action.coins ?? 0),
 				cAttack: state.cAttack + (action.attack ?? 0),
 				cRepair: state.cRepair + (action.repair ?? 0),
-				cCalm:   state.cCalm   + (action.calm ?? 0),
-				cBonusRepair,
+				
+				cCalm: state.cCalm + (action.calm ?? 0),
+				cBonusRepairFarm: state.cCalm + (action.bonusRepairFarm ?? 0),
+				cBonusRepairGate: state.cCalm + (action.bonusRepairGate ?? 0),
+				cBonusRepairTower: state.cCalm + (action.bonusRepairTower ?? 0),
 				actionLogs: newActionLog
 			}
 			return newState
@@ -243,7 +256,9 @@ export const initialState: GameState = {
 
 	cCoins: 0,
 	cRepair: 0,
-	cBonusRepair: [],
+	cBonusRepairFarm: 0,
+	cBonusRepairGate: 0,
+	cBonusRepairTower: 0,
 	cCalm: 0,
 	cAttack: 0,
 
