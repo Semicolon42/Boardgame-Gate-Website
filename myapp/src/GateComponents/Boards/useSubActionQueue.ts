@@ -198,29 +198,31 @@ function expandSubAction(
 		case 'ENQ_VILLAGER_ROW_BUY_CARD': {
 			const cost = action.cost ?? 0
 			return [
-				{type: 'EXECUTE_GAMTE_STATE_UPDATE', 
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
 					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
 				},
 				{type: 'VILLAGER_ROW_BUY_CARD', cardId: action.cardId},
-				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
+				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 			]
 		}
 
 		case 'ENQ_VILLAGER_ROW_CLEAR': {
 			const cost = action.cost ?? 0
 			return [
-				{type: 'EXECUTE_GAMTE_STATE_UPDATE', 
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
 					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
 				},
-				{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}
+				{type: 'VILLAGER_ROW_CLEAR'},
+				{type: 'ENQ_VILLAGER_ROW_FILL'}
 			]
 		}
 		case 'ENQ_VILLAGER_ROW_FILL': {
-			
 			if (state.vRow.length < 4) {
 				return [
 					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
-					{type: 'ENQ_VILLAGER_ROW_FILL'},
+					{type: 'ENQ_VILLAGER_ROW_FILL'}
 				]
 			}
 			return [] // atomic
@@ -241,7 +243,9 @@ export function useSubActionQueue(
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>
 ) {
-	const [queue, setQueue] = useState<SubAction[]>([{type:'ENQ_PLAYER_DRAW_N', count: 3}])
+	const [queue, setQueue] = useState<SubAction[]>([
+		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
+	])
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(
 		null
