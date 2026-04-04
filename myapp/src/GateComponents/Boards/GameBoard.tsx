@@ -16,6 +16,7 @@ export function GameBoard() {
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
+		gameBuyCard,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -86,6 +87,8 @@ export function GameBoard() {
 						/>
 					</div>
 					<VillageRow
+						currentCoins={gameState.cCoins}
+						onBuyCard={gameBuyCard}
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
 						onAnimationEnd={signalAnimationComplete}
