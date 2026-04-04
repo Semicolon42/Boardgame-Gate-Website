@@ -12,6 +12,8 @@
 
 import type {Dispatch, RefObject} from 'react'
 import {useCallback, useEffect, useRef, useState} from 'react'
+import type {CardPlayType} from '../Cards/XCard'
+import {getCitizenCard} from '../Data/PlayerCards'
 import type {GameAction, GameState} from './gameStateReducer'
 
 // ---------------------------------------------------------------------------
@@ -19,6 +21,7 @@ import type {GameAction, GameState} from './gameStateReducer'
 // ---------------------------------------------------------------------------
 
 export type SubActionType =
+	| 'ENQ_PLAYER_PLAY_CARD'
 	| 'ENQ_PLAYER_DRAW_SINGLE_CARD'
 	| 'ENQ_PLAYER_DRAW_N'
 	| 'ENQ_DISCARD_HAND'
@@ -34,6 +37,7 @@ export type SubActionType =
 	| 'VILLAGER_SHUFFLE_DECK'
 	| 'VILLAGER_ROW_CLEAR'
 	| 'VILLAGER_ROW_DRAW_CARD'
+	| 'EXECUTE_GAMTE_STATE_UPDATE'
 
 export interface SubAction {
 	type: SubActionType
@@ -43,6 +47,10 @@ export interface SubAction {
 	count?: number | undefined
 	/** Used for multiple card ids - VILLAGER_ROW_CLEAR mainly */
 	cardIds?: number[] | undefined
+	/** used for playing cards, how the card was played */
+	cardPlayType?: CardPlayType | undefined
+	/** used for resource changes */
+	gameStateAction?: GameAction | undefined
 }
 
 /** Animation spec passed down to the component tree. */
@@ -64,6 +72,46 @@ export interface AnimatingVillagerRowSpec {
 // Pure expander
 // ---------------------------------------------------------------------------
 
+function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
+	const cardInfo = getCitizenCard(action.cardId ?? -1)
+	return [
+		{
+			type: 'EXECUTE_GAMTE_STATE_UPDATE',
+			gameStateAction: {
+				type: 'MULTI_ACTION',
+				actions: [
+					{
+						type: 'UPADTE_RESOURCES',
+						coins: action.cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
+						attack:
+							action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
+						repair:
+							action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairFarm:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusFarm ?? 0)
+								: 0,
+						bonusRepairGate:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusGate ?? 0)
+								: 0,
+						bonusRepairTower:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusTower ?? 0)
+								: 0,
+						calm: action.cardPlayType === 'CALM' ? cardInfo.actionCalm : 0
+					},
+					{
+						type: 'MARK_CARD_PLAYED',
+						cardId: action.cardId ?? -1,
+						cardPlayType: action.cardPlayType
+					}
+				]
+			}
+		}
+	]
+}
+
 /**
  * Returns expanded sub-actions for high-level types, or null if the action
  * is already atomic and should be processed directly.
@@ -73,6 +121,9 @@ function expandSubAction(
 	state: GameState
 ): SubAction[] | null {
 	switch (action.type) {
+		case 'ENQ_PLAYER_PLAY_CARD': {
+			return subactionPlayCard(action, state)
+		}
 		case 'ENQ_END_TURN':
 			return [
 				...state.pHand
@@ -81,6 +132,25 @@ function expandSubAction(
 						cardId
 					}))
 					.reverse(),
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {
+						type: 'UPADTE_RESOURCES',
+						coins: -state.cCoins,
+						attack: -state.cAttack,
+						repair: -state.cRepair,
+						bonusRepairFarm: -state.cBonusRepairFarm,
+						bonusRepairGate: -state.cBonusRepairGate,
+						bonusRepairTower: -state.cBonusRepairTower,
+						calm: -state.cCalm
+					}
+				},
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {
+						type: 'CLEAR_PLAYED_CARDS'
+					}
+				},
 				{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 			]
 		case 'ENQ_DISCARD_HAND':
@@ -218,6 +288,14 @@ export function useSubActionQueue(
 					cardId: cardToDraw,
 					moveFrom: deckPos ? {x: deckPos.left, y: deckPos.top} : undefined
 				})
+				break
+			}
+
+			case 'EXECUTE_GAMTE_STATE_UPDATE': {
+				if (head.gameStateAction) {
+					dispatch(head.gameStateAction)
+				}
+				setQueue(q => q.slice(1))
 				break
 			}
 

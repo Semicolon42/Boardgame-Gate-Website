@@ -1,64 +1,38 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
-import type {RefObject} from 'react'
+import type {ReactElement, RefObject} from 'react'
 import {useLayoutEffect, useRef} from 'react'
 import {getCitizenCard} from '../Data/PlayerCards'
 
-/** Scales font down until the name fits on one line within its flex container. */
-function ScaledName({text}: {text: string}) {
-	const outerRef = useRef<HTMLDivElement>(null)
-	const innerRef = useRef<HTMLSpanElement>(null)
-
-	useLayoutEffect(() => {
-		const outer = outerRef.current
-		const inner = innerRef.current
-		if (!(outer && inner)) return
-		inner.style.fontSize = '14px'
-		while (
-			inner.scrollWidth > outer.clientWidth &&
-			Number.parseFloat(inner.style.fontSize) > 6
-		) {
-			inner.style.fontSize = `${Number.parseFloat(inner.style.fontSize) - 0.5}px`
-		}
-	}, [])
-
+function ActionButton({
+	cardClass,
+	value,
+	icon,
+	isHandMode,
+	onAction
+}: {
+	cardClass: string
+	value: number
+	icon: ReactElement
+	isHandMode: boolean
+	onAction: () => void
+}) {
+	const isDisabled = value === 0
 	return (
-		<div className='min-w-0 flex-1 overflow-hidden' ref={outerRef}>
-			<span className='whitespace-nowrap' ref={innerRef}>
-				{text}
-			</span>
-		</div>
-	)
-}
-
-/** Renders text inside a fixed 50×50 box, scaling font down until it fits. */
-function FitText({text}: {text: string}) {
-	const outerRef = useRef<HTMLDivElement>(null)
-	const innerRef = useRef<HTMLDivElement>(null)
-
-	useLayoutEffect(() => {
-		const outer = outerRef.current
-		const inner = innerRef.current
-		if (!(outer && inner)) return
-		inner.style.fontSize = '12px'
-		while (
-			inner.scrollHeight > outer.clientHeight &&
-			Number.parseFloat(inner.style.fontSize) > 6
-		) {
-			inner.style.fontSize = `${Number.parseFloat(inner.style.fontSize) - 0.5}px`
-		}
-	}, [])
-
-	return (
-		<div className='h-[50px] w-[50px] overflow-hidden' ref={outerRef}>
-			<div className='w-full whitespace-normal break-words' ref={innerRef}>
-				{text}
-			</div>
+		<div
+			className={`card-action-btn ${cardClass}${isDisabled ? ' opacity-40 cursor-default' : ''}`}
+			{...(isHandMode && !isDisabled
+				? {role: 'button', onClick: onAction}
+				: {})}
+		>
+			{icon}
+			{value}
 		</div>
 	)
 }
 
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
+import {FitText, ScaledName} from '../UIComponents/misc'
 
 export type CardPlayType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
 
@@ -66,7 +40,8 @@ export type CardPlayHandler = (
 	cardId: number,
 	type: CardPlayType,
 	amount: number,
-	actionBonusId?: string
+	actionBonusId?: string,
+	disabled?: boolean
 ) => void
 
 interface XcardProps {
@@ -85,6 +60,8 @@ interface XcardProps {
 	// Village mode: the whole card is one button to buy it.
 	// When provided, inner action buttons are suppressed.
 	onBuyCard?: (cardId: number) => void
+	// Card has already been played this turn.
+	disabled?: boolean
 }
 
 export function XCard({
@@ -93,7 +70,8 @@ export function XCard({
 	moveFrom,
 	moveTo,
 	onPlayCard,
-	onBuyCard
+	onBuyCard,
+	disabled = false
 }: XcardProps) {
 	const info = getCitizenCard(cardId)
 
@@ -132,8 +110,7 @@ export function XCard({
 		}
 	}, [moveFrom, moveTo])
 
-	const containerClass =
-		'flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD'
+	const containerClass = `flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD${disabled ? ' opacity-40 pointer-events-none' : ''}`
 
 	// Hand mode: action fields shown as individual clickable divs.
 	// Village mode: action fields are read-only (whole card is the button).
@@ -149,78 +126,57 @@ export function XCard({
 			</div>
 			<div className='flex'>
 				<div className='block w-[40px]'>
-					<div
-						className='card-action-btn @cardCoins'
-						{...(isHandMode
-							? {
-									role: 'button',
-									onClick: () =>
-										onPlayCard?.(
-											cardId,
-											'COINS',
-											info.actionCoins,
-											info.actionBonusId
-										)
-								}
-							: {})}
-					>
-						<WaIcon name='circle' variant='regular' />
-						{info.actionCoins}
-					</div>
-					<div
-						className='card-action-btn @cardRepair'
-						{...(isHandMode
-							? {
-									role: 'button',
-									onClick: () =>
-										onPlayCard?.(
-											cardId,
-											'REPAIR',
-											info.actionRepair,
-											info.actionBonusId
-										)
-								}
-							: {})}
-					>
-						<WaIcon name='plus' />
-						{info.actionRepair}
-					</div>
-					<div
-						className='card-action-btn @cardCalm'
-						{...(isHandMode
-							? {
-									role: 'button',
-									onClick: () =>
-										onPlayCard?.(
-											cardId,
-											'CALM',
-											info.actionCalm,
-											info.actionBonusId
-										)
-								}
-							: {})}
-					>
-						<WaIcon name='eye' variant='regular' />
-						{info.actionCalm}
-					</div>
-					<div
-						className='card-action-btn @cardFight'
-						{...(isHandMode
-							? {
-									role: 'button',
-									onClick: () =>
-										onPlayCard?.(
-											cardId,
-											'ATTACK',
-											info.actionFight,
-											info.actionBonusId
-										)
-								}
-							: {})}
-					>
-						<WaIcon name='arrow-trend-up' />
-						{info.actionFight}
-					</div>
+					<ActionButton
+						cardClass='@cardCoins'
+						icon={<WaIcon name='circle' variant='regular' />}
+						isHandMode={isHandMode}
+						onAction={() =>
+							onPlayCard?.(
+								cardId,
+								'COINS',
+								info.actionCoins,
+								info.actionBonusId
+							)
+						}
+						value={info.actionCoins}
+					/>
+					<ActionButton
+						cardClass='@cardRepair'
+						icon={<WaIcon name='plus' />}
+						isHandMode={isHandMode}
+						onAction={() =>
+							onPlayCard?.(
+								cardId,
+								'REPAIR',
+								info.actionRepair,
+								info.actionBonusId
+							)
+						}
+						value={info.actionRepair}
+					/>
+					<ActionButton
+						cardClass='@cardCalm'
+						icon={<WaIcon name='eye' variant='regular' />}
+						isHandMode={isHandMode}
+						onAction={() =>
+							onPlayCard?.(cardId, 'CALM', info.actionCalm, info.actionBonusId)
+						}
+						value={info.actionCalm}
+					/>
+					<ActionButton
+						cardClass='@cardFight'
+						icon={<WaIcon name='arrow-trend-up' />}
+						isHandMode={isHandMode}
+						onAction={() =>
+							onPlayCard?.(
+								cardId,
+								'ATTACK',
+								info.actionAttack,
+								info.actionBonusId
+							)
+						}
+						value={info.actionAttack}
+					/>
 				</div>
 				<div className='block min-w-0'>
 					<div className='h-[50px] w-[50px] border-1' />

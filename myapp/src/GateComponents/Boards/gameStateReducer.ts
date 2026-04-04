@@ -5,6 +5,7 @@
 // see useGameStateActions.ts for the rationale).
 // ---------------------------------------------------------------------------
 
+import type {CardPlayType} from '../Cards/XCard'
 import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
@@ -14,6 +15,7 @@ import {GetRange} from '../Data/PlayerCards'
 export interface GameState {
 	pDeck: number[]
 	pHand: number[]
+	pPlayed: number[]
 	pDiscard: number[]
 	hDeck: number[]
 
@@ -24,7 +26,9 @@ export interface GameState {
 	cCoins: number
 	cCalm: number
 	cRepair: number
-	cBonusRepair: {type: BuildingType; amount: number}[]
+	cBonusRepairFarm: number
+	cBonusRepairGate: number
+	cBonusRepairTower: number
 	cAttack: number
 
 	actionLogs: GameAction[]
@@ -52,6 +56,22 @@ export type GameAction =
 			building: BuildingType
 			healthChange: number
 	  }
+	| {
+			type: 'UPADTE_RESOURCES'
+			coins?: number
+			attack?: number
+			repair?: number
+			calm?: number
+			bonusRepairFarm: number
+			bonusRepairGate: number
+			bonusRepairTower: number
+	  }
+	| {
+			type: 'MARK_CARD_PLAYED'
+			cardId: number
+			cardPlayType: CardPlayType | undefined
+	  }
+	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
 
@@ -164,6 +184,42 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'UPADTE_RESOURCES': {
+			// TODO bonus repair
+			const newState = {
+				...state,
+				cCoins: state.cCoins + (action.coins ?? 0),
+				cAttack: state.cAttack + (action.attack ?? 0),
+				cRepair: state.cRepair + (action.repair ?? 0),
+
+				cCalm: state.cCalm + (action.calm ?? 0),
+				cBonusRepairFarm:
+					state.cBonusRepairFarm + (action.bonusRepairFarm ?? 0),
+				cBonusRepairGate:
+					state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
+				cBonusRepairTower:
+					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
+				actionLogs: newActionLog
+			}
+			return newState
+		}
+
+		case 'MARK_CARD_PLAYED': {
+			return {
+				...state,
+				pPlayed: [...(state.pPlayed ?? []), action.cardId],
+				actionLogs: newActionLog
+			}
+		}
+
+		case 'CLEAR_PLAYED_CARDS': {
+			return {
+				...state,
+				pPlayed: [],
+				actionLogs: newActionLog
+			}
+		}
+
 		case 'MULTI_ACTION': {
 			let currentState = state
 			for (const a of action.actions) {
@@ -192,6 +248,7 @@ export const HAND_SIZE = 3
 export const initialState: GameState = {
 	pDeck: [1, 2, 3],
 	pHand: [],
+	pPlayed: [],
 	pDiscard: [],
 	hDeck: GetRange('HERO').sort(() => 0.5 - Math.random()),
 	vDeck: GetRange('VILLAGER').sort(() => 0.5 - Math.random()),
@@ -206,7 +263,9 @@ export const initialState: GameState = {
 
 	cCoins: 0,
 	cRepair: 0,
-	cBonusRepair: [],
+	cBonusRepairFarm: 0,
+	cBonusRepairGate: 0,
+	cBonusRepairTower: 0,
 	cCalm: 0,
 	cAttack: 0,
 

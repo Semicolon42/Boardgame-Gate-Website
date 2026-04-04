@@ -7,6 +7,7 @@
 //   - Layer 2: useSubActionQueue (animated sub-action sequencing)
 
 import {useReducer, useRef} from 'react'
+import type {CardPlayHandler, CardPlayType} from '../Cards/XCard'
 import {
 	type BuildingType,
 	gameStateReducer,
@@ -52,8 +53,11 @@ export function useGameActions() {
 	}
 
 	/** TODO: implement play card logic */
-	const playCard = (_cardId: number): void => {
-		// TODO
+	const playCard: CardPlayHandler = (
+		_cardId: number,
+		cardPlayType: CardPlayType
+	): void => {
+		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', cardId: _cardId, cardPlayType}])
 	}
 
 	/** TODO: implement player attack enemy logic */
