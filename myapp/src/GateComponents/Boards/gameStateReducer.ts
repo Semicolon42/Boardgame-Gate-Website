@@ -5,7 +5,7 @@
 // see useGameStateActions.ts for the rationale).
 // ---------------------------------------------------------------------------
 
-import type { CardPlayType } from '../Cards/XCard'
+import type {CardPlayType} from '../Cards/XCard'
 import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
@@ -66,7 +66,11 @@ export type GameAction =
 			bonusRepairGate: number
 			bonusRepairTower: number
 	  }
-	| {type: 'MARK_CARD_PLAYED'; cardId: number; cardPlayType: CardPlayType | undefined}
+	| {
+			type: 'MARK_CARD_PLAYED'
+			cardId: number
+			cardPlayType: CardPlayType | undefined
+	  }
 	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
@@ -187,11 +191,14 @@ export function gameStateReducer(
 				cCoins: state.cCoins + (action.coins ?? 0),
 				cAttack: state.cAttack + (action.attack ?? 0),
 				cRepair: state.cRepair + (action.repair ?? 0),
-				
+
 				cCalm: state.cCalm + (action.calm ?? 0),
-				cBonusRepairFarm: state.cBonusRepairFarm + (action.bonusRepairFarm ?? 0),
-				cBonusRepairGate: state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
-				cBonusRepairTower: state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
+				cBonusRepairFarm:
+					state.cBonusRepairFarm + (action.bonusRepairFarm ?? 0),
+				cBonusRepairGate:
+					state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
+				cBonusRepairTower:
+					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
 				actionLogs: newActionLog
 			}
 			return newState

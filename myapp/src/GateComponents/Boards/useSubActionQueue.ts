@@ -83,12 +83,23 @@ function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
 					{
 						type: 'UPADTE_RESOURCES',
 						coins: action.cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
-						attack: action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
-						repair: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
-						bonusRepairFarm: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusFarm ?? 0 : 0,
-						bonusRepairGate: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusGate ?? 0 : 0,
-						bonusRepairTower: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepairBonusTower ?? 0 : 0,
-						calm: action.cardPlayType === 'CALM' ? cardInfo.actionCalm : 0,
+						attack:
+							action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
+						repair:
+							action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						bonusRepairFarm:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusFarm ?? 0)
+								: 0,
+						bonusRepairGate:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusGate ?? 0)
+								: 0,
+						bonusRepairTower:
+							action.cardPlayType === 'REPAIR'
+								? (cardInfo.actionRepairBonusTower ?? 0)
+								: 0,
+						calm: action.cardPlayType === 'CALM' ? cardInfo.actionCalm : 0
 					},
 					{
 						type: 'MARK_CARD_PLAYED',
@@ -131,13 +142,13 @@ function expandSubAction(
 						bonusRepairFarm: -state.cBonusRepairFarm,
 						bonusRepairGate: -state.cBonusRepairGate,
 						bonusRepairTower: -state.cBonusRepairTower,
-						calm: -state.cCalm,
+						calm: -state.cCalm
 					}
 				},
 				{
 					type: 'EXECUTE_GAMTE_STATE_UPDATE',
 					gameStateAction: {
-						type: 'CLEAR_PLAYED_CARDS',
+						type: 'CLEAR_PLAYED_CARDS'
 					}
 				},
 				{type: 'ENQ_PLAYER_DRAW_N', count: 3}
