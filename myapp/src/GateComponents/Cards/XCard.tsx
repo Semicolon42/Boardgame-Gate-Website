@@ -1,25 +1,38 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
 import {useLayoutEffect, useRef} from 'react'
+import type {CardInstance} from '../Boards/gameStateReducer'
 import {getCitizenCard} from '../Data/PlayerCards'
 
 function ActionButton({
 	cardClass,
 	value,
+	isPlayed,
+	isDisabled,
 	icon,
 	isHandMode,
 	onAction
 }: {
 	cardClass: string
 	value: number
+	isPlayed: boolean
+	isDisabled: boolean
 	icon: ReactElement
 	isHandMode: boolean
 	onAction: () => void
 }) {
-	const isDisabled = value === 0
+	let buttonClass: string = `card-action-btn outline-2 ${cardClass}`
+	if (isDisabled) {
+		buttonClass += ' outline-transparent bg-transparent opacity-40 cursor-default'
+	} else if (isPlayed) {
+		buttonClass += ' outline-blue-500 bg-blue-400'
+	} else {
+		buttonClass += ' outline-transparent bg-transparent ' 
+		buttonClass += isHandMode ? 'hover:outline-blue-600' : ''
+	}
 	return (
 		<div
-			className={`card-action-btn ${cardClass}${isDisabled ? ' opacity-40 cursor-default' : ''}`}
+			className={buttonClass}
 			{...(isHandMode && !isDisabled
 				? {role: 'button', onClick: onAction}
 				: {})}
@@ -37,7 +50,7 @@ import {FitText, ScaledName} from '../UIComponents/misc'
 export type CardPlayType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
 
 export type CardPlayHandler = (
-	cardId: number,
+	card: CardInstance,
 	type: CardPlayType,
 	amount: number,
 	actionBonusId?: string,
@@ -45,7 +58,7 @@ export type CardPlayHandler = (
 ) => void
 
 interface XcardProps {
-	cardId: number
+	card: CardInstance
 	onAnimationEnd?: () => void
 	// Enter animation: card is already at its destination in the DOM.
 	// Animates FROM this position TO the card's self-measured DOM position.
@@ -59,21 +72,23 @@ interface XcardProps {
 	onPlayCard?: CardPlayHandler | undefined
 	// Village mode: the whole card is one button to buy it.
 	// When provided, inner action buttons are suppressed.
-	onBuyCard?: (cardId: number) => void
-	// Card has already been played this turn.
+	onBuyCard?: (card: CardInstance) => void
+	// Disable all functions
 	disabled?: boolean
+	isPlayed?: CardPlayType | undefined
 }
 
 export function XCard({
-	cardId,
+	card,
 	onAnimationEnd,
 	moveFrom,
 	moveTo,
 	onPlayCard,
 	onBuyCard,
+	isPlayed,
 	disabled = false
 }: XcardProps) {
-	const info = getCitizenCard(cardId)
+	const info = getCitizenCard(card.typeId)
 
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -110,7 +125,13 @@ export function XCard({
 		}
 	}, [moveFrom, moveTo])
 
-	const containerClass = `flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD${disabled ? ' opacity-40 pointer-events-none' : ''}`
+	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD outline-4 outline-white-400`
+	if (disabled) {
+		containerClass += ' outline-gray-500 pointer-events-none'
+	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
+		containerClass += ' outline-blue-500 hover:outline-blue-700'
+	}
+	
 
 	// Hand mode: action fields shown as individual clickable divs.
 	// Village mode: action fields are read-only (whole card is the button).
@@ -130,62 +151,42 @@ export function XCard({
 						cardClass='@cardCoins'
 						icon={<WaIcon name='circle' variant='regular' />}
 						isHandMode={isHandMode}
-						onAction={() =>
-							onPlayCard?.(
-								cardId,
-								'COINS',
-								info.actionCoins,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)}
 						value={info.actionCoins}
+						isDisabled={info.actionCoins === 0}
+						isPlayed={isPlayed === 'COINS'}
 					/>
 					<ActionButton
 						cardClass='@cardRepair'
 						icon={<WaIcon name='plus' />}
 						isHandMode={isHandMode}
-						onAction={() =>
-							onPlayCard?.(
-								cardId,
-								'REPAIR',
-								info.actionRepair,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'REPAIR', info.actionRepair, info.actionBonusId)}
 						value={info.actionRepair}
+						isDisabled={info.actionRepair === 0}
+						isPlayed={isPlayed === 'REPAIR'}
 					/>
 					<ActionButton
 						cardClass='@cardCalm'
 						icon={<WaIcon name='eye' variant='regular' />}
 						isHandMode={isHandMode}
-						onAction={() =>
-							onPlayCard?.(cardId, 'CALM', info.actionCalm, info.actionBonusId)
-						}
+						onAction={() => onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)}
 						value={info.actionCalm}
+						isDisabled={info.actionCalm === 0}
+						isPlayed={isPlayed === 'CALM'}
 					/>
 					<ActionButton
 						cardClass='@cardFight'
 						icon={<WaIcon name='arrow-trend-up' />}
 						isHandMode={isHandMode}
-						onAction={() =>
-							onPlayCard?.(
-								cardId,
-								'ATTACK',
-								info.actionAttack,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'ATTACK', info.actionAttack, info.actionBonusId)}
 						value={info.actionAttack}
+						isDisabled={info.actionAttack === 0}
+						isPlayed={isPlayed === 'ATTACK'}
 					/>
 				</div>
 				<div className='block min-w-0'>
 					<div className='h-[50px] w-[50px] border-1' />
 					{info.actionBonusText && <FitText text={info.actionBonusText} />}
-					{/* {info.actionBonusText && (
-						<div className='w-[50px] break-words'>
-							{info.actionBonusText}
-						</div>
-					)} */}
 				</div>
 			</div>
 		</div>
@@ -196,9 +197,7 @@ export function XCard({
 			<button
 				className={containerClass}
 				onAnimationEnd={onAnimationEnd}
-				onClick={() => {
-					onBuyCard(cardId)
-				}}
+				onClick={() => onBuyCard(card)}
 				ref={ref as RefObject<HTMLButtonElement>}
 				type='button'
 			>

@@ -10,6 +10,7 @@ import {useReducer, useRef} from 'react'
 import type {CardPlayHandler, CardPlayType} from '../Cards/XCard'
 import {
 	type BuildingType,
+	type CardInstance,
 	gameStateReducer,
 	initialState
 } from './gameStateReducer'
@@ -43,20 +44,19 @@ export function useGameActions() {
 		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
-	const gameVillagerRowClear = (cost?: number): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR', cost}])
+	const gameVillagerRowClear = (): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR'}])
 	}
 
-	const gameBuyCard = (_cardId: number, cost: number): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', cardId: _cardId, cost}])
+	const gameBuyCard = (card: CardInstance): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', card}])
 	}
 
-	/** TODO: implement play card logic */
 	const playCard: CardPlayHandler = (
-		_cardId: number,
+		card: CardInstance,
 		cardPlayType: CardPlayType
 	): void => {
-		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', cardId: _cardId, cardPlayType}])
+		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', card, cardPlayType}])
 	}
 
 	/** TODO: implement player attack enemy logic */
@@ -130,7 +130,6 @@ export function useGameActions() {
 		enemyDies,
 		addHeroCardToDiscard,
 		clearActionLogs,
-
 		queue
 	}
 }
