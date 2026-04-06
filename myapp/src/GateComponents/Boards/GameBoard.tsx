@@ -16,6 +16,7 @@ export function GameBoard() {
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
+		gameBuyCard,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -88,7 +89,9 @@ export function GameBoard() {
 					<VillageRow
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
+						currentCoins={gameState.cCoins}
 						onAnimationEnd={signalAnimationComplete}
+						onBuyCard={gameBuyCard}
 						villageCards={gameState.vRow}
 					/>
 					{/* Third Base and Health */}
@@ -158,7 +161,7 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 1}
 							onClick={() => {
-								gameVillagerRowClear()
+								gameVillagerRowClear(1)
 							}}
 							type='button'
 						>

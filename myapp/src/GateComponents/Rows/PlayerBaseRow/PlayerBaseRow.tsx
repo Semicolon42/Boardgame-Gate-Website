@@ -23,9 +23,9 @@ export function PlayerBaseRow() {
 	return (
 		<div className='flex space-x-3 p-[2px]'>
 			<PlayerBaseCard health={6} image='farm' name='Farm' />
-			<PlayerBaseCard health={6} image='farm' name='Gate' />
-			<PlayerBaseCard health={6} image='farm' name='Farm' />
-			<Fearamid fear={3} />
+			<PlayerBaseCard health={12} image='gate' name='Gate' />
+			<PlayerBaseCard health={6} image='tower' name='Tower' />
+			<Fearamid fear={0} />
 		</div>
 	)
 }

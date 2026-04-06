@@ -43,13 +43,12 @@ export function useGameActions() {
 		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
-	const gameVillagerRowClear = (): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR'}])
+	const gameVillagerRowClear = (cost?: number): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR', cost}])
 	}
 
-	/** TODO: implement buy card logic */
-	const buyCard = (_cardId: number): void => {
-		// TODO
+	const gameBuyCard = (_cardId: number, cost: number): void => {
+		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', cardId: _cardId, cost}])
 	}
 
 	/** TODO: implement play card logic */
@@ -119,7 +118,7 @@ export function useGameActions() {
 		gameDrawCards,
 		gameEndTurn,
 		gameVillagerRowClear,
-		buyCard,
+		gameBuyCard,
 		playCard,
 		playerAttackEnemy,
 		playerRepairBuilding,

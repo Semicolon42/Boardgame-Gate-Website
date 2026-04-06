@@ -28,6 +28,7 @@ export type SubActionType =
 	| 'ENQ_VILLAGER_DRAW_SINGLE_CARD'
 	| 'ENQ_VILLAGER_ROW_CLEAR'
 	| 'ENQ_VILLAGER_ROW_FILL'
+	| 'ENQ_VILLAGER_ROW_BUY_CARD'
 	| 'ENQ_END_TURN'
 	| 'PLAYER_DRAW_CARD'
 	| 'PLAYER_DISCARD_SINGLE_CARD'
@@ -37,6 +38,7 @@ export type SubActionType =
 	| 'VILLAGER_SHUFFLE_DECK'
 	| 'VILLAGER_ROW_CLEAR'
 	| 'VILLAGER_ROW_DRAW_CARD'
+	| 'VILLAGER_ROW_BUY_CARD'
 	| 'EXECUTE_GAMTE_STATE_UPDATE'
 
 export interface SubAction {
@@ -51,6 +53,8 @@ export interface SubAction {
 	cardPlayType?: CardPlayType | undefined
 	/** used for resource changes */
 	gameStateAction?: GameAction | undefined
+	/** for things when they have option cost */
+	cost?: number | undefined
 }
 
 /** Animation spec passed down to the component tree. */
@@ -191,8 +195,28 @@ function expandSubAction(
 			const cardToDraw = state.vDeck[0]
 			return [{type: 'VILLAGER_ROW_DRAW_CARD', cardId: cardToDraw}]
 		}
+		case 'ENQ_VILLAGER_ROW_BUY_CARD': {
+			const cost = action.cost ?? 0
+			return [
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
+				},
+				{type: 'VILLAGER_ROW_BUY_CARD', cardId: action.cardId},
+				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
+			]
+		}
+
 		case 'ENQ_VILLAGER_ROW_CLEAR': {
-			return [{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}]
+			const cost = action.cost ?? 0
+			return [
+				{
+					type: 'EXECUTE_GAMTE_STATE_UPDATE',
+					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
+				},
+				{type: 'VILLAGER_ROW_CLEAR'},
+				{type: 'ENQ_VILLAGER_ROW_FILL'}
+			]
 		}
 		case 'ENQ_VILLAGER_ROW_FILL': {
 			if (state.vRow.length < 4) {
@@ -219,7 +243,9 @@ export function useSubActionQueue(
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>
 ) {
-	const [queue, setQueue] = useState<SubAction[]>([])
+	const [queue, setQueue] = useState<SubAction[]>([
+		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
+	])
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(
 		null
@@ -366,6 +392,38 @@ export function useSubActionQueue(
 				})
 				break
 			}
+			case 'VILLAGER_ROW_BUY_CARD': {
+				if (head.cardId === undefined) {
+					setQueue(q => q.slice(1))
+					return
+				}
+				pendingOnCompleteRef.current = () => {
+					dispatch({
+						type: 'MULTI_ACTION',
+						actions: [
+							{
+								type: 'STACK_REMOVE_CARDS',
+								stack: 'VILLAGER_ROW',
+								cardIds: [head.cardId ?? -1]
+							},
+							{
+								type: 'STACK_ADD_CARDS',
+								stack: 'DISCARD',
+								cardIds: [head.cardId ?? -1]
+							}
+						]
+					})
+				}
+				setIsAnimating(true)
+				setAnimatingCard({
+					type: 'VILLAGER',
+					cardId: head.cardId,
+					moveTo: discardPos
+						? {x: discardPos.left, y: discardPos.top}
+						: undefined
+				})
+				break
+			}
 
 			case 'VILLAGER_ROW_CLEAR': {
 				const {cardIds} = head
@@ -381,6 +439,10 @@ export function useSubActionQueue(
 								type: 'STACK_ADD_CARDS',
 								stack: 'VILLAGER_DISCARD',
 								cardIds: cardIds ?? state.vRow
+							},
+							{
+								type: 'UPADTE_RESOURCES',
+								coins: -(head.count ?? 0)
 							}
 						]
 					})
