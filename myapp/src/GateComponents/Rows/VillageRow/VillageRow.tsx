@@ -1,3 +1,4 @@
+import type {CardInstance} from '@/GateComponents/Boards/gameStateReducer'
 import type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec
@@ -8,11 +9,11 @@ import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 
 interface VillageRowProps {
 	currentCoins: number
-	villageCards: number[]
+	villageCards: CardInstance[]
 	onAnimationEnd?: () => void
 	animatingClearVillagerRow?: AnimatingVillagerRowSpec | null
 	animatingCard?: AnimatingCardSpec | null
-	onBuyCard?: (cardId: number, cost: number) => void
+	onBuyCard?: (card: CardInstance) => void
 }
 
 export function VillageRow({
@@ -31,14 +32,14 @@ export function VillageRow({
 	const rowAnimSpec = animatingClearVillagerRow
 	return (
 		<div className='flex space-x-3 p-[2px]'>
-			{slots.map((cardId, slotIndex) => {
-				if (cardId === null) {
-					return <CardSlot key={`slot-${crypto.randomUUID()}`} />
+			{slots.map((card, slotIndex) => {
+				if (card === null) {
+					return <CardSlot key={`slot-${slotIndex}`} />
 				}
-				const cardInfo = getCitizenCard(cardId)
+				const cardInfo = getCitizenCard(card.typeId)
 				const buyable: boolean = currentCoins >= cardInfo.cost
 				const cardAnimSpec =
-					animatingCard?.type === 'VILLAGER' && animatingCard?.cardId === cardId
+					animatingCard?.type === 'VILLAGER' && animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
 				let moveToAnim = rowAnimSpec?.moveTo ?? undefined
@@ -51,14 +52,10 @@ export function VillageRow({
 				const isSignalCard = !rowAnimSpec?.moveTo || slotIndex === 0
 				return (
 					<XCard
-						cardId={cardId}
+						card={card}
 						disabled={!buyable}
-						key={`villager-${cardId}`}
-						onBuyCard={() => {
-							if (buyable) {
-								onBuyCard?.(cardId, cardInfo.cost)
-							}
-						}}
+						key={card.instanceId}
+						onBuyCard={buyable ? onBuyCard : undefined}
 						{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
 						{...(moveToAnim ? {moveTo: moveToAnim} : {})}
 						{...(isSignalCard && onAnimationEnd !== undefined

@@ -171,10 +171,10 @@ export function GameBoard() {
 					</div>
 					<PlayerHand
 						animatingCard={animatingCard}
-						cardIds={gameState.pHand}
+						cards={gameState.pHand}
 						onAnimationEnd={signalAnimationComplete}
 						onPlayCard={playCard}
-						playedCardIds={gameState.pPlayed}
+						playedInstanceIds={gameState.pPlayed}
 					/>
 				</div>
 			</div>

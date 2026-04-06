@@ -1,43 +1,45 @@
+import type {CardInstance} from '../../Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '../../Boards/useSubActionQueue'
 import {CardSlot} from '../../Cards/CardSlot'
-import type {CardPlayHandler} from '../../Cards/XCard'
+import type {CardPlayHandler, CardPlayType} from '../../Cards/XCard'
 import {XCard} from '../../Cards/XCard'
 
 const MIN_DISPLAY_SLOTS = 4
 
 interface PlayerHandProps {
-	cardIds: number[]
-	playedCardIds?: number[]
+	cards: CardInstance[]
+	playedInstanceIds?: {[key: string]: CardPlayType | undefined}
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
 	onPlayCard?: CardPlayHandler
 }
 
 export function PlayerHand({
-	cardIds,
-	playedCardIds,
+	cards,
+	playedInstanceIds,
 	animatingCard,
 	onAnimationEnd,
 	onPlayCard
 }: PlayerHandProps) {
-	const slotCount = Math.max(MIN_DISPLAY_SLOTS, cardIds.length)
-	const slots = Array.from({length: slotCount}, (_, i) => cardIds[i] ?? null)
+	const slotCount = Math.max(MIN_DISPLAY_SLOTS, cards.length)
+	const slots = Array.from({length: slotCount}, (_, i) => cards[i] ?? null)
 
 	return (
 		<div className='justify-left hello flex flex-wrap gap-3 p-[2px]'>
-			{slots.map(cardId => {
-				if (cardId === null) {
-					return <CardSlot key={`slot-${crypto.randomUUID()}`} />
+			{slots.map((card, i) => {
+				if (card === null) {
+					return <CardSlot key={`slot-${i}`} />
 				}
 				const spec =
-					animatingCard?.type === 'PLAYER' && animatingCard?.cardId === cardId
+					animatingCard?.type === 'PLAYER' && animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
 				return (
 					<XCard
-						cardId={cardId}
-						disabled={playedCardIds?.includes(cardId) ?? false}
-						key={`card-${cardId}`}
+						card={card}
+						disabled={playedInstanceIds && playedInstanceIds[card.instanceId] ? true : false}
+						isPlayed={playedInstanceIds ? playedInstanceIds[card.instanceId] : undefined}
+						key={card.instanceId}
 						{...(spec?.moveFrom ? {moveFrom: spec.moveFrom} : {})}
 						{...(spec?.moveTo ? {moveTo: spec.moveTo} : {})}
 						{...(spec !== null && onAnimationEnd !== undefined

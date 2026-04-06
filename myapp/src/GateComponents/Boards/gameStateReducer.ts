@@ -9,19 +9,41 @@ import type {CardPlayType} from '../Cards/XCard'
 import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
+// Card instance — separates physical card identity from card type info
+// ---------------------------------------------------------------------------
+
+export interface EnemyCardInstance {
+	instanceId: string
+	typeId: number
+	health: number
+}
+
+/** A single physical card in play. instanceId is the React key / identity;
+ *  typeId is passed to getCitizenCard() to look up stats. */
+export interface CardInstance {
+	instanceId: string
+	typeId: number
+}
+
+/** Wraps a list of typeIds as fresh CardInstances with unique instanceIds. */
+export function makeCardInstances(typeIds: number[]): CardInstance[] {
+	return typeIds.map(typeId => ({instanceId: crypto.randomUUID(), typeId}))
+}
+
+// ---------------------------------------------------------------------------
 // State & action types
 // ---------------------------------------------------------------------------
 
 export interface GameState {
-	pDeck: number[]
-	pHand: number[]
-	pPlayed: number[]
-	pDiscard: number[]
-	hDeck: number[]
+	pDeck: CardInstance[]
+	pHand: CardInstance[]
+	pPlayed: {[key: string]: CardPlayType | undefined}
+	pDiscard: CardInstance[]
+	hDeck: CardInstance[]
 
-	vDeck: number[]
-	vRow: number[]
-	vDiscard: number[]
+	vDeck: CardInstance[]
+	vRow: CardInstance[]
+	vDiscard: CardInstance[]
 
 	cCoins: number
 	cCalm: number
@@ -49,8 +71,8 @@ export type BuildingType = 'FARM' | 'GATE' | 'TOWER'
 export type GameAction =
 	| {type: 'STACK_CLEAR_ALL_CARDS'; stack: StackType}
 	| {type: 'STACK_SHUFFLE'; stack: StackType}
-	| {type: 'STACK_ADD_CARDS'; stack: StackType; cardIds: number[]}
-	| {type: 'STACK_REMOVE_CARDS'; stack: StackType; cardIds: number[]}
+	| {type: 'STACK_ADD_CARDS'; stack: StackType; cards: CardInstance[]}
+	| {type: 'STACK_REMOVE_CARDS'; stack: StackType; instanceIds: string[]}
 	| {
 			type: 'BUILDING_CHANGE_HEALTH'
 			building: BuildingType
@@ -68,7 +90,7 @@ export type GameAction =
 	  }
 	| {
 			type: 'MARK_CARD_PLAYED'
-			cardId: number
+			instanceId: string
 			cardPlayType: CardPlayType | undefined
 	  }
 	| {type: 'CLEAR_PLAYED_CARDS'}
@@ -129,17 +151,17 @@ export function gameStateReducer(
 			const key = stackKey(action.stack)
 			return {
 				...state,
-				[key]: [...state[key], ...action.cardIds],
+				[key]: [...state[key], ...action.cards],
 				actionLogs: newActionLog
 			}
 		}
 
 		case 'STACK_REMOVE_CARDS': {
 			const key = stackKey(action.stack)
-			const toRemove = new Set(action.cardIds)
+			const toRemove = new Set(action.instanceIds)
 			return {
 				...state,
-				[key]: state[key].filter((cid: number) => !toRemove.has(cid)),
+				[key]: state[key].filter((c: CardInstance) => !toRemove.has(c.instanceId)),
 				actionLogs: newActionLog
 			}
 		}
@@ -185,13 +207,11 @@ export function gameStateReducer(
 		}
 
 		case 'UPADTE_RESOURCES': {
-			// TODO bonus repair
-			const newState = {
+			return {
 				...state,
 				cCoins: state.cCoins + (action.coins ?? 0),
 				cAttack: state.cAttack + (action.attack ?? 0),
 				cRepair: state.cRepair + (action.repair ?? 0),
-
 				cCalm: state.cCalm + (action.calm ?? 0),
 				cBonusRepairFarm:
 					state.cBonusRepairFarm + (action.bonusRepairFarm ?? 0),
@@ -201,13 +221,12 @@ export function gameStateReducer(
 					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
 				actionLogs: newActionLog
 			}
-			return newState
 		}
 
 		case 'MARK_CARD_PLAYED': {
 			return {
 				...state,
-				pPlayed: [...(state.pPlayed ?? []), action.cardId],
+				pPlayed: {...state.pPlayed, [action.instanceId]: action.cardPlayType},
 				actionLogs: newActionLog
 			}
 		}
@@ -246,15 +265,15 @@ export function gameStateReducer(
 export const HAND_SIZE = 3
 
 export const initialState: GameState = {
-	pDeck: [1, 2, 3],
+	pDeck: makeCardInstances([1, 2, 3]),
 	pHand: [],
-	pPlayed: [],
+	pPlayed: {},
 	pDiscard: [],
-	hDeck: GetRange('HERO').sort(() => 0.5 - Math.random()),
-	vDeck: GetRange('VILLAGER').sort(() => 0.5 - Math.random()),
-	vRow: GetRange('VILLAGER')
-		.sort(() => 0.5 - Math.random())
-		.slice(-4),
+	hDeck: makeCardInstances(GetRange('HERO').sort(() => 0.5 - Math.random())),
+	vDeck: makeCardInstances(GetRange('VILLAGER').sort(() => 0.5 - Math.random())),
+	vRow: makeCardInstances(
+		GetRange('VILLAGER').sort(() => 0.5 - Math.random()).slice(-4)
+	),
 	vDiscard: [],
 
 	bFarmHealth: 6,

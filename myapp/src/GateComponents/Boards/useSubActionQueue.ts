@@ -14,7 +14,7 @@ import type {Dispatch, RefObject} from 'react'
 import {useCallback, useEffect, useRef, useState} from 'react'
 import type {CardPlayType} from '../Cards/XCard'
 import {getCitizenCard} from '../Data/PlayerCards'
-import type {GameAction, GameState} from './gameStateReducer'
+import type {CardInstance, GameAction, GameState} from './gameStateReducer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,6 +30,7 @@ export type SubActionType =
 	| 'ENQ_VILLAGER_ROW_FILL'
 	| 'ENQ_VILLAGER_ROW_BUY_CARD'
 	| 'ENQ_END_TURN'
+
 	| 'PLAYER_DRAW_CARD'
 	| 'PLAYER_DISCARD_SINGLE_CARD'
 	| 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'
@@ -43,24 +44,22 @@ export type SubActionType =
 
 export interface SubAction {
 	type: SubActionType
-	/** Card ID — required for PLAYER_DISCARD_SINGLE_CARD */
-	cardId?: number | undefined
-	/** Draw count — used by PLAYER_DRAW_N */
+	/** Single card instance — carries both identity and type for draw/discard/play */
+	card?: CardInstance | undefined
+	/** Draw count — used by ENQ_PLAYER_DRAW_N */
 	count?: number | undefined
-	/** Used for multiple card ids - VILLAGER_ROW_CLEAR mainly */
-	cardIds?: number[] | undefined
-	/** used for playing cards, how the card was played */
+	/** Multiple card instances — used by VILLAGER_ROW_CLEAR */
+	cards?: CardInstance[] | undefined
+	/** How the card was played — used by ENQ_PLAYER_PLAY_CARD */
 	cardPlayType?: CardPlayType | undefined
-	/** used for resource changes */
+	/** Game state action to dispatch — used by EXECUTE_GAMTE_STATE_UPDATE */
 	gameStateAction?: GameAction | undefined
-	/** for things when they have option cost */
-	cost?: number | undefined
 }
 
 /** Animation spec passed down to the component tree. */
 export interface AnimatingCardSpec {
 	type: 'PLAYER' | 'ENEMY' | 'VILLAGER'
-	cardId: number
+	instanceId: string
 	/** Enter animation: card slides FROM this screen position into its DOM slot. */
 	moveFrom?: {x: number; y: number} | undefined
 	/** Exit animation: card slides FROM its DOM slot TO this screen position. */
@@ -77,7 +76,7 @@ export interface AnimatingVillagerRowSpec {
 // ---------------------------------------------------------------------------
 
 function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
-	const cardInfo = getCitizenCard(action.cardId ?? -1)
+	const cardInfo = getCitizenCard(action.card?.typeId ?? -1)
 	return [
 		{
 			type: 'EXECUTE_GAMTE_STATE_UPDATE',
@@ -87,10 +86,8 @@ function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
 					{
 						type: 'UPADTE_RESOURCES',
 						coins: action.cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
-						attack:
-							action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
-						repair:
-							action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+						attack: action.cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
+						repair: action.cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
 						bonusRepairFarm:
 							action.cardPlayType === 'REPAIR'
 								? (cardInfo.actionRepairBonusFarm ?? 0)
@@ -107,7 +104,7 @@ function subactionPlayCard(action: SubAction, _state: GameState): SubAction[] {
 					},
 					{
 						type: 'MARK_CARD_PLAYED',
-						cardId: action.cardId ?? -1,
+						instanceId: action.card?.instanceId ?? '',
 						cardPlayType: action.cardPlayType
 					}
 				]
@@ -125,16 +122,13 @@ function expandSubAction(
 	state: GameState
 ): SubAction[] | null {
 	switch (action.type) {
-		case 'ENQ_PLAYER_PLAY_CARD': {
+		case 'ENQ_PLAYER_PLAY_CARD':
 			return subactionPlayCard(action, state)
-		}
+
 		case 'ENQ_END_TURN':
 			return [
 				...state.pHand
-					.map<SubAction>(cardId => ({
-						type: 'PLAYER_DISCARD_SINGLE_CARD',
-						cardId
-					}))
+					.map<SubAction>(card => ({type: 'PLAYER_DISCARD_SINGLE_CARD', card}))
 					.reverse(),
 				{
 					type: 'EXECUTE_GAMTE_STATE_UPDATE',
@@ -151,17 +145,17 @@ function expandSubAction(
 				},
 				{
 					type: 'EXECUTE_GAMTE_STATE_UPDATE',
-					gameStateAction: {
-						type: 'CLEAR_PLAYED_CARDS'
-					}
+					gameStateAction: {type: 'CLEAR_PLAYED_CARDS'}
 				},
 				{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 			]
+
 		case 'ENQ_DISCARD_HAND':
-			return state.pHand.map<SubAction>(cardId => ({
+			return state.pHand.map<SubAction>(card => ({
 				type: 'PLAYER_DISCARD_SINGLE_CARD',
-				cardId
+				card
 			}))
+
 		case 'ENQ_PLAYER_DRAW_N': {
 			const count = action.count ?? 1
 			return Array.from(
@@ -169,64 +163,57 @@ function expandSubAction(
 				(): SubAction => ({type: 'ENQ_PLAYER_DRAW_SINGLE_CARD'})
 			)
 		}
+
 		case 'ENQ_PLAYER_DRAW_SINGLE_CARD': {
 			if (state.pDeck.length === 0) {
 				if (state.pDiscard.length === 0) return [] // nothing to draw
-				// Deck empty — shuffle discard in, then retry the draw
 				return [
 					{type: 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'},
 					{type: 'PLAYER_SHUFFLE_SHUFFLE_DECK'},
 					{type: 'ENQ_PLAYER_DRAW_SINGLE_CARD'}
 				]
 			}
-			const cardToDraw = state.pDeck[0]
-			return [{type: 'PLAYER_DRAW_CARD', cardId: cardToDraw}]
+			const card = state.pDeck[0]
+			if (card === undefined) return []
+			return [{type: 'PLAYER_DRAW_CARD', card}]
 		}
+
 		case 'ENQ_VILLAGER_DRAW_SINGLE_CARD': {
 			if (state.vDeck.length === 0) {
 				if (state.vDiscard.length === 0) return [] // nothing to draw
-				// Deck empty — shuffle discard in, then retry the draw
 				return [
 					{type: 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK'},
 					{type: 'VILLAGER_SHUFFLE_DECK'},
 					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 				]
 			}
-			const cardToDraw = state.vDeck[0]
-			return [{type: 'VILLAGER_ROW_DRAW_CARD', cardId: cardToDraw}]
-		}
-		case 'ENQ_VILLAGER_ROW_BUY_CARD': {
-			const cost = action.cost ?? 0
-			return [
-				{
-					type: 'EXECUTE_GAMTE_STATE_UPDATE',
-					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
-				},
-				{type: 'VILLAGER_ROW_BUY_CARD', cardId: action.cardId},
-				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
-			]
+			const card = state.vDeck[0]
+			if (card === undefined) return []
+			return [{type: 'VILLAGER_ROW_DRAW_CARD', card}]
 		}
 
-		case 'ENQ_VILLAGER_ROW_CLEAR': {
-			const cost = action.cost ?? 0
+		case 'ENQ_VILLAGER_ROW_BUY_CARD':
 			return [
-				{
-					type: 'EXECUTE_GAMTE_STATE_UPDATE',
-					gameStateAction: {type: 'UPADTE_RESOURCES', coins: -cost}
-				},
-				{type: 'VILLAGER_ROW_CLEAR'},
-				{type: 'ENQ_VILLAGER_ROW_FILL'}
+				{type: 'EXECUTE_GAMTE_STATE_UPDATE', gameStateAction: {
+					type: 'UPADTE_RESOURCES',
+					coins: -getCitizenCard(action.card?.typeId ?? -1).cost
+				}},
+				{type: 'VILLAGER_ROW_BUY_CARD', card: action.card},
+				{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 			]
-		}
-		case 'ENQ_VILLAGER_ROW_FILL': {
+
+		case 'ENQ_VILLAGER_ROW_CLEAR':
+			return [{type: 'VILLAGER_ROW_CLEAR'}, {type: 'ENQ_VILLAGER_ROW_FILL'}]
+
+		case 'ENQ_VILLAGER_ROW_FILL':
 			if (state.vRow.length < 4) {
 				return [
 					{type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'},
 					{type: 'ENQ_VILLAGER_ROW_FILL'}
 				]
 			}
-			return [] // atomic
-		}
+			return [] // row is full — atomic no-op
+
 		default:
 			return null // atomic
 	}
@@ -243,13 +230,9 @@ export function useSubActionQueue(
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>
 ) {
-	const [queue, setQueue] = useState<SubAction[]>([
-		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
-	])
+	const [queue, setQueue] = useState<SubAction[]>([])
 	const [isAnimating, setIsAnimating] = useState(false)
-	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(
-		null
-	)
+	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(null)
 	const [animatingClearVillagerRow, setAnimatingClearVillagerRow] =
 		useState<AnimatingVillagerRowSpec | null>(null)
 
@@ -295,23 +278,22 @@ export function useSubActionQueue(
 
 		switch (head.type) {
 			case 'PLAYER_DRAW_CARD': {
-				const cardToDraw = head.cardId
-				if (cardToDraw === undefined) {
+				const {card} = head
+				if (card === undefined) {
 					setQueue(q => q.slice(1))
 					return
 				}
-				// Dispatch immediately — card appears in hand, then animates FROM deck
 				dispatch({
 					type: 'MULTI_ACTION',
 					actions: [
-						{type: 'STACK_REMOVE_CARDS', stack: 'DECK', cardIds: [cardToDraw]},
-						{type: 'STACK_ADD_CARDS', stack: 'HAND', cardIds: [cardToDraw]}
+						{type: 'STACK_REMOVE_CARDS', stack: 'DECK', instanceIds: [card.instanceId]},
+						{type: 'STACK_ADD_CARDS', stack: 'HAND', cards: [card]}
 					]
 				})
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'PLAYER',
-					cardId: cardToDraw,
+					instanceId: card.instanceId,
 					moveFrom: deckPos ? {x: deckPos.left, y: deckPos.top} : undefined
 				})
 				break
@@ -326,8 +308,8 @@ export function useSubActionQueue(
 			}
 
 			case 'PLAYER_DISCARD_SINGLE_CARD': {
-				const {cardId} = head
-				if (cardId === undefined) {
+				const {card} = head
+				if (card === undefined) {
 					setQueue(q => q.slice(1))
 					return
 				}
@@ -337,63 +319,47 @@ export function useSubActionQueue(
 					dispatch({
 						type: 'MULTI_ACTION',
 						actions: [
-							{
-								type: 'STACK_REMOVE_CARDS',
-								stack: 'HAND',
-								cardIds: [cardId]
-							},
-							{
-								type: 'STACK_ADD_CARDS',
-								stack: 'DISCARD',
-								cardIds: [cardId]
-							}
+							{type: 'STACK_REMOVE_CARDS', stack: 'HAND', instanceIds: [card.instanceId]},
+							{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]}
 						]
 					})
 				}
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'PLAYER',
-					cardId,
-					moveTo: discardPos
-						? {x: discardPos.left, y: discardPos.top}
-						: undefined
+					instanceId: card.instanceId,
+					moveTo: discardPos ? {x: discardPos.left, y: discardPos.top} : undefined
 				})
 				break
 			}
 
 			case 'VILLAGER_ROW_DRAW_CARD': {
-				if (head.cardId === undefined) {
+				const {card} = head
+				if (card === undefined) {
 					setQueue(q => q.slice(1))
 					return
 				}
-				// Dispatch immediately — card appears in hand, then animates FROM deck
 				dispatch({
 					type: 'MULTI_ACTION',
 					actions: [
-						{
-							type: 'STACK_REMOVE_CARDS',
-							stack: 'VILLAGER_DECK',
-							cardIds: [head.cardId]
-						},
-						{
-							type: 'STACK_ADD_CARDS',
-							stack: 'VILLAGER_ROW',
-							cardIds: [head.cardId]
-						}
+						{type: 'STACK_REMOVE_CARDS', stack: 'VILLAGER_DECK', instanceIds: [card.instanceId]},
+						{type: 'STACK_ADD_CARDS', stack: 'VILLAGER_ROW', cards: [card]}
 					]
 				})
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'VILLAGER',
-					cardId: head.cardId,
+					instanceId: card.instanceId,
 					moveFrom: villagerDeckPos
 						? {x: villagerDeckPos.left, y: villagerDeckPos.top}
 						: undefined
 				})
 				break
 			}
+
 			case 'VILLAGER_ROW_BUY_CARD': {
-				if (head.cardId === undefined) {
+				const {card} = head
+				if (card === undefined) {
 					setQueue(q => q.slice(1))
 					return
 				}
@@ -401,49 +367,28 @@ export function useSubActionQueue(
 					dispatch({
 						type: 'MULTI_ACTION',
 						actions: [
-							{
-								type: 'STACK_REMOVE_CARDS',
-								stack: 'VILLAGER_ROW',
-								cardIds: [head.cardId ?? -1]
-							},
-							{
-								type: 'STACK_ADD_CARDS',
-								stack: 'DISCARD',
-								cardIds: [head.cardId ?? -1]
-							}
+							{type: 'STACK_REMOVE_CARDS', stack: 'VILLAGER_ROW', instanceIds: [card.instanceId]},
+							{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]}
 						]
 					})
 				}
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'VILLAGER',
-					cardId: head.cardId,
-					moveTo: discardPos
-						? {x: discardPos.left, y: discardPos.top}
-						: undefined
+					instanceId: card.instanceId,
+					moveTo: discardPos ? {x: discardPos.left, y: discardPos.top} : undefined
 				})
 				break
 			}
 
 			case 'VILLAGER_ROW_CLEAR': {
-				const {cardIds} = head
+				const cardsToDiscard = head.cards ?? currentState.vRow
 				pendingOnCompleteRef.current = () => {
 					dispatch({
 						type: 'MULTI_ACTION',
 						actions: [
-							{
-								type: 'STACK_CLEAR_ALL_CARDS',
-								stack: 'VILLAGER_ROW'
-							},
-							{
-								type: 'STACK_ADD_CARDS',
-								stack: 'VILLAGER_DISCARD',
-								cardIds: cardIds ?? state.vRow
-							},
-							{
-								type: 'UPADTE_RESOURCES',
-								coins: -(head.count ?? 0)
-							}
+							{type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_ROW'},
+							{type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DISCARD', cards: cardsToDiscard}
 						]
 					})
 				}
@@ -457,34 +402,22 @@ export function useSubActionQueue(
 			}
 
 			case 'PLAYER_SHUFFLE_DISCARD_INTO_DECK': {
-				const shuffled = [...currentState.pDiscard].sort(
-					() => Math.random() - 0.5
-				)
-				dispatch({type: 'STACK_ADD_CARDS', stack: 'DECK', cardIds: shuffled})
+				const shuffled = [...currentState.pDiscard].sort(() => Math.random() - 0.5)
+				dispatch({type: 'STACK_ADD_CARDS', stack: 'DECK', cards: shuffled})
 				dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'DISCARD'})
 				setQueue(q => q.slice(1))
 				break
 			}
 
 			case 'PLAYER_SHUFFLE_SHUFFLE_DECK': {
-				const shuffled = [...currentState.pDiscard].sort(
-					() => Math.random() - 0.5
-				)
-				dispatch({type: 'STACK_ADD_CARDS', stack: 'DECK', cardIds: shuffled})
-				dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'DISCARD'})
+				dispatch({type: 'STACK_SHUFFLE', stack: 'DECK'})
 				setQueue(q => q.slice(1))
 				break
 			}
 
 			case 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK': {
-				const shuffled = [...currentState.vDiscard].sort(
-					() => Math.random() - 0.5
-				)
-				dispatch({
-					type: 'STACK_ADD_CARDS',
-					stack: 'VILLAGER_DECK',
-					cardIds: shuffled
-				})
+				const shuffled = [...currentState.vDiscard].sort(() => Math.random() - 0.5)
+				dispatch({type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DECK', cards: shuffled})
 				dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_DISCARD'})
 				setQueue(q => q.slice(1))
 				break
