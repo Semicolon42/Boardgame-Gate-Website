@@ -66,7 +66,7 @@ export type StackType =
 	| 'VILLAGER_DECK'
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
-export type BuildingType = 'FARM' | 'GATE' | 'TOWER'
+export type BuildingType = 'FARM' | 'GATE' | 'TOWER' | 'ALL'
 
 export type GameAction =
 	| {type: 'STACK_CLEAR_ALL_CARDS'; stack: StackType}
