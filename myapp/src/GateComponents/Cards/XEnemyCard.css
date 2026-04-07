@@ -1,0 +1,51 @@
+@keyframes card-move-from {
+	from {
+		transform: translate(var(--slide-x, 0px), var(--slide-y, 0px));
+	}
+	to {
+		transform: translate(0, 0);
+	}
+}
+
+@keyframes card-move-to {
+	from {
+		transform: translate(0, 0);
+	}
+	to {
+		transform: translate(var(--slide-x, 0px), var(--slide-y, 0px));
+	}
+}
+
+.card-move-from-animate {
+	animation: card-move-from 0.6s ease-out forwards;
+}
+
+.card-move-to-animate {
+	animation: card-move-to 0.6s ease-in forwards;
+}
+
+@keyframes card-fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.card-fade-out-animate {
+	animation: card-fade-out 0.4s ease-in forwards;
+}
+
+.card-action-btn {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	appearance: none;
+	cursor: pointer;
+}

@@ -28,17 +28,25 @@ export function PlayerHand({
 		<div className='justify-left hello flex flex-wrap gap-3 p-[2px]'>
 			{slots.map((card, i) => {
 				if (card === null) {
+					// biome-ignore lint/suspicious/noArrayIndexKey: this is a generic element where he index key is fine to use
 					return <CardSlot key={`slot-${i}`} />
 				}
 				const spec =
-					animatingCard?.type === 'PLAYER' && animatingCard.instanceId === card.instanceId
+					animatingCard?.type === 'PLAYER' &&
+					animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
 				return (
 					<XCard
 						card={card}
-						disabled={playedInstanceIds && playedInstanceIds[card.instanceId] ? true : false}
-						isPlayed={playedInstanceIds ? playedInstanceIds[card.instanceId] : undefined}
+						disabled={
+							playedInstanceIds && playedInstanceIds[card.instanceId]
+								? true
+								: false
+						}
+						isPlayed={
+							playedInstanceIds ? playedInstanceIds[card.instanceId] : undefined
+						}
 						key={card.instanceId}
 						{...(spec?.moveFrom ? {moveFrom: spec.moveFrom} : {})}
 						{...(spec?.moveTo ? {moveTo: spec.moveTo} : {})}
