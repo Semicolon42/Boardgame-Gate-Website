@@ -21,13 +21,14 @@ function ActionButton({
 	isHandMode: boolean
 	onAction: () => void
 }) {
-	let buttonClass: string = `card-action-btn outline-2 ${cardClass}`
+	let buttonClass = `card-action-btn outline-2 ${cardClass}`
 	if (isDisabled) {
-		buttonClass += ' outline-transparent bg-transparent opacity-40 cursor-default'
+		buttonClass +=
+			' outline-transparent bg-transparent opacity-40 cursor-default'
 	} else if (isPlayed) {
 		buttonClass += ' outline-blue-500 bg-blue-400'
 	} else {
-		buttonClass += ' outline-transparent bg-transparent ' 
+		buttonClass += ' outline-transparent bg-transparent '
 		buttonClass += isHandMode ? 'hover:outline-blue-600' : ''
 	}
 	return (
@@ -88,7 +89,7 @@ export function XCard({
 	isPlayed,
 	disabled = false
 }: XcardProps) {
-	const info = getCitizenCard(card.typeId)
+	const info = getCitizenCard(card.cardId)
 
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -125,13 +126,13 @@ export function XCard({
 		}
 	}, [moveFrom, moveTo])
 
-	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD outline-4 outline-white-400`
+	let containerClass =
+		'flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD outline-4 outline-white-400'
 	if (disabled) {
 		containerClass += ' outline-gray-500 pointer-events-none'
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
 		containerClass += ' outline-blue-500 hover:outline-blue-700'
 	}
-	
 
 	// Hand mode: action fields shown as individual clickable divs.
 	// Village mode: action fields are read-only (whole card is the button).
@@ -150,38 +151,56 @@ export function XCard({
 					<ActionButton
 						cardClass='@cardCoins'
 						icon={<WaIcon name='circle' variant='regular' />}
-						isHandMode={isHandMode}
-						onAction={() => onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)}
-						value={info.actionCoins}
 						isDisabled={info.actionCoins === 0}
+						isHandMode={isHandMode}
 						isPlayed={isPlayed === 'COINS'}
+						onAction={() =>
+							onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)
+						}
+						value={info.actionCoins}
 					/>
 					<ActionButton
 						cardClass='@cardRepair'
 						icon={<WaIcon name='plus' />}
-						isHandMode={isHandMode}
-						onAction={() => onPlayCard?.(card, 'REPAIR', info.actionRepair, info.actionBonusId)}
-						value={info.actionRepair}
 						isDisabled={info.actionRepair === 0}
+						isHandMode={isHandMode}
 						isPlayed={isPlayed === 'REPAIR'}
+						onAction={() =>
+							onPlayCard?.(
+								card,
+								'REPAIR',
+								info.actionRepair,
+								info.actionBonusId
+							)
+						}
+						value={info.actionRepair}
 					/>
 					<ActionButton
 						cardClass='@cardCalm'
 						icon={<WaIcon name='eye' variant='regular' />}
-						isHandMode={isHandMode}
-						onAction={() => onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)}
-						value={info.actionCalm}
 						isDisabled={info.actionCalm === 0}
+						isHandMode={isHandMode}
 						isPlayed={isPlayed === 'CALM'}
+						onAction={() =>
+							onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)
+						}
+						value={info.actionCalm}
 					/>
 					<ActionButton
 						cardClass='@cardFight'
 						icon={<WaIcon name='arrow-trend-up' />}
-						isHandMode={isHandMode}
-						onAction={() => onPlayCard?.(card, 'ATTACK', info.actionAttack, info.actionBonusId)}
-						value={info.actionAttack}
 						isDisabled={info.actionAttack === 0}
+						isHandMode={isHandMode}
 						isPlayed={isPlayed === 'ATTACK'}
+						onAction={() =>
+							onPlayCard?.(
+								card,
+								'ATTACK',
+								info.actionAttack,
+								info.actionBonusId
+							)
+						}
+						value={info.actionAttack}
 					/>
 				</div>
 				<div className='block min-w-0'>

@@ -34,12 +34,14 @@ export function VillageRow({
 		<div className='flex space-x-3 p-[2px]'>
 			{slots.map((card, slotIndex) => {
 				if (card === null) {
+					// biome-ignore lint/suspicious/noArrayIndexKey: this is a generic element where he index key is fine to use
 					return <CardSlot key={`slot-${slotIndex}`} />
 				}
-				const cardInfo = getCitizenCard(card.typeId)
+				const cardInfo = getCitizenCard(card.cardId)
 				const buyable: boolean = currentCoins >= cardInfo.cost
 				const cardAnimSpec =
-					animatingCard?.type === 'VILLAGER' && animatingCard.instanceId === card.instanceId
+					animatingCard?.type === 'VILLAGER' &&
+					animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
 				let moveToAnim = rowAnimSpec?.moveTo ?? undefined
@@ -55,7 +57,7 @@ export function VillageRow({
 						card={card}
 						disabled={!buyable}
 						key={card.instanceId}
-						onBuyCard={buyable ? onBuyCard : undefined}
+						{...(buyable && onBuyCard ? {onBuyCard} : {})}
 						{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
 						{...(moveToAnim ? {moveTo: moveToAnim} : {})}
 						{...(isSignalCard && onAnimationEnd !== undefined

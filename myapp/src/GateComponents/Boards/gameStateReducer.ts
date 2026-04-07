@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 import type {CardPlayType} from '../Cards/XCard'
+import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {GetRange} from '../Data/PlayerCards'
 
 // ---------------------------------------------------------------------------
@@ -14,7 +15,7 @@ import {GetRange} from '../Data/PlayerCards'
 
 export interface EnemyCardInstance {
 	instanceId: string
-	typeId: number
+	cardId: number
 	health: number
 }
 
@@ -22,12 +23,27 @@ export interface EnemyCardInstance {
  *  typeId is passed to getCitizenCard() to look up stats. */
 export interface CardInstance {
 	instanceId: string
-	typeId: number
+	cardId: number
 }
 
 /** Wraps a list of typeIds as fresh CardInstances with unique instanceIds. */
-export function makeCardInstances(typeIds: number[]): CardInstance[] {
-	return typeIds.map(typeId => ({instanceId: crypto.randomUUID(), typeId}))
+export function makeCardInstances(cardIds: number[]): CardInstance[] {
+	return cardIds.map(cardId => ({instanceId: crypto.randomUUID(), cardId}))
+}
+
+/** Wraps a list of entries as fresh EnemyCardInstances with unique instanceIds. */
+export function makeEnemyCardInstances(
+	enemyCardIds: number[]
+): EnemyCardInstance[] {
+	return enemyCardIds.flatMap(enemyCardId => {
+		const enemyInfo: IEnemyCard = getEnemyCard(enemyCardId)
+		const enemyInstance: EnemyCardInstance = {
+			instanceId: crypto.randomUUID(),
+			cardId: enemyCardId,
+			health: enemyInfo.health
+		}
+		return enemyInstance
+	})
 }
 
 // ---------------------------------------------------------------------------
@@ -70,7 +86,7 @@ export type StackType =
 	| 'VILLAGER_DECK'
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
-export type BuildingType = 'FARM' | 'GATE' | 'TOWER' | 'ALL'
+export type BuildingType = 'farm' | 'gate' | 'tower' | 'all'
 
 export type GameAction =
 	| {type: 'STACK_CLEAR_ALL_CARDS'; stack: StackType}
@@ -100,6 +116,8 @@ export type GameAction =
 	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
+	| {type: 'ENEMY_DECK_REMOVE_CARD'; instanceId: string}
+	| {type: 'ENEMY_ROW_ADD_CARD'; card: EnemyCardInstance}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -165,7 +183,9 @@ export function gameStateReducer(
 			const toRemove = new Set(action.instanceIds)
 			return {
 				...state,
-				[key]: state[key].filter((c: CardInstance) => !toRemove.has(c.instanceId)),
+				[key]: state[key].filter(
+					(c: CardInstance) => !toRemove.has(c.instanceId)
+				),
 				actionLogs: newActionLog
 			}
 		}
@@ -187,19 +207,19 @@ export function gameStateReducer(
 		case 'BUILDING_CHANGE_HEALTH': {
 			// Fixed: was mutating state directly — now immutable
 			switch (action.building) {
-				case 'FARM':
+				case 'farm':
 					return {
 						...state,
 						bFarmHealth: state.bFarmHealth + action.healthChange,
 						actionLogs: newActionLog
 					}
-				case 'GATE':
+				case 'gate':
 					return {
 						...state,
 						bGateHealth: state.bGateHealth + action.healthChange,
 						actionLogs: newActionLog
 					}
-				case 'TOWER':
+				case 'tower':
 					return {
 						...state,
 						bTowerHealth: state.bTowerHealth + action.healthChange,
@@ -238,7 +258,7 @@ export function gameStateReducer(
 		case 'CLEAR_PLAYED_CARDS': {
 			return {
 				...state,
-				pPlayed: [],
+				pPlayed: {},
 				actionLogs: newActionLog
 			}
 		}
@@ -250,6 +270,24 @@ export function gameStateReducer(
 			}
 			return {
 				...currentState,
+				actionLogs: newActionLog
+			}
+		}
+
+		case 'ENEMY_DECK_REMOVE_CARD': {
+			return {
+				...state,
+				eEnemyDeck: state.eEnemyDeck.filter(
+					c => c.instanceId !== action.instanceId
+				),
+				actionLogs: newActionLog
+			}
+		}
+
+		case 'ENEMY_ROW_ADD_CARD': {
+			return {
+				...state,
+				eEnemyRow: [...state.eEnemyRow, action.card],
 				actionLogs: newActionLog
 			}
 		}
@@ -274,14 +312,18 @@ export const initialState: GameState = {
 	pPlayed: {},
 	pDiscard: [],
 	hDeck: makeCardInstances(GetRange('HERO').sort(() => 0.5 - Math.random())),
-	vDeck: makeCardInstances(GetRange('VILLAGER').sort(() => 0.5 - Math.random())),
+	vDeck: makeCardInstances(
+		GetRange('VILLAGER').sort(() => 0.5 - Math.random())
+	),
 
-	eEnemyDeck: [],
+	eEnemyDeck: makeEnemyCardInstances([1, 2, 3, 4]),
 	eEnemyRow: [],
 	eEnemyRowMax: 2,
 
 	vRow: makeCardInstances(
-		GetRange('VILLAGER').sort(() => 0.5 - Math.random()).slice(-4)
+		GetRange('VILLAGER')
+			.sort(() => 0.5 - Math.random())
+			.slice(-4)
 	),
 	vDiscard: [],
 

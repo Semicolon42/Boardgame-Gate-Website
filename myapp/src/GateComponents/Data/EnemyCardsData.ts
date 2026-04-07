@@ -1,4 +1,4 @@
-import type { BuildingType } from "../Boards/gameStateReducer"
+import type {BuildingType} from '../Boards/gameStateReducer'
 
 export type EnemyCardType = 'DEBUG' | 'L1' | 'L2' | 'L3' | 'Z'
 
@@ -28,7 +28,7 @@ const GENERIC_DEBUG_ENEMY: IEnemyCard = {
 	stars: 0,
 	health: 1,
 	attack: {
-		FARM: 1
+		farm: 1
 	},
 	fear: 1,
 	specialAbility: 'generic'
@@ -45,9 +45,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 1,
 		health: 3,
 		attack: {
-			GATE: 1
+			gate: 1
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 2,
@@ -58,8 +58,8 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 2,
 		health: 3,
 		attack: {
-			TOWER: 2
-		},
+			tower: 2
+		}
 	},
 	{
 		id: 3,
@@ -70,9 +70,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 3,
 		health: 3,
 		attack: {
-			FARM: 1
+			farm: 1
 		},
-		fear: 2,
+		fear: 2
 	},
 	{
 		id: 4,
@@ -83,9 +83,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 4,
 		health: 5,
 		attack: {
-			FARM: 2
+			farm: 2
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 5,
@@ -96,8 +96,8 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 5,
 		health: 6,
 		attack: {
-			GATE: 2
-		},
+			gate: 2
+		}
 	},
 	{
 		id: 6,
@@ -108,7 +108,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 6,
 		health: 1,
 		attack: {
-			FARM: 1
+			farm: 1
 		},
 		fear: 1,
 		specialAbility: 'generic'
@@ -122,9 +122,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 7,
 		health: 1,
 		attack: {
-			TOWER: 1
+			tower: 1
 		},
-		fear: 2,
+		fear: 2
 	},
 	{
 		id: 8,
@@ -135,12 +135,12 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 8,
 		health: 7,
 		attack: {
-			FARM: 2
+			farm: 2
 		},
 		fear: 1,
 		specialAbility: 'generic'
 	},
-		{
+	{
 		id: 9,
 		name: 'LEVEL 3-C',
 		image: 'generic',
@@ -149,7 +149,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 0,
 		health: 10,
 		attack: {
-			ALL: 1
+			all: 1
 		},
 		fear: 1,
 		specialAbility: 'generic'
@@ -163,10 +163,10 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 9,
 		health: 11,
 		attack: {
-			ALL: 2
+			all: 2
 		},
-		fear: 2,
-	},
+		fear: 2
+	}
 ]
 
 export function getEnemyCard(id: number): IEnemyCard {

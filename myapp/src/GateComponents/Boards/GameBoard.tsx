@@ -13,6 +13,7 @@ export function GameBoard() {
 		deckRef,
 		discardRef,
 		villageDeckRef,
+		eDeckRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
@@ -21,6 +22,7 @@ export function GameBoard() {
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
+		gameDrawEnemy,
 		clearActionLogs
 	} = useGameActions()
 
@@ -76,8 +78,29 @@ export function GameBoard() {
 							value={`${gameState.cAttack}`}
 							variant={gameState.cAttack > 0 ? 'success' : 'neutral'}
 						/>
+						<button
+							className={buttonClass}
+							disabled={
+								isProcessing ||
+								gameState.eEnemyDeck.length === 0 ||
+								gameState.eEnemyRow.length >= gameState.eEnemyRowMax
+							}
+							onClick={() => {
+								gameDrawEnemy()
+							}}
+							type='button'
+						>
+							+Enemy
+						</button>
 					</div>
-					<EnemyRow heroCardsRemaining={gameState?.hDeck?.length ?? 'XXX'} />
+					<EnemyRow
+						animatingCard={animatingCard}
+						eDeckRef={eDeckRef}
+						enemyCards={gameState.eEnemyRow}
+						enemyRowMax={gameState.eEnemyRowMax}
+						heroCardsRemaining={gameState.hDeck.length}
+						onAnimationEnd={signalAnimationComplete}
+					/>
 					{/* Second Row Village cards to buy */}
 					<div className={statusBarClass}>
 						<ValueBadge
@@ -161,7 +184,7 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 1}
 							onClick={() => {
-								gameVillagerRowClear(1)
+								gameVillagerRowClear()
 							}}
 							type='button'
 						>

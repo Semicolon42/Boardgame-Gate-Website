@@ -22,6 +22,7 @@ export function useGameActions() {
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
 	const villageDeckRef = useRef<HTMLDivElement>(null)
+	const eDeckRef = useRef<HTMLDivElement>(null)
 
 	const {
 		enqueue,
@@ -30,7 +31,14 @@ export function useGameActions() {
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow
-	} = useSubActionQueue(state, dispatch, deckRef, discardRef, villageDeckRef)
+	} = useSubActionQueue(
+		state,
+		dispatch,
+		deckRef,
+		discardRef,
+		villageDeckRef,
+		eDeckRef
+	)
 
 	const gameDrawCards = (n: number): void => {
 		enqueue([{type: 'ENQ_PLAYER_DRAW_N', count: n}])
@@ -91,9 +99,8 @@ export function useGameActions() {
 		// TODO
 	}
 
-	/** TODO: implement draw new enemy logic */
-	const drawNewEnemy = (): void => {
-		// TODO
+	const gameDrawEnemy = (): void => {
+		enqueue([{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}])
 	}
 
 	/** TODO: implement enemy dies logic */
@@ -111,6 +118,7 @@ export function useGameActions() {
 		deckRef,
 		discardRef,
 		villageDeckRef,
+		eDeckRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
@@ -120,13 +128,13 @@ export function useGameActions() {
 		gameVillagerRowClear,
 		gameBuyCard,
 		playCard,
+		gameDrawEnemy,
 		playerAttackEnemy,
 		playerRepairBuilding,
 		playerSpendCoin,
 		enemyAttackBuilding,
 		enemyRaiseFear,
 		triggerFearEffect,
-		drawNewEnemy,
 		enemyDies,
 		addHeroCardToDiscard,
 		clearActionLogs,
