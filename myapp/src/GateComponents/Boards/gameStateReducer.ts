@@ -41,6 +41,10 @@ export interface GameState {
 	pDiscard: CardInstance[]
 	hDeck: CardInstance[]
 
+	eEnemyDeck: EnemyCardInstance[]
+	eEnemyRow: EnemyCardInstance[]
+	eEnemyRowMax: number
+
 	vDeck: CardInstance[]
 	vRow: CardInstance[]
 	vDiscard: CardInstance[]
@@ -271,6 +275,11 @@ export const initialState: GameState = {
 	pDiscard: [],
 	hDeck: makeCardInstances(GetRange('HERO').sort(() => 0.5 - Math.random())),
 	vDeck: makeCardInstances(GetRange('VILLAGER').sort(() => 0.5 - Math.random())),
+
+	eEnemyDeck: [],
+	eEnemyRow: [],
+	eEnemyRowMax: 2,
+
 	vRow: makeCardInstances(
 		GetRange('VILLAGER').sort(() => 0.5 - Math.random()).slice(-4)
 	),
