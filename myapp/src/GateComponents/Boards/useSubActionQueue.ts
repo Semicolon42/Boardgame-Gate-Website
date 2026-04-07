@@ -46,6 +46,7 @@ export type SubActionType =
 	| 'VILLAGER_ROW_BUY_CARD'
 	| 'EXECUTE_GAMTE_STATE_UPDATE'
 	| 'ENQ_ENEMY_DRAW_SINGLE_CARD'
+	| 'ENEMY_ROW_REMOVE_OLDEST'
 	| 'ENEMY_ROW_DRAW_CARD'
 
 export interface SubAction {
@@ -229,9 +230,14 @@ function expandSubAction(
 
 		case 'ENQ_ENEMY_DRAW_SINGLE_CARD': {
 			if (state.eEnemyDeck.length === 0) return [] // no enemies to draw
-			if (state.eEnemyRow.length >= state.eEnemyRowMax) return [] // row is full
 			const enemyCard = state.eEnemyDeck[0]
 			if (enemyCard === undefined) return []
+			if (state.eEnemyRow.length >= state.eEnemyRowMax) {
+				return [
+					{type: 'ENEMY_ROW_REMOVE_OLDEST'},
+					{type: 'ENEMY_ROW_DRAW_CARD', enemyCard}
+				]
+			}
 			return [{type: 'ENEMY_ROW_DRAW_CARD', enemyCard}]
 		}
 
@@ -250,7 +256,8 @@ export function useSubActionQueue(
 	deckRef: RefObject<HTMLDivElement | null>,
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>,
-	eDeckRef: RefObject<HTMLDivElement | null>
+	eDeckRef: RefObject<HTMLDivElement | null>,
+	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>
 ) {
 	const [queue, setQueue] = useState<SubAction[]>([])
 	const [isAnimating, setIsAnimating] = useState(false)
@@ -259,6 +266,12 @@ export function useSubActionQueue(
 	)
 	const [animatingClearVillagerRow, setAnimatingClearVillagerRow] =
 		useState<AnimatingVillagerRowSpec | null>(null)
+	const [animatingEnemyShifts, setAnimatingEnemyShifts] = useState<
+		Record<string, {x: number; y: number}>
+	>({})
+	const [animatingEnemyRemove, setAnimatingEnemyRemove] = useState<
+		string | null
+	>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -279,6 +292,8 @@ export function useSubActionQueue(
 		pendingOnCompleteRef.current = null
 		setAnimatingCard(null)
 		setAnimatingClearVillagerRow(null)
+		setAnimatingEnemyShifts({})
+		setAnimatingEnemyRemove(null)
 		setIsAnimating(false)
 		setQueue(q => q.slice(1))
 	}, [])
@@ -486,11 +501,38 @@ export function useSubActionQueue(
 				break
 			}
 
+			case 'ENEMY_ROW_REMOVE_OLDEST': {
+				const oldest = currentState.eEnemyRow[0]
+				if (oldest === undefined) {
+					setQueue(q => q.slice(1))
+					return
+				}
+				// Defer dispatch until after fade-out so the card stays rendered.
+				pendingOnCompleteRef.current = () => {
+					dispatch({type: 'ENEMY_ROW_DISCARD_OLDEST'})
+				}
+				setAnimatingEnemyRemove(oldest.instanceId)
+				setIsAnimating(true)
+				break
+			}
+
 			case 'ENEMY_ROW_DRAW_CARD': {
 				const {enemyCard} = head
 				if (enemyCard === undefined) {
 					setQueue(q => q.slice(1))
 					return
+				}
+				// Capture current slot positions before dispatch so shifted cards can
+				// animate from their old slot positions after re-render.
+				const currentRow = currentState.eEnemyRow
+				const offset = currentState.eEnemyRowMax - currentRow.length
+				const shiftMap: Record<string, {x: number; y: number}> = {}
+				for (let i = 0; i < currentRow.length; i++) {
+					const c = currentRow[i]
+					if (c === undefined) continue
+					const slotEl = enemySlotsRef.current[offset + i]
+					const rect = slotEl?.getBoundingClientRect()
+					if (rect) shiftMap[c.instanceId] = {x: rect.left, y: rect.top}
 				}
 				dispatch({
 					type: 'MULTI_ACTION',
@@ -499,6 +541,7 @@ export function useSubActionQueue(
 						{type: 'ENEMY_ROW_ADD_CARD', card: enemyCard}
 					]
 				})
+				setAnimatingEnemyShifts(shiftMap)
 				setIsAnimating(true)
 				setAnimatingCard({
 					type: 'ENEMY',
@@ -533,6 +576,8 @@ export function useSubActionQueue(
 		/** True whenever the queue is non-empty (including mid-animation). */
 		isProcessing: queue.length > 0,
 		animatingCard,
-		animatingClearVillagerRow
+		animatingClearVillagerRow,
+		animatingEnemyShifts,
+		animatingEnemyRemove
 	}
 }

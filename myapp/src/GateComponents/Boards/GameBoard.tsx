@@ -14,9 +14,12 @@ export function GameBoard() {
 		discardRef,
 		villageDeckRef,
 		eDeckRef,
+		enemySlotsRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
+		animatingEnemyShifts,
+		animatingEnemyRemove,
 		gameBuyCard,
 		playCard,
 		signalAnimationComplete,
@@ -80,11 +83,7 @@ export function GameBoard() {
 						/>
 						<button
 							className={buttonClass}
-							disabled={
-								isProcessing ||
-								gameState.eEnemyDeck.length === 0 ||
-								gameState.eEnemyRow.length >= gameState.eEnemyRowMax
-							}
+							disabled={isProcessing || gameState.eEnemyDeck.length === 0}
 							onClick={() => {
 								gameDrawEnemy()
 							}}
@@ -95,9 +94,12 @@ export function GameBoard() {
 					</div>
 					<EnemyRow
 						animatingCard={animatingCard}
+						animatingEnemyRemove={animatingEnemyRemove}
+						animatingEnemyShifts={animatingEnemyShifts}
 						eDeckRef={eDeckRef}
 						enemyCards={gameState.eEnemyRow}
 						enemyRowMax={gameState.eEnemyRowMax}
+						enemySlotsRef={enemySlotsRef}
 						heroCardsRemaining={gameState.hDeck.length}
 						onAnimationEnd={signalAnimationComplete}
 					/>

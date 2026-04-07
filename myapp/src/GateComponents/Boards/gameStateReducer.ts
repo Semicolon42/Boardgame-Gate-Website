@@ -59,6 +59,7 @@ export interface GameState {
 
 	eEnemyDeck: EnemyCardInstance[]
 	eEnemyRow: EnemyCardInstance[]
+	eEnemyDiscard: EnemyCardInstance[]
 	eEnemyRowMax: number
 
 	vDeck: CardInstance[]
@@ -118,6 +119,7 @@ export type GameAction =
 	| {type: 'ACTION_LOGS_CLEAR'}
 	| {type: 'ENEMY_DECK_REMOVE_CARD'; instanceId: string}
 	| {type: 'ENEMY_ROW_ADD_CARD'; card: EnemyCardInstance}
+	| {type: 'ENEMY_ROW_DISCARD_OLDEST'}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -292,6 +294,17 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'ENEMY_ROW_DISCARD_OLDEST': {
+			const oldest = state.eEnemyRow[0]
+			if (oldest === undefined) return {...state, actionLogs: newActionLog}
+			return {
+				...state,
+				eEnemyRow: state.eEnemyRow.slice(1),
+				eEnemyDiscard: [...state.eEnemyDiscard, oldest],
+				actionLogs: newActionLog
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -318,6 +331,7 @@ export const initialState: GameState = {
 
 	eEnemyDeck: makeEnemyCardInstances([1, 2, 3, 4]),
 	eEnemyRow: [],
+	eEnemyDiscard: [],
 	eEnemyRowMax: 2,
 
 	vRow: makeCardInstances(

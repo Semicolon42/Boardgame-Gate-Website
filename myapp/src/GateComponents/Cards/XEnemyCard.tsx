@@ -10,6 +10,7 @@ interface XEnemyCardProps {
 	onAnimationEnd?: () => void
 	moveFrom?: {x: number; y: number} | undefined
 	moveTo?: {x: number; y: number} | undefined
+	isFadingOut?: boolean
 	/** CSS class injected by parent — used for grid-area stacking. */
 	className?: string
 }
@@ -19,6 +20,7 @@ export function XEnemyCard({
 	onAnimationEnd,
 	moveFrom,
 	moveTo,
+	isFadingOut = false,
 	className = ''
 }: XEnemyCardProps) {
 	const ref = useRef<HTMLDivElement>(null)
@@ -44,7 +46,7 @@ export function XEnemyCard({
 
 	return (
 		<div
-			className={`flex h-[140px] w-[100px] shrink-0 flex-col items-start rounded-xl bg-red-800 p-[5px] text-white XENEMYCARD ${className}`}
+			className={`flex h-[140px] w-[100px] shrink-0 flex-col items-start rounded-xl bg-red-800 p-[5px] text-white XENEMYCARD ${isFadingOut ? 'card-fade-out-animate' : ''} ${className}`}
 			onAnimationEnd={onAnimationEnd}
 			ref={ref as RefObject<HTMLDivElement>}
 		>

@@ -23,6 +23,7 @@ export function useGameActions() {
 	const discardRef = useRef<HTMLDivElement>(null)
 	const villageDeckRef = useRef<HTMLDivElement>(null)
 	const eDeckRef = useRef<HTMLDivElement>(null)
+	const enemySlotsRef = useRef<(HTMLDivElement | null)[]>([])
 
 	const {
 		enqueue,
@@ -30,14 +31,17 @@ export function useGameActions() {
 		signalAnimationComplete,
 		isProcessing,
 		animatingCard,
-		animatingClearVillagerRow
+		animatingClearVillagerRow,
+		animatingEnemyShifts,
+		animatingEnemyRemove
 	} = useSubActionQueue(
 		state,
 		dispatch,
 		deckRef,
 		discardRef,
 		villageDeckRef,
-		eDeckRef
+		eDeckRef,
+		enemySlotsRef
 	)
 
 	const gameDrawCards = (n: number): void => {
@@ -119,9 +123,12 @@ export function useGameActions() {
 		discardRef,
 		villageDeckRef,
 		eDeckRef,
+		enemySlotsRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
+		animatingEnemyShifts,
+		animatingEnemyRemove,
 		signalAnimationComplete,
 		gameDrawCards,
 		gameEndTurn,
