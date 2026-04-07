@@ -103,10 +103,6 @@ export function useGameActions() {
 		// TODO
 	}
 
-	const gameDrawEnemy = (): void => {
-		enqueue([{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}])
-	}
-
 	/** TODO: implement enemy dies logic */
 	const enemyDies = (_enemyId: number): void => {
 		// TODO
@@ -135,7 +131,6 @@ export function useGameActions() {
 		gameVillagerRowClear,
 		gameBuyCard,
 		playCard,
-		gameDrawEnemy,
 		playerAttackEnemy,
 		playerRepairBuilding,
 		playerSpendCoin,

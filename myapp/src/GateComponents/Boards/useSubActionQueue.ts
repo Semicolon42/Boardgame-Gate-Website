@@ -47,6 +47,7 @@ export type SubActionType =
 	| 'EXECUTE_GAMTE_STATE_UPDATE'
 	| 'ENQ_ENEMY_DRAW_SINGLE_CARD'
 	| 'ENEMY_ROW_REMOVE_OLDEST'
+	| 'ENEMY_ROW_REMOVE_INSTANCE'
 	| 'ENEMY_ROW_DRAW_CARD'
 
 export interface SubAction {
@@ -158,6 +159,7 @@ function expandSubAction(
 					type: 'EXECUTE_GAMTE_STATE_UPDATE',
 					gameStateAction: {type: 'CLEAR_PLAYED_CARDS'}
 				},
+				{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'},
 				{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 			]
 
@@ -230,15 +232,16 @@ function expandSubAction(
 
 		case 'ENQ_ENEMY_DRAW_SINGLE_CARD': {
 			if (state.eEnemyDeck.length === 0) return [] // no enemies to draw
-			const enemyCard = state.eEnemyDeck[0]
-			if (enemyCard === undefined) return []
+			const newEnemy = state.eEnemyDeck[0]
+			const discardEnemy = state.eEnemyRow[0]
+			if (newEnemy === undefined) return []
 			if (state.eEnemyRow.length >= state.eEnemyRowMax) {
 				return [
-					{type: 'ENEMY_ROW_REMOVE_OLDEST'},
-					{type: 'ENEMY_ROW_DRAW_CARD', enemyCard}
+					{type: 'ENEMY_ROW_REMOVE_INSTANCE', enemyCard: discardEnemy},
+					{type: 'ENEMY_ROW_DRAW_CARD', enemyCard: newEnemy}
 				]
 			}
-			return [{type: 'ENEMY_ROW_DRAW_CARD', enemyCard}]
+			return [{type: 'ENEMY_ROW_DRAW_CARD', enemyCard: newEnemy}]
 		}
 
 		default:
@@ -498,6 +501,21 @@ export function useSubActionQueue(
 			case 'VILLAGER_SHUFFLE_DECK': {
 				dispatch({type: 'STACK_SHUFFLE', stack: 'VILLAGER_DECK'})
 				setQueue(q => q.slice(1))
+				break
+			}
+
+			case 'ENEMY_ROW_REMOVE_INSTANCE': {
+				const uuid = head.enemyCard?.instanceId
+				if (uuid === undefined) {
+					setQueue(q => q.slice(1))
+					return
+				}
+				// Defer dispatch until after fade-out so the card stays rendered.
+				pendingOnCompleteRef.current = () => {
+					dispatch({type: 'ENEMY_ROW_DISCARD_INSTANCE', uuid})
+				}
+				setAnimatingEnemyRemove(uuid)
+				setIsAnimating(true)
 				break
 			}
 

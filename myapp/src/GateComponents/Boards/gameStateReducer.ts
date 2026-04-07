@@ -120,6 +120,7 @@ export type GameAction =
 	| {type: 'ENEMY_DECK_REMOVE_CARD'; instanceId: string}
 	| {type: 'ENEMY_ROW_ADD_CARD'; card: EnemyCardInstance}
 	| {type: 'ENEMY_ROW_DISCARD_OLDEST'}
+	| {type: 'ENEMY_ROW_DISCARD_INSTANCE'; uuid: string}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -294,6 +295,17 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'ENEMY_ROW_DISCARD_INSTANCE': {
+			const discard = state.eEnemyRow.filter((e)=>e.instanceId===action.uuid)
+			if (discard === undefined || discard.length > 1) return {...state, actionLogs: newActionLog}
+			return {
+				...state,
+				eEnemyRow: state.eEnemyRow.filter((e)=>e.instanceId!==action.uuid),
+				eEnemyDiscard: discard[0] ? [...state.eEnemyDiscard, discard[0]] : state.eEnemyDiscard,
+				actionLogs: newActionLog
+			}
+		}
+
 		case 'ENEMY_ROW_DISCARD_OLDEST': {
 			const oldest = state.eEnemyRow[0]
 			if (oldest === undefined) return {...state, actionLogs: newActionLog}
@@ -329,7 +341,7 @@ export const initialState: GameState = {
 		GetRange('VILLAGER').sort(() => 0.5 - Math.random())
 	),
 
-	eEnemyDeck: makeEnemyCardInstances([1, 2, 3, 4]),
+	eEnemyDeck: makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
 	eEnemyRow: [],
 	eEnemyDiscard: [],
 	eEnemyRowMax: 2,

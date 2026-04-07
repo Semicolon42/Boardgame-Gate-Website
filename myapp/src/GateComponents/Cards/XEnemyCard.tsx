@@ -4,6 +4,8 @@ import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
+import { getEnemyCard } from '../Data/EnemyCardsData'
+import { ScaledName } from '../UIComponents/misc'
 
 interface XEnemyCardProps {
 	card: EnemyCardInstance
@@ -24,6 +26,7 @@ export function XEnemyCard({
 	className = ''
 }: XEnemyCardProps) {
 	const ref = useRef<HTMLDivElement>(null)
+	const enemyInfo = getEnemyCard(card.cardId)
 
 	useLayoutEffect(() => {
 		const el = ref.current
@@ -46,13 +49,20 @@ export function XEnemyCard({
 
 	return (
 		<div
-			className={`flex h-[140px] w-[100px] shrink-0 flex-col items-start rounded-xl bg-red-800 p-[5px] text-white XENEMYCARD ${isFadingOut ? 'card-fade-out-animate' : ''} ${className}`}
+			className={`flex h-[140px] w-[100px] shrink-0 flex-col items-start rounded-xl bg-red-800 p-[5px] text-white XENEMYCARD ${isFadingOut ? 'card-fade-out-animate' : ''} ${className} outline-4 outline-black`}
 			onAnimationEnd={onAnimationEnd}
 			ref={ref as RefObject<HTMLDivElement>}
 		>
-			<div className='font-bold text-xs'>Enemy</div>
-			<div className='text-xs'>Type: {card.cardId}</div>
-			<div className='text-xs'>HP: {card.health}</div>
+			<div className='flex items-center gap-[4px] px-[5px] w-full'>
+				<ScaledName text={enemyInfo.name} />
+				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs text-black'>
+					{enemyInfo.stars}
+				</div>
+			</div>
+			<div>
+				<div className='text-xs'>Type: {card.cardId}</div>
+				<div className='text-xs'>HP: {card.health}</div>
+			</div>
 		</div>
 	)
 }

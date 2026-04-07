@@ -3,10 +3,12 @@ import type {EnemyCardInstance} from '@/GateComponents/Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
 import {XEnemyCard} from '@/GateComponents/Cards/XEnemyCard'
+import { getEnemyCard } from '@/GateComponents/Data/EnemyCardsData'
 
 interface EnemyRowProps {
 	enemyCards: EnemyCardInstance[]
 	enemyRowMax: number
+	enemyDeckCards: EnemyCardInstance[]
 	heroCardsRemaining: number
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
@@ -29,6 +31,7 @@ export function HeroDeck(props: {cardsRemaining: number}) {
 export function EnemyRow({
 	enemyCards,
 	enemyRowMax,
+	enemyDeckCards,
 	heroCardsRemaining,
 	animatingCard,
 	onAnimationEnd,
@@ -44,6 +47,9 @@ export function EnemyRow({
 		{length: enemyRowMax},
 		(_, i) => (i >= offset ? enemyCards[i - offset] ?? null : null)
 	)
+
+	let topdDeckLevel = "<empty>"
+	if (enemyDeckCards[0]) {topdDeckLevel = getEnemyCard(enemyDeckCards[0]?.cardId).type }
 
 	return (
 		<div className='flex space-x-3 p-[2px]'>
@@ -98,10 +104,12 @@ export function EnemyRow({
 
 			{/* Enemy deck ref node — used by animation system to measure source position */}
 			<div
-				className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+				className='flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
 				ref={eDeckRef}
 			>
-				Enemy Deck
+				<div>Enemy Deck</div>
+				<div>{enemyDeckCards.length} Cards</div>
+				<div>{topdDeckLevel}</div>
 			</div>
 
 			<HeroDeck cardsRemaining={heroCardsRemaining} />

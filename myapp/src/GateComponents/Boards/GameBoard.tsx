@@ -25,7 +25,6 @@ export function GameBoard() {
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
-		gameDrawEnemy,
 		clearActionLogs
 	} = useGameActions()
 
@@ -81,22 +80,13 @@ export function GameBoard() {
 							value={`${gameState.cAttack}`}
 							variant={gameState.cAttack > 0 ? 'success' : 'neutral'}
 						/>
-						<button
-							className={buttonClass}
-							disabled={isProcessing || gameState.eEnemyDeck.length === 0}
-							onClick={() => {
-								gameDrawEnemy()
-							}}
-							type='button'
-						>
-							+Enemy
-						</button>
 					</div>
 					<EnemyRow
 						animatingCard={animatingCard}
 						animatingEnemyRemove={animatingEnemyRemove}
 						animatingEnemyShifts={animatingEnemyShifts}
 						eDeckRef={eDeckRef}
+						enemyDeckCards={gameState.eEnemyDeck}
 						enemyCards={gameState.eEnemyRow}
 						enemyRowMax={gameState.eEnemyRowMax}
 						enemySlotsRef={enemySlotsRef}
