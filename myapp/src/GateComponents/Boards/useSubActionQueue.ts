@@ -580,7 +580,8 @@ export function useSubActionQueue(
 		deckRef,
 		discardRef,
 		villagerDeckRef.current?.getBoundingClientRect,
-		eDeckRef.current?.getBoundingClientRect
+		eDeckRef.current?.getBoundingClientRect,
+		enemySlotsRef
 	])
 
 	const enqueue = useCallback((actions: SubAction[]) => {

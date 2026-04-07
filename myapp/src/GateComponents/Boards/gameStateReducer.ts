@@ -296,12 +296,15 @@ export function gameStateReducer(
 		}
 
 		case 'ENEMY_ROW_DISCARD_INSTANCE': {
-			const discard = state.eEnemyRow.filter((e)=>e.instanceId===action.uuid)
-			if (discard === undefined || discard.length > 1) return {...state, actionLogs: newActionLog}
+			const discard = state.eEnemyRow.filter(e => e.instanceId === action.uuid)
+			if (discard === undefined || discard.length > 1)
+				return {...state, actionLogs: newActionLog}
 			return {
 				...state,
-				eEnemyRow: state.eEnemyRow.filter((e)=>e.instanceId!==action.uuid),
-				eEnemyDiscard: discard[0] ? [...state.eEnemyDiscard, discard[0]] : state.eEnemyDiscard,
+				eEnemyRow: state.eEnemyRow.filter(e => e.instanceId !== action.uuid),
+				eEnemyDiscard: discard[0]
+					? [...state.eEnemyDiscard, discard[0]]
+					: state.eEnemyDiscard,
 				actionLogs: newActionLog
 			}
 		}

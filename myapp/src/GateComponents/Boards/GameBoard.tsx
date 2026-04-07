@@ -86,8 +86,8 @@ export function GameBoard() {
 						animatingEnemyRemove={animatingEnemyRemove}
 						animatingEnemyShifts={animatingEnemyShifts}
 						eDeckRef={eDeckRef}
-						enemyDeckCards={gameState.eEnemyDeck}
 						enemyCards={gameState.eEnemyRow}
+						enemyDeckCards={gameState.eEnemyDeck}
 						enemyRowMax={gameState.eEnemyRowMax}
 						enemySlotsRef={enemySlotsRef}
 						heroCardsRemaining={gameState.hDeck.length}

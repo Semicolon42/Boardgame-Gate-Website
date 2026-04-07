@@ -3,7 +3,7 @@ import type {EnemyCardInstance} from '@/GateComponents/Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
 import {XEnemyCard} from '@/GateComponents/Cards/XEnemyCard'
-import { getEnemyCard } from '@/GateComponents/Data/EnemyCardsData'
+import {getEnemyCard} from '@/GateComponents/Data/EnemyCardsData'
 
 interface EnemyRowProps {
 	enemyCards: EnemyCardInstance[]
@@ -43,13 +43,14 @@ export function EnemyRow({
 	// Right-aligned: newest card occupies rightmost slot.
 	// eEnemyRow = [oldest, ..., newest]; slot[offset + i] = eEnemyRow[i]
 	const offset = enemyRowMax - enemyCards.length
-	const slots = Array.from(
-		{length: enemyRowMax},
-		(_, i) => (i >= offset ? enemyCards[i - offset] ?? null : null)
+	const slots = Array.from({length: enemyRowMax}, (_, i) =>
+		i >= offset ? (enemyCards[i - offset] ?? null) : null
 	)
 
-	let topdDeckLevel = "<empty>"
-	if (enemyDeckCards[0]) {topdDeckLevel = getEnemyCard(enemyDeckCards[0]?.cardId).type }
+	let topdDeckLevel = '<empty>'
+	if (enemyDeckCards[0]) {
+		topdDeckLevel = getEnemyCard(enemyDeckCards[0]?.cardId).type
+	}
 
 	return (
 		<div className='flex space-x-3 p-[2px]'>
@@ -80,6 +81,7 @@ export function EnemyRow({
 					// biome-ignore lint/suspicious/noArrayIndexKey: stable positional slot key
 					<div
 						className='grid'
+						// biome-ignore lint/suspicious/noArrayIndexKey: this is a valid usecase for slot indexing
 						key={`enemy-slot-${slotIndex}`}
 						ref={el => {
 							if (enemySlotsRef) enemySlotsRef.current[slotIndex] = el
@@ -95,7 +97,9 @@ export function EnemyRow({
 								isFadingOut={isFadingOut}
 								key={card.instanceId}
 								{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
-								{...(cardOnAnimEnd !== undefined ? {onAnimationEnd: cardOnAnimEnd} : {})}
+								{...(cardOnAnimEnd !== undefined
+									? {onAnimationEnd: cardOnAnimEnd}
+									: {})}
 							/>
 						)}
 					</div>

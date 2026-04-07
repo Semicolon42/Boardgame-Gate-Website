@@ -4,8 +4,8 @@ import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
-import { getEnemyCard } from '../Data/EnemyCardsData'
-import { ScaledName } from '../UIComponents/misc'
+import {getEnemyCard} from '../Data/EnemyCardsData'
+import {ScaledName} from '../UIComponents/misc'
 
 interface XEnemyCardProps {
 	card: EnemyCardInstance
