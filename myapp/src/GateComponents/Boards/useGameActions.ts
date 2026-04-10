@@ -5,16 +5,17 @@
 // This hook is the single entry point for GameBoard. It wires together:
 //   - Layer 1: gameStateReducer (pure state machine)
 //   - Layer 2: useSubActionQueue (animated sub-action sequencing)
+//
+// Action logic is split by domain into actions/ — each is a plain factory
+// function (not a hook) that closes over enqueue/dispatch.
 
 import {useReducer, useRef} from 'react'
-import type {CardPlayHandler, CardPlayType} from '../Cards/XCard'
-import {
-	type BuildingType,
-	type CardInstance,
-	gameStateReducer,
-	initialState
-} from './gameStateReducer'
+import {gameStateReducer, initialState} from './gameStateReducer'
 import {useSubActionQueue} from './useSubActionQueue'
+import {makeBuildingActions} from './actions/buildingActions'
+import {makeEnemyActions} from './actions/enemyActions'
+import {makePlayerActions} from './actions/playerActions'
+import {makeVillagerActions} from './actions/villagerActions'
 
 export function useGameActions() {
 	const [state, dispatch] = useReducer(gameStateReducer, initialState)
@@ -44,75 +45,6 @@ export function useGameActions() {
 		enemySlotsRef
 	)
 
-	const gameDrawCards = (n: number): void => {
-		enqueue([{type: 'ENQ_PLAYER_DRAW_N', count: n}])
-	}
-
-	const gameEndTurn = (): void => {
-		enqueue([{type: 'ENQ_END_TURN'}])
-	}
-
-	const clearActionLogs = (): void => {
-		dispatch({type: 'ACTION_LOGS_CLEAR'})
-	}
-
-	const gameVillagerRowClear = (): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_CLEAR'}])
-	}
-
-	const gameBuyCard = (card: CardInstance): void => {
-		enqueue([{type: 'ENQ_VILLAGER_ROW_BUY_CARD', card}])
-	}
-
-	const playCard: CardPlayHandler = (
-		card: CardInstance,
-		cardPlayType: CardPlayType
-	): void => {
-		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', card, cardPlayType}])
-	}
-
-	/** TODO: implement player attack enemy logic */
-	const playerAttackEnemy = (_enemyId: number): void => {
-		// TODO
-	}
-
-	/** TODO: implement player repair building logic */
-	const playerRepairBuilding = (_building: BuildingType): void => {
-		// TODO
-	}
-
-	/** TODO: implement player spend coin logic */
-	const playerSpendCoin = (
-		_coinAction: 'CALM' | 'ATTACK' | 'REPAIR' | 'REPLACE_BUY_ROW'
-	): void => {
-		// TODO
-	}
-
-	/** TODO: implement enemy attack building logic */
-	const enemyAttackBuilding = (_building: BuildingType): void => {
-		// TODO
-	}
-
-	/** TODO: implement enemy raise fear logic */
-	const enemyRaiseFear = (): void => {
-		// TODO
-	}
-
-	/** TODO: implement trigger fear effect logic */
-	const triggerFearEffect = (): void => {
-		// TODO
-	}
-
-	/** TODO: implement enemy dies logic */
-	const enemyDies = (_enemyId: number): void => {
-		// TODO
-	}
-
-	/** TODO: implement add hero card to discard logic */
-	const addHeroCardToDiscard = (): void => {
-		// TODO
-	}
-
 	return {
 		state,
 		deckRef,
@@ -126,20 +58,10 @@ export function useGameActions() {
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		signalAnimationComplete,
-		gameDrawCards,
-		gameEndTurn,
-		gameVillagerRowClear,
-		gameBuyCard,
-		playCard,
-		playerAttackEnemy,
-		playerRepairBuilding,
-		playerSpendCoin,
-		enemyAttackBuilding,
-		enemyRaiseFear,
-		triggerFearEffect,
-		enemyDies,
-		addHeroCardToDiscard,
-		clearActionLogs,
-		queue
+		queue,
+		...makePlayerActions(enqueue, dispatch),
+		...makeVillagerActions(enqueue),
+		...makeEnemyActions(enqueue),
+		...makeBuildingActions(enqueue)
 	}
 }
