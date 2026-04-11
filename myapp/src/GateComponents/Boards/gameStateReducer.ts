@@ -8,6 +8,7 @@
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {GetRange} from '../Data/PlayerCards'
+import type { SubActionType } from './useSubActionQueue'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -51,21 +52,35 @@ export function makeEnemyCardInstances(
 // ---------------------------------------------------------------------------
 
 export interface GameState {
+	gameOutcome: GameOutcomeType | undefined
+	stateActionLogs: GameAction[]
+
+	// Game State
+	bGateHealth: number
+	bFarmHealth: number
+	bTowerHealth: number
+	fFear: number
+	fFearamid: SubActionType[]
+
+	// Player card state
 	pDeck: CardInstance[]
 	pHand: CardInstance[]
 	pPlayed: {[key: string]: CardPlayType | undefined}
 	pDiscard: CardInstance[]
 	hDeck: CardInstance[]
 
+	// Enemy cards state
 	eEnemyDeck: EnemyCardInstance[]
 	eEnemyRow: EnemyCardInstance[]
 	eEnemyDiscard: EnemyCardInstance[]
 	eEnemyRowMax: number
 
+	// Citizen Cards State
 	vDeck: CardInstance[]
 	vRow: CardInstance[]
 	vDiscard: CardInstance[]
 
+	// Current resources State
 	cCoins: number
 	cCalm: number
 	cRepair: number
@@ -73,11 +88,6 @@ export interface GameState {
 	cBonusRepairGate: number
 	cBonusRepairTower: number
 	cAttack: number
-
-	actionLogs: GameAction[]
-	bGateHealth: number
-	bFarmHealth: number
-	bTowerHealth: number
 }
 
 export type StackType =
@@ -88,6 +98,8 @@ export type StackType =
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
 export type BuildingType = 'farm' | 'gate' | 'tower' | 'all'
+
+export type GameOutcomeType = 'WIN' | 'LOSS'
 
 export type GameAction =
 	| {type: 'STACK_CLEAR_ALL_CARDS'; stack: StackType}
@@ -121,6 +133,7 @@ export type GameAction =
 	| {type: 'ENEMY_ROW_ADD_CARD'; card: EnemyCardInstance}
 	| {type: 'ENEMY_ROW_DISCARD_OLDEST'}
 	| {type: 'ENEMY_ROW_DISCARD_INSTANCE'; uuid: string}
+	| {type: 'UPDATE_GAME_OUTCOME'; outcome: GameOutcomeType}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -163,13 +176,22 @@ export function gameStateReducer(
 	state: GameState,
 	action: GameAction
 ): GameState {
-	const newActionLog = [...state.actionLogs, action]
+	const newActionLog = [...state.stateActionLogs, action]
 
 	switch (action.type) {
+		case 'UPDATE_GAME_OUTCOME': {
+			return {
+				...state,
+				gameOutcome: action.outcome,
+				stateActionLogs: newActionLog,
+			}
+		}
+
+
 		case 'ACTION_LOGS_CLEAR':
 			return {
 				...state,
-				actionLogs: [action]
+				stateActionLogs: [action]
 			}
 
 		case 'STACK_ADD_CARDS': {
@@ -177,7 +199,7 @@ export function gameStateReducer(
 			return {
 				...state,
 				[key]: [...state[key], ...action.cards],
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -189,7 +211,7 @@ export function gameStateReducer(
 				[key]: state[key].filter(
 					(c: CardInstance) => !toRemove.has(c.instanceId)
 				),
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -198,13 +220,13 @@ export function gameStateReducer(
 			return {
 				...state,
 				[key]: [...state[key]].sort(() => Math.random() - 0.5),
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
 		case 'STACK_CLEAR_ALL_CARDS': {
 			const key = stackKey(action.stack)
-			return {...state, [key]: [], actionLogs: newActionLog}
+			return {...state, [key]: [], stateActionLogs: newActionLog}
 		}
 
 		case 'BUILDING_CHANGE_HEALTH': {
@@ -214,19 +236,19 @@ export function gameStateReducer(
 					return {
 						...state,
 						bFarmHealth: state.bFarmHealth + action.healthChange,
-						actionLogs: newActionLog
+						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
 						bGateHealth: state.bGateHealth + action.healthChange,
-						actionLogs: newActionLog
+						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
 						bTowerHealth: state.bTowerHealth + action.healthChange,
-						actionLogs: newActionLog
+						stateActionLogs: newActionLog
 					}
 				default:
 					return state
@@ -246,7 +268,7 @@ export function gameStateReducer(
 					state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
 				cBonusRepairTower:
 					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -254,7 +276,7 @@ export function gameStateReducer(
 			return {
 				...state,
 				pPlayed: {...state.pPlayed, [action.instanceId]: action.cardPlayType},
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -262,7 +284,7 @@ export function gameStateReducer(
 			return {
 				...state,
 				pPlayed: {},
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -273,7 +295,7 @@ export function gameStateReducer(
 			}
 			return {
 				...currentState,
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -283,7 +305,7 @@ export function gameStateReducer(
 				eEnemyDeck: state.eEnemyDeck.filter(
 					c => c.instanceId !== action.instanceId
 				),
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
@@ -291,39 +313,39 @@ export function gameStateReducer(
 			return {
 				...state,
 				eEnemyRow: [...state.eEnemyRow, action.card],
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
 		case 'ENEMY_ROW_DISCARD_INSTANCE': {
 			const discard = state.eEnemyRow.filter(e => e.instanceId === action.uuid)
 			if (discard === undefined || discard.length > 1)
-				return {...state, actionLogs: newActionLog}
+				return {...state, stateActionLogs: newActionLog}
 			return {
 				...state,
 				eEnemyRow: state.eEnemyRow.filter(e => e.instanceId !== action.uuid),
 				eEnemyDiscard: discard[0]
 					? [...state.eEnemyDiscard, discard[0]]
 					: state.eEnemyDiscard,
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
 		case 'ENEMY_ROW_DISCARD_OLDEST': {
 			const oldest = state.eEnemyRow[0]
-			if (oldest === undefined) return {...state, actionLogs: newActionLog}
+			if (oldest === undefined) return {...state, stateActionLogs: newActionLog}
 			return {
 				...state,
 				eEnemyRow: state.eEnemyRow.slice(1),
 				eEnemyDiscard: [...state.eEnemyDiscard, oldest],
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 		}
 
 		default:
 			return {
 				...state,
-				actionLogs: newActionLog
+				stateActionLogs: newActionLog
 			}
 	}
 }
@@ -335,6 +357,18 @@ export function gameStateReducer(
 export const HAND_SIZE = 3
 
 export const initialState: GameState = {
+	bFarmHealth: 6,
+	bTowerHealth: 6,
+	bGateHealth: 12,
+	fFear: 0,
+	fFearamid: [
+		{type: 'DEBUG_ALERT', message: `Fear 1`},
+		{type: 'DEBUG_ALERT', message: `Fear 1`},
+		{type: 'DEBUG_ALERT', message: `Fear 1`},
+	],
+
+	gameOutcome: undefined,
+
 	pDeck: makeCardInstances([1, 2, 3]),
 	pHand: [],
 	pPlayed: {},
@@ -356,10 +390,6 @@ export const initialState: GameState = {
 	),
 	vDiscard: [],
 
-	bFarmHealth: 6,
-	bTowerHealth: 6,
-	bGateHealth: 12,
-
 	cCoins: 0,
 	cRepair: 0,
 	cBonusRepairFarm: 0,
@@ -368,5 +398,5 @@ export const initialState: GameState = {
 	cCalm: 0,
 	cAttack: 0,
 
-	actionLogs: []
+	stateActionLogs: []
 }

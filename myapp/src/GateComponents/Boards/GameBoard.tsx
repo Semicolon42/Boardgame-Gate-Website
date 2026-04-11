@@ -1,4 +1,4 @@
-import {WaButton, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
@@ -25,7 +25,8 @@ export function GameBoard() {
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
-		clearActionLogs
+		clearActionLogs,
+		gameOver,
 	} = useGameActions()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
@@ -68,6 +69,15 @@ export function GameBoard() {
 						variant='brand'
 					>
 						End Turn
+					</WaButton>
+					<WaButton
+						disabled={isProcessing}
+						onClick={() => {
+							gameOver()
+						}}
+						variant='brand'
+					>
+						GAME OVER
 					</WaButton>
 				</div>
 
@@ -212,6 +222,14 @@ export function GameBoard() {
 					})}
 				</div>
 			</div>
+			<WaDialog open={gameState.gameOutcome !== undefined}>
+				GAME OVER
+				{gameState.gameOutcome}
+				<WaButton appearance="filled" slot="footer" variant="brand" data-dialog="close">
+					Close
+				</WaButton>
+
+			</WaDialog>
 		</div>
 	)
 }

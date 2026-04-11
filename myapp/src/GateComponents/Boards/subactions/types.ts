@@ -23,6 +23,7 @@ export type SubActionType =
 	| {type: 'ENQ_DISCARD_HAND'}
 	| {type: 'ENQ_GAME_END_TURN'}
 	| {type: 'ENQ_GAME_START'}
+	| {type: 'ENQ_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 	| {type: 'ENQ_VILLAGER_ROW_CLEAR'}
@@ -38,6 +39,8 @@ export type SubActionType =
 	| {type: 'ENEMY_ROW_REMOVE_OLDEST'}
 	| {type: 'ENEMY_ROW_REMOVE_INSTANCE'; enemyCard: EnemyCardInstance | undefined}
 	| {type: 'ENEMY_ROW_DRAW_CARD'; enemyCard: EnemyCardInstance}
+
+	| {type: 'DEBUG_ALERT'; message: string}
 
 /** Function signature for enqueuing sub-actions. */
 export type EnqueueFn = (actions: SubActionType[]) => void

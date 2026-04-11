@@ -17,6 +17,10 @@ export function makePlayerActions(
 		enqueue([{type: 'ENQ_GAME_END_TURN'}])
 	}
 
+	const gameOver = (): void => {
+		enqueue([{type: 'ENQ_GAME_OVER'}])
+	}
+
 	const playCard: CardPlayHandler = (card: CardInstance, cardPlayType): void => {
 		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', card, cardPlayType}])
 	}
@@ -62,5 +66,5 @@ export function makePlayerActions(
 		
 	}
 
-	return {gameDrawCards, gameEndTurn, playCard, gainGenericResource, clearActionLogs}
+	return {gameDrawCards, gameEndTurn, gameOver, playCard, gainGenericResource, clearActionLogs}
 }

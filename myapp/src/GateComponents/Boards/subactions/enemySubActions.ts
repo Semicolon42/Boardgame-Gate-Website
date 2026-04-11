@@ -3,12 +3,6 @@ import type {AtomicHandler, Expander, SubActionType} from './types'
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	ENQ_ENEMY_TURN:  (_action, state: GameState): SubActionType[] => {
-		let actionQueue = []
-		while (state.eEnemyRow.length >= state.eEnemyRowMax) {
-			actionQueue.push({
-				type: 'ENEMY_ROW_DISCARD_INSTANCE'
-			})
-		}
 		return [
 			{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 		]

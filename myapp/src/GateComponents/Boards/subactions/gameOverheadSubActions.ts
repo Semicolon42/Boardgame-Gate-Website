@@ -36,7 +36,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			gameStateAction: {type: 'CLEAR_PLAYED_CARDS'}
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
-	]
+	],
+	ENQ_GAME_OVER: (_action, state: GameState): SubActionType[] => {
+		return [
+			{type: 'EXECUTE_GAME_STATE_UPDATE', 
+				gameStateAction: {type: 'UPDATE_GAME_OUTCOME', outcome: 'WIN'}
+			}
+		]
+	},
 }
 
 export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler>> = {
@@ -46,6 +53,14 @@ export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler
 			{type: 'EXECUTE_GAME_STATE_UPDATE'}
 		>
 		ctx.dispatch(gameStateAction)
+		ctx.setQueue(q => q.slice(1))
+	},
+	DEBUG_ALERT: (action, ctx) => {
+		const {message} = action as Extract<
+			SubActionType,
+			{type: 'DEBUG_ALERT'}
+		>
+		alert(message)
 		ctx.setQueue(q => q.slice(1))
 	}
 }
