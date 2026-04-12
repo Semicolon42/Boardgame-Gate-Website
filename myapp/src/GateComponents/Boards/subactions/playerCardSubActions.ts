@@ -1,6 +1,7 @@
 import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
-import type {GameState} from '../gameStateReducer'
-import type {AtomicHandler, Expander, SubActionType} from './types'
+import type {GameAction, GameState} from '../gameStateReducer'
+import type {AtomicHandler, Expander, FloatingTextTarget, SubActionType} from './types'
+import { kind } from 'happy-dom/lib/PropertySymbol.js'
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	ENQ_PLAYER_PLAY_CARD: (action, _state): SubActionType[] => {
@@ -74,6 +75,58 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		const card = state.pDeck[0]
 		if (card === undefined) return []
 		return [{type: 'PLAYER_DRAW_CARD', card}]
+	},
+
+	ENQ_PLAYER_REPAIR_BUILDING: (action, state: GameState): SubActionType[] => {
+		const {building, amount} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_PLAYER_REPAIR_BUILDING'}
+		>
+		let actionResourceUpdate: GameAction = {
+			type: 'UPADTE_RESOURCES',
+			repair: -1
+		}
+		let buildingTarget: FloatingTextTarget = {kind:'BUILDING_FARM'}
+		let repairAmout = amount
+		switch(building) {
+			case 'farm': {
+				buildingTarget = {kind:'BUILDING_FARM'}
+				repairAmout += state.cBonusRepairFarm
+				actionResourceUpdate.bonusRepairFarm = -state.cBonusRepairFarm
+				break;
+			}
+			case 'gate': {
+				buildingTarget = {kind:'BUILDING_GATE'}
+				repairAmout += state.cBonusRepairGate
+				actionResourceUpdate.bonusRepairGate = -state.cBonusRepairGate
+				break;
+			}	
+			case 'tower': {
+				buildingTarget = {kind:'BUILDING_TOWER'}
+				repairAmout += state.cBonusRepairTower
+				actionResourceUpdate.bonusRepairTower = -state.cBonusRepairTower
+				break;
+			}
+		}
+		return [
+			{type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'BUILDING_CHANGE_HEALTH',
+					building: building,
+					healthChange: repairAmout
+				}
+			},
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: actionResourceUpdate
+			},
+			{
+				type: 'SHOW_FLOATING_TEXT',
+				target: buildingTarget,
+				color: 'green',
+				text: ''+repairAmout,
+			}
+		]
 	}
 }
 

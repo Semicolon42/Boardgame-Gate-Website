@@ -6,6 +6,8 @@ import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {ValueBadge} from '../UIComponents/ValueBadge'
 import {useGameActions} from './useGameActions'
+import type { BuildingType } from './gameStateReducer'
+import { ActionColumn } from '../ActionColumn'
 
 export function GameBoard() {
 	const {
@@ -26,6 +28,7 @@ export function GameBoard() {
 		animatingEnemyRemove,
 		animatingFloatingText,
 		gameBuyCard,
+		gameRepairBase,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -41,12 +44,12 @@ export function GameBoard() {
 		'flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
 
 	return (
-		<div className='flex'>
+		<div className='flex bg-gameboard-background'>
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-card-back text-white'
 						ref={villageDeckRef}
 					>
 						Village:
@@ -60,7 +63,7 @@ export function GameBoard() {
 						{gameState?.pDiscard?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-card-back text-white'
 						ref={deckRef}
 					>
 						Deck:
@@ -162,6 +165,13 @@ export function GameBoard() {
 						farmRef={farmRef}
 						gateRef={gateRef}
 						towerRef={towerRef}
+						canRepair={gameState.cRepair > 0}
+						onRepair={(building: BuildingType)=>{
+							gameRepairBase(building, 1)
+						}}
+						farmHealth={gameState.bFarmHealth}
+						gateHealth={gameState.bGateHealth}
+						towerHealth={gameState.bTowerHealth}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>
@@ -214,17 +224,17 @@ export function GameBoard() {
 			</div>
 			<div className='flex-1'>
 				{/* Top of column for some elements */}
-				<div />
+				{/* <ActionColumn actionLog={gameState.stateActionLogs}/> */}
 				{/* bottom of column to show the action list for the current turn */}
 				<div className='flex-1'>
-					<WaButton
+					{/* <WaButton
 						onClick={() => {
 							clearActionLogs()
 						}}
 						variant='brand'
 					>
 						Clear Log
-					</WaButton>
+					</WaButton> */}
 					{/* <ActionColumn actionLog={gameState.actionLogs} /> */}
 					{queue.map(it => {
 						return <div key={crypto.randomUUID()}>{JSON.stringify(it)}</div>

@@ -1,6 +1,6 @@
 import type {Dispatch} from 'react'
 import type {CardPlayHandler} from '../../Cards/XCard'
-import type {CardInstance, GameAction} from '../gameStateReducer'
+import type {BuildingType, CardInstance, GameAction} from '../gameStateReducer'
 import type {EnqueueFn} from '../useSubActionQueue'
 
 type ResourceType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
@@ -92,12 +92,17 @@ export function makePlayerActions(
 		}
 	}
 
+	const gameRepairBase = (building: BuildingType, repairAmount: number) => {
+		enqueue([{type: 'ENQ_PLAYER_REPAIR_BUILDING', building: building, amount: repairAmount }])
+	}
+
 	return {
 		gameDrawCards,
 		gameEndTurn,
 		gameOver,
 		playCard,
 		gainGenericResource,
+		gameRepairBase,
 		clearActionLogs
 	}
 }

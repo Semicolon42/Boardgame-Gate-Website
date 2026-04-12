@@ -5,6 +5,8 @@ import {LoadingOrError} from '@/components/LoadingOrError'
 import {GameBoard} from '@/GateComponents/Boards/GameBoard'
 import {Gallery} from '@/pages/Gallery'
 
+import './GateOverall.css'
+
 const Details = lazy(async () =>
 	import('@/pages/Details').then(m => ({default: m.Details}))
 )

@@ -59,6 +59,9 @@ export interface GameState {
 	bGateHealth: number
 	bFarmHealth: number
 	bTowerHealth: number
+	bGateHealthMAX: number
+	bFarmHealthMAX: number
+	bTowerHealthMAX: number
 	fFear: number
 	fFearamid: SubActionType[]
 
@@ -97,7 +100,7 @@ export type StackType =
 	| 'VILLAGER_DECK'
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
-export type BuildingType = 'farm' | 'gate' | 'tower' | 'all'
+export type BuildingType = 'farm' | 'gate' | 'tower'
 
 export type GameOutcomeType = 'WIN' | 'LOSS'
 
@@ -234,19 +237,19 @@ export function gameStateReducer(
 				case 'farm':
 					return {
 						...state,
-						bFarmHealth: state.bFarmHealth + action.healthChange,
+						bFarmHealth: Math.min(state.bFarmHealth + action.healthChange, state.bFarmHealthMAX),
 						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
-						bGateHealth: state.bGateHealth + action.healthChange,
+						bGateHealth: Math.min(state.bGateHealth + action.healthChange, state.bFarmHealthMAX),
 						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
-						bTowerHealth: state.bTowerHealth + action.healthChange,
+						bTowerHealth: Math.min(state.bTowerHealth + action.healthChange, state.bFarmHealthMAX),
 						stateActionLogs: newActionLog
 					}
 				default:
