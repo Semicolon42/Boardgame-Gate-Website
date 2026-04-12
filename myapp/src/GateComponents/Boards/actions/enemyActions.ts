@@ -1,9 +1,9 @@
-import type {BuildingType, EnemyCardInstance} from '../gameStateReducer'
+import type {EnemyCardInstance} from '../gameStateReducer'
 import type {EnqueueFn} from '../useSubActionQueue'
 
-export function makeEnemyActions(enqueue: EnqueueFn) {
+export function makeEnemyActions(_enqueue: EnqueueFn) {
 	/** TODO: implement logic to attack an enemy */
-	const attackEnemy = (enemy: EnemyCardInstance, damage: number): void => {
+	const attackEnemy = (_enemy: EnemyCardInstance, _damage: number): void => {
 		// TODO
 	}
 

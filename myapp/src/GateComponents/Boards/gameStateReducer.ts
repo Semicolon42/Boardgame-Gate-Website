@@ -8,7 +8,7 @@
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {GetRange} from '../Data/PlayerCards'
-import type { SubActionType } from './useSubActionQueue'
+import type {SubActionType} from './useSubActionQueue'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -183,10 +183,9 @@ export function gameStateReducer(
 			return {
 				...state,
 				gameOutcome: action.outcome,
-				stateActionLogs: newActionLog,
+				stateActionLogs: newActionLog
 			}
 		}
-
 
 		case 'ACTION_LOGS_CLEAR':
 			return {
@@ -362,9 +361,9 @@ export const initialState: GameState = {
 	bGateHealth: 12,
 	fFear: 0,
 	fFearamid: [
-		{type: 'DEBUG_ALERT', message: `Fear 1`},
-		{type: 'DEBUG_ALERT', message: `Fear 1`},
-		{type: 'DEBUG_ALERT', message: `Fear 1`},
+		{type: 'DEBUG_ALERT', message: 'Fear 1'},
+		{type: 'DEBUG_ALERT', message: 'Fear 1'},
+		{type: 'DEBUG_ALERT', message: 'Fear 1'}
 	],
 
 	gameOutcome: undefined,

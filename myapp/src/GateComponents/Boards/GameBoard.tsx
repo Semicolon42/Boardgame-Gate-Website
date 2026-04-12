@@ -1,4 +1,5 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {FloatingText} from '../Cards/FloatingText'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
@@ -15,18 +16,22 @@ export function GameBoard() {
 		villageDeckRef,
 		eDeckRef,
 		enemySlotsRef,
+		farmRef,
+		gateRef,
+		towerRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
 		animatingEnemyRemove,
+		animatingFloatingText,
 		gameBuyCard,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
 		clearActionLogs,
-		gameOver,
+		gameOver
 	} = useGameActions()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
@@ -153,7 +158,11 @@ export function GameBoard() {
 							/>
 						)}
 					</div>
-					<PlayerBaseRow />
+					<PlayerBaseRow
+						farmRef={farmRef}
+						gateRef={gateRef}
+						towerRef={towerRef}
+					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>
 						<button
@@ -225,11 +234,21 @@ export function GameBoard() {
 			<WaDialog open={gameState.gameOutcome !== undefined}>
 				GAME OVER
 				{gameState.gameOutcome}
-				<WaButton appearance="filled" slot="footer" variant="brand" data-dialog="close">
+				<WaButton
+					appearance='filled'
+					data-dialog='close'
+					slot='footer'
+					variant='brand'
+				>
 					Close
 				</WaButton>
-
 			</WaDialog>
+			{animatingFloatingText && (
+				<FloatingText
+					onAnimationEnd={signalAnimationComplete}
+					spec={animatingFloatingText}
+				/>
+			)}
 		</div>
 	)
 }

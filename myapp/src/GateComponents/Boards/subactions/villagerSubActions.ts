@@ -3,7 +3,10 @@ import type {GameState} from '../gameStateReducer'
 import type {AtomicHandler, Expander, SubActionType} from './types'
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
-	ENQ_VILLAGER_DRAW_SINGLE_CARD: (_action, state: GameState): SubActionType[] => {
+	ENQ_VILLAGER_DRAW_SINGLE_CARD: (
+		_action,
+		state: GameState
+	): SubActionType[] => {
 		if (state.vDeck.length === 0) {
 			if (state.vDiscard.length === 0) return []
 			return [
@@ -18,7 +21,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	},
 
 	ENQ_VILLAGER_ROW_BUY_CARD: (action, _state): SubActionType[] => {
-		const {card} = action as Extract<SubActionType, {type: 'ENQ_VILLAGER_ROW_BUY_CARD'}>
+		const {card} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_VILLAGER_ROW_BUY_CARD'}
+		>
 		return [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
@@ -48,9 +54,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	}
 }
 
-export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler>> = {
+export const atomicHandlers: Partial<
+	Record<SubActionType['type'], AtomicHandler>
+> = {
 	VILLAGER_ROW_DRAW_CARD: (action, ctx) => {
-		const {card} = action as Extract<SubActionType, {type: 'VILLAGER_ROW_DRAW_CARD'}>
+		const {card} = action as Extract<
+			SubActionType,
+			{type: 'VILLAGER_ROW_DRAW_CARD'}
+		>
 		ctx.dispatch({
 			type: 'MULTI_ACTION',
 			actions: [
@@ -73,7 +84,10 @@ export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler
 	},
 
 	VILLAGER_ROW_BUY_CARD: (action, ctx) => {
-		const {card} = action as Extract<SubActionType, {type: 'VILLAGER_ROW_BUY_CARD'}>
+		const {card} = action as Extract<
+			SubActionType,
+			{type: 'VILLAGER_ROW_BUY_CARD'}
+		>
 		if (card === undefined) {
 			ctx.setQueue(q => q.slice(1))
 			return
@@ -102,14 +116,21 @@ export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler
 	},
 
 	VILLAGER_ROW_CLEAR: (action, ctx) => {
-		const {cards} = action as Extract<SubActionType, {type: 'VILLAGER_ROW_CLEAR'}>
+		const {cards} = action as Extract<
+			SubActionType,
+			{type: 'VILLAGER_ROW_CLEAR'}
+		>
 		const cardsToDiscard = cards ?? ctx.currentState.vRow
 		ctx.pendingOnCompleteRef.current = () => {
 			ctx.dispatch({
 				type: 'MULTI_ACTION',
 				actions: [
 					{type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_ROW'},
-					{type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DISCARD', cards: cardsToDiscard}
+					{
+						type: 'STACK_ADD_CARDS',
+						stack: 'VILLAGER_DISCARD',
+						cards: cardsToDiscard
+					}
 				]
 			})
 		}
@@ -122,8 +143,14 @@ export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler
 	},
 
 	VILLAGER_SHUFFLE_DISCARD_INTO_DECK: (_action, ctx) => {
-		const shuffled = [...ctx.currentState.vDiscard].sort(() => Math.random() - 0.5)
-		ctx.dispatch({type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DECK', cards: shuffled})
+		const shuffled = [...ctx.currentState.vDiscard].sort(
+			() => Math.random() - 0.5
+		)
+		ctx.dispatch({
+			type: 'STACK_ADD_CARDS',
+			stack: 'VILLAGER_DECK',
+			cards: shuffled
+		})
 		ctx.dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_DISCARD'})
 		ctx.setQueue(q => q.slice(1))
 	},

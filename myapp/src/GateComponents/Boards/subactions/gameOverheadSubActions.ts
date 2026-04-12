@@ -2,7 +2,7 @@ import type {GameState} from '../gameStateReducer'
 import type {AtomicHandler, Expander, SubActionType} from './types'
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
-	ENQ_GAME_START: (_action, state: GameState): SubActionType[] => {
+	ENQ_GAME_START: (_action, _state: GameState): SubActionType[] => {
 		return [
 			// Prepare the player starter deck
 			// Prepare the village deck
@@ -37,16 +37,19 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
-	ENQ_GAME_OVER: (_action, state: GameState): SubActionType[] => {
+	ENQ_GAME_OVER: (_action, _state: GameState): SubActionType[] => {
 		return [
-			{type: 'EXECUTE_GAME_STATE_UPDATE', 
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {type: 'UPDATE_GAME_OUTCOME', outcome: 'WIN'}
 			}
 		]
-	},
+	}
 }
 
-export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler>> = {
+export const atomicHandlers: Partial<
+	Record<SubActionType['type'], AtomicHandler>
+> = {
 	EXECUTE_GAME_STATE_UPDATE: (action, ctx) => {
 		const {gameStateAction} = action as Extract<
 			SubActionType,
@@ -55,11 +58,39 @@ export const atomicHandlers: Partial<Record<SubActionType['type'], AtomicHandler
 		ctx.dispatch(gameStateAction)
 		ctx.setQueue(q => q.slice(1))
 	},
-	DEBUG_ALERT: (action, ctx) => {
-		const {message} = action as Extract<
+	SHOW_FLOATING_TEXT: (action, ctx) => {
+		const {text, color, target} = action as Extract<
 			SubActionType,
-			{type: 'DEBUG_ALERT'}
+			{type: 'SHOW_FLOATING_TEXT'}
 		>
+		let rect: DOMRect | undefined
+		if (target.kind === 'ENEMY_CARD') {
+			const idx = ctx.currentState.eEnemyRow.findIndex(
+				c => c.instanceId === target.instanceId
+			)
+			if (idx >= 0)
+				rect = ctx.enemySlotsRef.current[idx]?.getBoundingClientRect()
+		} else if (target.kind === 'BUILDING_FARM') {
+			rect = ctx.farmRef.current?.getBoundingClientRect()
+		} else if (target.kind === 'BUILDING_GATE') {
+			rect = ctx.gateRef.current?.getBoundingClientRect()
+		} else if (target.kind === 'BUILDING_TOWER') {
+			rect = ctx.towerRef.current?.getBoundingClientRect()
+		}
+		if (rect === undefined) {
+			ctx.setQueue(q => q.slice(1))
+			return
+		}
+		ctx.setAnimatingFloatingText({
+			text,
+			color,
+			x: rect.left + rect.width / 2,
+			y: rect.top + rect.height / 2
+		})
+		ctx.setIsAnimating(true)
+	},
+	DEBUG_ALERT: (action, ctx) => {
+		const {message} = action as Extract<SubActionType, {type: 'DEBUG_ALERT'}>
 		alert(message)
 		ctx.setQueue(q => q.slice(1))
 	}

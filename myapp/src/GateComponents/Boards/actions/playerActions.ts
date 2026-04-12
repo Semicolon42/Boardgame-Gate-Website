@@ -21,7 +21,10 @@ export function makePlayerActions(
 		enqueue([{type: 'ENQ_GAME_OVER'}])
 	}
 
-	const playCard: CardPlayHandler = (card: CardInstance, cardPlayType): void => {
+	const playCard: CardPlayHandler = (
+		card: CardInstance,
+		cardPlayType
+	): void => {
 		enqueue([{type: 'ENQ_PLAYER_PLAY_CARD', card, cardPlayType}])
 	}
 
@@ -29,42 +32,72 @@ export function makePlayerActions(
 		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
-	const gainGenericResource = (type: ResourceType, amount: number, cost: number): void => {
-		switch(type) {
+	const gainGenericResource = (
+		type: ResourceType,
+		amount: number,
+		cost: number
+	): void => {
+		switch (type) {
 			case 'COINS': {
-				enqueue([{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {
-					type: 'UPADTE_RESOURCES',
-					coins: amount - cost
-				}}])
+				enqueue([
+					{
+						type: 'EXECUTE_GAME_STATE_UPDATE',
+						gameStateAction: {
+							type: 'UPADTE_RESOURCES',
+							coins: amount - cost
+						}
+					}
+				])
 				return
 			}
 			case 'REPAIR': {
-				enqueue([{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {
-					type: 'UPADTE_RESOURCES',
-					coins: -cost,
-					repair: amount
-				}}])
+				enqueue([
+					{
+						type: 'EXECUTE_GAME_STATE_UPDATE',
+						gameStateAction: {
+							type: 'UPADTE_RESOURCES',
+							coins: -cost,
+							repair: amount
+						}
+					}
+				])
 				return
 			}
 			case 'CALM': {
-				enqueue([{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {
-					type: 'UPADTE_RESOURCES',
-					calm: -cost,
-					repair: amount
-				}}])
-				return 
+				enqueue([
+					{
+						type: 'EXECUTE_GAME_STATE_UPDATE',
+						gameStateAction: {
+							type: 'UPADTE_RESOURCES',
+							calm: -cost,
+							repair: amount
+						}
+					}
+				])
+				return
 			}
 			case 'ATTACK': {
-				enqueue([{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {
-					type: 'UPADTE_RESOURCES',
-					attack: -cost,
-					repair: amount
-				}}])
+				enqueue([
+					{
+						type: 'EXECUTE_GAME_STATE_UPDATE',
+						gameStateAction: {
+							type: 'UPADTE_RESOURCES',
+							attack: -cost,
+							repair: amount
+						}
+					}
+				])
 				return
 			}
 		}
-		
 	}
 
-	return {gameDrawCards, gameEndTurn, gameOver, playCard, gainGenericResource, clearActionLogs}
+	return {
+		gameDrawCards,
+		gameEndTurn,
+		gameOver,
+		playCard,
+		gainGenericResource,
+		clearActionLogs
+	}
 }

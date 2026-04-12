@@ -1,11 +1,25 @@
 import type {Dispatch, MutableRefObject, RefObject, SetStateAction} from 'react'
 import type {CardPlayType} from '@/GateComponents/Cards/XCard'
 import type {
+	BuildingType,
 	CardInstance,
 	EnemyCardInstance,
 	GameAction,
 	GameState
 } from '../gameStateReducer'
+
+export type FloatingTextTarget =
+	| {kind: 'ENEMY_CARD'; instanceId: string}
+	| {kind: 'BUILDING_FARM'}
+	| {kind: 'BUILDING_GATE'}
+	| {kind: 'BUILDING_TOWER'}
+
+export interface FloatingTextSpec {
+	text: string
+	color: string
+	x: number
+	y: number
+}
 
 // ---------------------------------------------------------------------------
 // SubActionType — discriminated union
@@ -15,7 +29,11 @@ import type {
 export type SubActionType =
 	| {type: 'ENQ_PLAYER_DRAW_N'; count: number}
 	| {type: 'ENQ_PLAYER_DRAW_SINGLE_CARD'}
-	| {type: 'ENQ_PLAYER_PLAY_CARD'; card: CardInstance; cardPlayType: CardPlayType}
+	| {
+			type: 'ENQ_PLAYER_PLAY_CARD'
+			card: CardInstance
+			cardPlayType: CardPlayType
+	  }
 	| {type: 'PLAYER_DRAW_CARD'; card: CardInstance}
 	| {type: 'PLAYER_DISCARD_SINGLE_CARD'; card: CardInstance}
 	| {type: 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'}
@@ -37,9 +55,17 @@ export type SubActionType =
 	| {type: 'ENQ_ENEMY_TURN'}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 	| {type: 'ENEMY_ROW_REMOVE_OLDEST'}
-	| {type: 'ENEMY_ROW_REMOVE_INSTANCE'; enemyCard: EnemyCardInstance | undefined}
+	| {
+			type: 'ENEMY_ROW_REMOVE_INSTANCE'
+			enemyCard: EnemyCardInstance | undefined
+	  }
 	| {type: 'ENEMY_ROW_DRAW_CARD'; enemyCard: EnemyCardInstance}
-
+	| {
+			type: 'SHOW_FLOATING_TEXT'
+			text: string
+			color: string
+			target: FloatingTextTarget
+	  }
 	| {type: 'DEBUG_ALERT'; message: string}
 
 /** Function signature for enqueuing sub-actions. */
@@ -71,12 +97,16 @@ export interface SubActionContext {
 	setAnimatingEnemyShifts: (v: Record<string, {x: number; y: number}>) => void
 	setAnimatingEnemyRemove: (v: string | null) => void
 	pendingOnCompleteRef: MutableRefObject<(() => void) | null>
+	setAnimatingFloatingText: (v: FloatingTextSpec | null) => void
 	// DOM snapshot positions (captured before dispatch):
 	deckPos: DOMRect | undefined
 	discardPos: DOMRect | undefined
 	villagerDeckPos: DOMRect | undefined
 	eDeckPos: DOMRect | undefined
 	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>
+	farmRef: RefObject<HTMLDivElement | null>
+	gateRef: RefObject<HTMLDivElement | null>
+	towerRef: RefObject<HTMLDivElement | null>
 }
 
 /** An expander turns a high-level (ENQ_*) sub-action into a sequence of atomic ones. */
