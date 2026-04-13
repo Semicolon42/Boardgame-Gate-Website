@@ -5,7 +5,7 @@
 	--color-card-text: white;
 	--color-card-back: rgb(23, 23, 23);
 	--color-card-face: rgb(16, 16, 16);
-	--color-card-action-played: rgb(90, 90, 90);;
+	--color-card-action-played: rgb(90, 90, 90);
 	--color-enemy-card-back: rgb(23, 23, 23);
 	--color-enemy-card-face: rgb(16, 16, 16);
 	--color-outline-active: rgb(170, 170, 170);
@@ -27,5 +27,6 @@
 }
 
 @utility text-stroke-floating {
-	-webkit-text-stroke: var(--text-stroke-floating-width) var(--text-stroke-floating-color);
+	-webkit-text-stroke: var(--text-stroke-floating-width)
+		var(--text-stroke-floating-color);
 }

@@ -27,7 +27,7 @@ export function XEnemyCard({
 	isFadingOut = false,
 	isAttackable = false,
 	onAttack,
-	className = '',
+	className = ''
 }: XEnemyCardProps) {
 	const ref = useRef<HTMLElement>(null)
 	const enemyInfo = getEnemyCard(card.cardId)
@@ -60,7 +60,7 @@ export function XEnemyCard({
 		'bg-(--color-enemy-card-face)',
 		isFadingOut ? 'card-fade-out-animate' : '',
 		outlineClass,
-		className,
+		className
 	].join(' ')
 
 	const inner = (

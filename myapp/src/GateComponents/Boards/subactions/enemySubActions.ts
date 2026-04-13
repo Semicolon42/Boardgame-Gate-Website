@@ -27,7 +27,9 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			SubActionType,
 			{type: 'ENQ_ATTACK_ENEMY'}
 		>
-		const targetEnemey = state.eEnemyRow.find((e)=>e.instanceId===enemy.instanceId)
+		const targetEnemey = state.eEnemyRow.find(
+			e => e.instanceId === enemy.instanceId
+		)
 		if (targetEnemey === undefined) {
 			return []
 		}
@@ -44,13 +46,13 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				gameStateAction: {
 					type: 'ENEMY_DAMAGE',
 					targetInstanceId: targetEnemey.instanceId,
-					damage: damage
+					damage
 				}
 			},
 			{
 				type: 'SHOW_FLOATING_TEXT',
 				color: 'red',
-				text: ''+damage,
+				text: `${damage}`,
 				target: {kind: 'ENEMY_CARD', instanceId: targetEnemey.instanceId}
 			}
 		]

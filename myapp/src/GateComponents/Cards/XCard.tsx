@@ -26,10 +26,13 @@ function ActionButton({
 		buttonClass +=
 			' outline-transparent bg-transparent opacity-40 cursor-default'
 	} else if (isPlayed) {
-		buttonClass += ' outline-(--color-card-action-played) bg-(--color-card-action-played)'
+		buttonClass +=
+			' outline-(--color-card-action-played) bg-(--color-card-action-played)'
 	} else {
 		buttonClass += ' outline-transparent bg-transparent '
-		buttonClass += isHandMode ? 'hover:outline-(--color-outline-active-hover)' : ''
+		buttonClass += isHandMode
+			? 'hover:outline-(--color-outline-active-hover)'
+			: ''
 	}
 	return (
 		<div
@@ -130,11 +133,14 @@ export function XCard({
 		'flex h-[140px] w-[100px] items-start rounded-xl bg-(--color-card-face) text-(--color-card-text) XCARD outline-4'
 	if (disabled) {
 		containerClass += ' pointer-events-none'
-		containerClass += ' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		containerClass +=
+			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
-		containerClass += ' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+		containerClass +=
+			' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
 	} else {
-		containerClass += ' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		containerClass +=
+			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	}
 
 	// Hand mode: action fields shown as individual clickable divs.

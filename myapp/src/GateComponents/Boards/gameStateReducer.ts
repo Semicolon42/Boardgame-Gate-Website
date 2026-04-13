@@ -355,7 +355,7 @@ export function gameStateReducer(
 		}
 
 		case 'ENEMY_DAMAGE': {
-			const newEnemyRow = state.eEnemyRow.map((e) => {
+			const newEnemyRow = state.eEnemyRow.map(e => {
 				if (e.instanceId === action.targetInstanceId) {
 					return {
 						...e,
@@ -367,7 +367,7 @@ export function gameStateReducer(
 			return {
 				...state,
 				eEnemyRow: newEnemyRow,
-				stateActionLogs: newActionLog,
+				stateActionLogs: newActionLog
 			}
 		}
 

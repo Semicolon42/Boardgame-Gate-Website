@@ -110,9 +110,9 @@ export function GameBoard() {
 						enemyRowMax={gameState.eEnemyRowMax}
 						enemySlotsRef={enemySlotsRef}
 						heroCardsRemaining={gameState.hDeck.length}
+						isAttackable={gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
-						isAttackable={gameState.cAttack > 0}
 					/>
 					{/* Second Row Village cards to buy */}
 					<div className={statusBarClass}>
@@ -237,9 +237,11 @@ export function GameBoard() {
 			<div className='flex-1'>
 				<div className='flex-1'>
 					{queue.map(it => {
-						return <div key={crypto.randomUUID()} className='bg-cyan-400'>
-							{JSON.stringify(it)}
-						</div>
+						return (
+							<div className='bg-cyan-400' key={crypto.randomUUID()}>
+								{JSON.stringify(it)}
+							</div>
+						)
 					})}
 				</div>
 			</div>
