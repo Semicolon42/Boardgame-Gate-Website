@@ -23,7 +23,7 @@ interface EnemyRowProps {
 export function HeroDeck(props: {cardsRemaining: number}) {
 	const {cardsRemaining} = props
 	return (
-		<div className='h-[140px] w-[100px] rounded-xl bg-blue-300'>
+		<div className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'>
 			<div>Hero Deck</div>
 			<div>{cardsRemaining}</div>
 		</div>
@@ -114,7 +114,7 @@ export function EnemyRow({
 
 			{/* Enemy deck ref node — used by animation system to measure source position */}
 			<div
-				className='flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+				className='flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-white'
 				ref={eDeckRef}
 			>
 				<div>Enemy Deck</div>

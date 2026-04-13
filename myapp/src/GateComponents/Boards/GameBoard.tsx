@@ -50,21 +50,21 @@ export function GameBoard() {
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={villageDeckRef}
 					>
 						Village:
 						{gameState?.vDeck?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-400 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={discardRef}
 					>
 						Discard:
 						{gameState?.pDiscard?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-card-back text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={deckRef}
 					>
 						Deck:

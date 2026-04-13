@@ -68,8 +68,10 @@ export const atomicHandlers: Partial<
 			const idx = ctx.currentState.eEnemyRow.findIndex(
 				c => c.instanceId === target.instanceId
 			)
-			if (idx >= 0)
-				rect = ctx.enemySlotsRef.current[idx]?.getBoundingClientRect()
+			if (idx >= 0) {
+				const offset = ctx.currentState.eEnemyRowMax - ctx.currentState.eEnemyRow.length
+				rect = ctx.enemySlotsRef.current[offset + idx]?.getBoundingClientRect()
+			}
 		} else if (target.kind === 'BUILDING_FARM') {
 			rect = ctx.farmRef.current?.getBoundingClientRect()
 		} else if (target.kind === 'BUILDING_GATE') {
