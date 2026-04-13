@@ -1,7 +1,11 @@
 import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 import type {GameAction, GameState} from '../gameStateReducer'
-import type {AtomicHandler, Expander, FloatingTextTarget, SubActionType} from './types'
-import { kind } from 'happy-dom/lib/PropertySymbol.js'
+import type {
+	AtomicHandler,
+	Expander,
+	FloatingTextTarget,
+	SubActionType
+} from './types'
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	ENQ_PLAYER_PLAY_CARD: (action, _state): SubActionType[] => {
@@ -82,37 +86,38 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			SubActionType,
 			{type: 'ENQ_PLAYER_REPAIR_BUILDING'}
 		>
-		let actionResourceUpdate: GameAction = {
+		const actionResourceUpdate: GameAction = {
 			type: 'UPADTE_RESOURCES',
 			repair: -1
 		}
-		let buildingTarget: FloatingTextTarget = {kind:'BUILDING_FARM'}
+		let buildingTarget: FloatingTextTarget = {kind: 'BUILDING_FARM'}
 		let repairAmout = amount
-		switch(building) {
+		switch (building) {
 			case 'farm': {
-				buildingTarget = {kind:'BUILDING_FARM'}
+				buildingTarget = {kind: 'BUILDING_FARM'}
 				repairAmout += state.cBonusRepairFarm
 				actionResourceUpdate.bonusRepairFarm = -state.cBonusRepairFarm
-				break;
+				break
 			}
 			case 'gate': {
-				buildingTarget = {kind:'BUILDING_GATE'}
+				buildingTarget = {kind: 'BUILDING_GATE'}
 				repairAmout += state.cBonusRepairGate
 				actionResourceUpdate.bonusRepairGate = -state.cBonusRepairGate
-				break;
-			}	
+				break
+			}
 			case 'tower': {
-				buildingTarget = {kind:'BUILDING_TOWER'}
+				buildingTarget = {kind: 'BUILDING_TOWER'}
 				repairAmout += state.cBonusRepairTower
 				actionResourceUpdate.bonusRepairTower = -state.cBonusRepairTower
-				break;
+				break
 			}
 		}
 		return [
-			{type: 'EXECUTE_GAME_STATE_UPDATE',
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
 					type: 'BUILDING_CHANGE_HEALTH',
-					building: building,
+					building,
 					healthChange: repairAmout
 				}
 			},
@@ -124,7 +129,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				target: buildingTarget,
 				color: 'green',
-				text: ''+repairAmout,
+				text: `${repairAmout}`
 			}
 		]
 	}

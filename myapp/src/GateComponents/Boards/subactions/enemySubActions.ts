@@ -21,6 +21,50 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		const newEnemy = state.eEnemyDeck[0]
 		if (newEnemy === undefined) return []
 		return [{type: 'ENEMY_ROW_DRAW_CARD', enemyCard: newEnemy}]
+	},
+	ENQ_ATTACK_ENEMY: (action, state: GameState): SubActionType[] => {
+		const {enemy, damage} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_ATTACK_ENEMY'}
+		>
+		const targetEnemey = state.eEnemyRow.find((e)=>e.instanceId===enemy.instanceId)
+		if (targetEnemey === undefined) {
+			return []
+		}
+		const actionsDamageEnemy: SubActionType[] = [
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'UPADTE_RESOURCES',
+					attack: -damage
+				}
+			},
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'ENEMY_DAMAGE',
+					targetInstanceId: targetEnemey.instanceId,
+					damage: damage
+				}
+			},
+			{
+				type: 'SHOW_FLOATING_TEXT',
+				color: 'red',
+				text: ''+damage,
+				target: {kind: 'ENEMY_CARD', instanceId: targetEnemey.instanceId}
+			}
+		]
+
+		if (targetEnemey.health <= damage) {
+			return [
+				...actionsDamageEnemy,
+				{
+					type: 'ENEMY_ROW_REMOVE_INSTANCE',
+					enemyCard: targetEnemey
+				}
+			]
+		}
+		return actionsDamageEnemy
 	}
 }
 

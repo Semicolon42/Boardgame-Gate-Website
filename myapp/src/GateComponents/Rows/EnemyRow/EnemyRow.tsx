@@ -10,6 +10,8 @@ interface EnemyRowProps {
 	enemyRowMax: number
 	enemyDeckCards: EnemyCardInstance[]
 	heroCardsRemaining: number
+	isAttackable?: boolean
+	onAttack?: (enemy: EnemyCardInstance, amount: number) => void
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
 	eDeckRef?: RefObject<HTMLDivElement | null>
@@ -33,6 +35,8 @@ export function EnemyRow({
 	enemyRowMax,
 	enemyDeckCards,
 	heroCardsRemaining,
+	isAttackable,
+	onAttack,
 	animatingCard,
 	onAnimationEnd,
 	eDeckRef,
@@ -100,6 +104,8 @@ export function EnemyRow({
 								{...(cardOnAnimEnd !== undefined
 									? {onAnimationEnd: cardOnAnimEnd}
 									: {})}
+								isAttackable={isAttackable}
+								onAttack={onAttack}
 							/>
 						)}
 					</div>

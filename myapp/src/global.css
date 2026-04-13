@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
-@theme {
-	--font-sans: Inter, sans-serif;
+:root {
+	--color-gameboard-background: rgb(14, 12, 55);
+	--color-card-text: white;
+	--color-card-back: rgb(23, 23, 23);
+	--color-card-face: rgb(16, 16, 16);
+	--color-card-action-played: rgb(90, 90, 90);;
+	--color-enemy-card-back: rgb(23, 23, 23);
+	--color-enemy-card-face: rgb(16, 16, 16);
+	--color-outline-active: rgb(170, 170, 170);
+	--color-outline-active-hover: rgb(200, 200, 200);
+	--color-outline-attackable: rgb(200, 0, 0);
+	--color-outline-attackable-hover: rgb(240, 0, 0);
+	--color-outline-inactive: rgb(40, 40, 40);
+	--color-outline-inactive-hover: rgb(80, 80, 80);
+	--color-outline-normal: rgb(90, 90, 90);
+	--color-outline-normal-hover: rgb(120, 120, 120);
+	--color-text-primary: rgb(225, 225, 225);
+	--color-text-secondary: rgb(200, 199, 199);
+	--color-text-damage: rgb(255, 46, 46);
+	--color-text-healing: rgb(106, 221, 106);
+
+	--text-floating-size: 3rem;
+	--text-stroke-floating-width: 3px;
+	--text-stroke-floating-color: white;
+}
+
+@utility text-stroke-floating {
+	-webkit-text-stroke: var(--text-stroke-floating-width) var(--text-stroke-floating-color);
 }

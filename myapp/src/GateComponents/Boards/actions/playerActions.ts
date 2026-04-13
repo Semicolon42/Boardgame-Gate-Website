@@ -32,7 +32,7 @@ export function makePlayerActions(
 		dispatch({type: 'ACTION_LOGS_CLEAR'})
 	}
 
-	const gainGenericResource = (
+	const gameGainGenericResource = (
 		type: ResourceType,
 		amount: number,
 		cost: number
@@ -69,8 +69,8 @@ export function makePlayerActions(
 						type: 'EXECUTE_GAME_STATE_UPDATE',
 						gameStateAction: {
 							type: 'UPADTE_RESOURCES',
-							calm: -cost,
-							repair: amount
+							coins: -cost,
+							calm: amount
 						}
 					}
 				])
@@ -82,8 +82,8 @@ export function makePlayerActions(
 						type: 'EXECUTE_GAME_STATE_UPDATE',
 						gameStateAction: {
 							type: 'UPADTE_RESOURCES',
-							attack: -cost,
-							repair: amount
+							coins: -cost,
+							attack: amount
 						}
 					}
 				])
@@ -93,7 +93,9 @@ export function makePlayerActions(
 	}
 
 	const gameRepairBase = (building: BuildingType, repairAmount: number) => {
-		enqueue([{type: 'ENQ_PLAYER_REPAIR_BUILDING', building: building, amount: repairAmount }])
+		enqueue([
+			{type: 'ENQ_PLAYER_REPAIR_BUILDING', building, amount: repairAmount}
+		])
 	}
 
 	return {
@@ -101,7 +103,7 @@ export function makePlayerActions(
 		gameEndTurn,
 		gameOver,
 		playCard,
-		gainGenericResource,
+		gameGainGenericResource,
 		gameRepairBase,
 		clearActionLogs
 	}

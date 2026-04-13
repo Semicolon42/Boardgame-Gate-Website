@@ -26,10 +26,10 @@ function ActionButton({
 		buttonClass +=
 			' outline-transparent bg-transparent opacity-40 cursor-default'
 	} else if (isPlayed) {
-		buttonClass += ' outline-blue-500 bg-blue-400'
+		buttonClass += ' outline-(--color-card-action-played) bg-(--color-card-action-played)'
 	} else {
 		buttonClass += ' outline-transparent bg-transparent '
-		buttonClass += isHandMode ? 'hover:outline-blue-600' : ''
+		buttonClass += isHandMode ? 'hover:outline-(--color-outline-active-hover)' : ''
 	}
 	return (
 		<div
@@ -127,11 +127,14 @@ export function XCard({
 	}, [moveFrom, moveTo])
 
 	let containerClass =
-		'flex h-[140px] w-[100px] items-start rounded-xl bg-blue-300 XCARD outline-4 outline-white-400'
+		'flex h-[140px] w-[100px] items-start rounded-xl bg-(--color-card-face) text-(--color-card-text) XCARD outline-4'
 	if (disabled) {
-		containerClass += ' outline-gray-500 pointer-events-none'
+		containerClass += ' pointer-events-none'
+		containerClass += ' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
-		containerClass += ' outline-blue-500 hover:outline-blue-700'
+		containerClass += ' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+	} else {
+		containerClass += ' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	}
 
 	// Hand mode: action fields shown as individual clickable divs.
@@ -140,9 +143,9 @@ export function XCard({
 
 	const cardInner = (
 		<div className='w-full'>
-			<div className='flex items-center gap-[4px] px-[5px]'>
+			<div className='flex items-center gap-[4px] px-[5px] stroke-2 stroke-amber-100'>
 				<ScaledName text={info.name} />
-				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'>
+				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs text-black'>
 					{info.cost}
 				</div>
 			</div>

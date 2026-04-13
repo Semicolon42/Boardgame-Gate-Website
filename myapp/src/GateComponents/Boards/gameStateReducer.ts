@@ -137,6 +137,7 @@ export type GameAction =
 	| {type: 'ENEMY_ROW_DISCARD_OLDEST'}
 	| {type: 'ENEMY_ROW_DISCARD_INSTANCE'; uuid: string}
 	| {type: 'UPDATE_GAME_OUTCOME'; outcome: GameOutcomeType}
+	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -237,19 +238,28 @@ export function gameStateReducer(
 				case 'farm':
 					return {
 						...state,
-						bFarmHealth: Math.min(state.bFarmHealth + action.healthChange, state.bFarmHealthMAX),
+						bFarmHealth: Math.min(
+							state.bFarmHealth + action.healthChange,
+							state.bFarmHealthMAX
+						),
 						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
-						bGateHealth: Math.min(state.bGateHealth + action.healthChange, state.bFarmHealthMAX),
+						bGateHealth: Math.min(
+							state.bGateHealth + action.healthChange,
+							state.bFarmHealthMAX
+						),
 						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
-						bTowerHealth: Math.min(state.bTowerHealth + action.healthChange, state.bFarmHealthMAX),
+						bTowerHealth: Math.min(
+							state.bTowerHealth + action.healthChange,
+							state.bFarmHealthMAX
+						),
 						stateActionLogs: newActionLog
 					}
 				default:
@@ -344,6 +354,23 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'ENEMY_DAMAGE': {
+			const newEnemyRow = state.eEnemyRow.map((e) => {
+				if (e.instanceId === action.targetInstanceId) {
+					return {
+						...e,
+						health: e.health - action.damage
+					}
+				}
+				return e
+			})
+			return {
+				...state,
+				eEnemyRow: newEnemyRow,
+				stateActionLogs: newActionLog,
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -362,6 +389,9 @@ export const initialState: GameState = {
 	bFarmHealth: 6,
 	bTowerHealth: 6,
 	bGateHealth: 12,
+	bFarmHealthMAX: 6,
+	bTowerHealthMAX: 6,
+	bGateHealthMAX: 12,
 	fFear: 0,
 	fFearamid: [
 		{type: 'DEBUG_ALERT', message: 'Fear 1'},

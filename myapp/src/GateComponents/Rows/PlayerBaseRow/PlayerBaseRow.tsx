@@ -13,11 +13,11 @@ function PlayerBaseCard(props: {
 	const cnBase = 'block h-[150px] w-[100px] bg-black text-white'
 	let cnOutline = 'outline-4 outline-color:var(--color-red)'
 	if (canRepair) {
-		cnOutline += ' outline-outline-repairable'
-		cnOutline += ' hover:outline-outline-repairable-hover'
+		cnOutline += ' outline-(--color-outline-active)'
+		cnOutline += ' hover:outline-(--color-outline-active-hover)'
 	} else {
-		cnOutline += ' outline-outline-normal'
-		cnOutline += ' hover:outline-outline-inactive-hover'
+		cnOutline += ' outline-(--color-outline-normal)'
+		cnOutline += ' hover:outline-(--color-outline-normal-hover)'
 	}
 	return (
 		<div
@@ -49,7 +49,7 @@ interface PlayerBaseRowProps {
 	onRepair: (building: BuildingType) => void
 	canRepair: boolean
 	farmHealth: number
-	gateHealth: number 
+	gateHealth: number
 	towerHealth: number
 }
 
@@ -61,33 +61,39 @@ export function PlayerBaseRow({
 	canRepair,
 	farmHealth,
 	gateHealth,
-	towerHealth,
+	towerHealth
 }: PlayerBaseRowProps) {
 	return (
 		<div className='flex space-x-3 p-[2px]'>
 			<PlayerBaseCard
+				canRepair={canRepair}
 				divRef={farmRef}
 				health={farmHealth}
 				image='farm'
 				name='Farm'
-				onRepair={() => {onRepair('farm')}}
-				canRepair={canRepair}
+				onRepair={() => {
+					onRepair('farm')
+				}}
 			/>
 			<PlayerBaseCard
+				canRepair={canRepair}
 				divRef={gateRef}
 				health={gateHealth}
 				image='gate'
 				name='Gate'
-				onRepair={() => {onRepair('gate')}}
-				canRepair={canRepair}
+				onRepair={() => {
+					onRepair('gate')
+				}}
 			/>
 			<PlayerBaseCard
+				canRepair={canRepair}
 				divRef={towerRef}
 				health={towerHealth}
 				image='tower'
 				name='Tower'
-				onRepair={() => {onRepair('tower')}}
-				canRepair={canRepair}
+				onRepair={() => {
+					onRepair('tower')
+				}}
 			/>
 			<Fearamid fear={0} />
 		</div>

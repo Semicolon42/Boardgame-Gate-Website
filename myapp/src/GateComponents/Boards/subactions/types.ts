@@ -52,10 +52,9 @@ export type SubActionType =
 	| {type: 'VILLAGER_ROW_CLEAR'; cards?: CardInstance[]}
 	| {type: 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK'}
 	| {type: 'VILLAGER_SHUFFLE_DECK'}
-
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
-	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType, amount: number}
-
+	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
+	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
 	| {type: 'ENQ_ENEMY_TURN'}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 	| {type: 'ENEMY_ROW_REMOVE_OLDEST'}

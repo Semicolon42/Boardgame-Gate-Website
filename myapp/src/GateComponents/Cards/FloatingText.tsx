@@ -50,6 +50,7 @@ export function FloatingText({spec, onAnimationEnd}: FloatingTextProps) {
 	return (
 		<div
 			ref={elRef}
+			className='text-stroke-floating'
 			style={{
 				position: 'fixed',
 				left: spec.x,
@@ -58,7 +59,7 @@ export function FloatingText({spec, onAnimationEnd}: FloatingTextProps) {
 				pointerEvents: 'none',
 				userSelect: 'none',
 				fontWeight: 'bold',
-				fontSize: '1.25rem',
+				fontSize: 'var(--text-floating-size)',
 				zIndex: 9999,
 				transform: 'translate(-50%, -50%)'
 			}}
