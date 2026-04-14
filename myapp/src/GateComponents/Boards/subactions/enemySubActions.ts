@@ -11,7 +11,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 	],
 	ENQ_ENEMY_SINGLE_ATTACK: (action, state: GameState): SubActionType[] => {
-		const {enemyCard} = action as Extract<SubActionType, {type: 'ENQ_ENEMY_SINGLE_ATTACK'}>
+		const {enemyCard} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_ENEMY_SINGLE_ATTACK'}
+		>
 		const enemyInfo = getEnemyCard(enemyCard.cardId)
 		const result: SubActionType[] = []
 
@@ -26,22 +29,66 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		const actualGateDamage = Math.min(gateDamage, state.bGateHealth)
 
 		if (actualFarmDamage > 0) {
-			result.push({type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type: 'BUILDING_CHANGE_HEALTH', building: 'farm', healthChange: -actualFarmDamage}})
-			result.push({type: 'SHOW_FLOATING_TEXT', text: `-${actualFarmDamage}`, color: 'var(--color-text-damage)', target: {kind: 'BUILDING_FARM'}})
+			result.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'BUILDING_CHANGE_HEALTH',
+					building: 'farm',
+					healthChange: -actualFarmDamage
+				}
+			})
+			result.push({
+				type: 'SHOW_FLOATING_TEXT',
+				text: `-${actualFarmDamage}`,
+				color: 'var(--color-text-damage)',
+				target: {kind: 'BUILDING_FARM'}
+			})
 		}
 		if (actualGateDamage > 0) {
-			result.push({type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type: 'BUILDING_CHANGE_HEALTH', building: 'gate', healthChange: -actualGateDamage}})
-			result.push({type: 'SHOW_FLOATING_TEXT', text: `-${actualGateDamage}`, color: 'var(--color-text-damage)', target: {kind: 'BUILDING_GATE'}})
+			result.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'BUILDING_CHANGE_HEALTH',
+					building: 'gate',
+					healthChange: -actualGateDamage
+				}
+			})
+			result.push({
+				type: 'SHOW_FLOATING_TEXT',
+				text: `-${actualGateDamage}`,
+				color: 'var(--color-text-damage)',
+				target: {kind: 'BUILDING_GATE'}
+			})
 		}
 		if (actualTowerDamage > 0) {
-			result.push({type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type: 'BUILDING_CHANGE_HEALTH', building: 'tower', healthChange: -actualTowerDamage}})
-			result.push({type: 'SHOW_FLOATING_TEXT', text: `-${actualTowerDamage}`, color: 'var(--color-text-damage)', target: {kind: 'BUILDING_TOWER'}})
+			result.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'BUILDING_CHANGE_HEALTH',
+					building: 'tower',
+					healthChange: -actualTowerDamage
+				}
+			})
+			result.push({
+				type: 'SHOW_FLOATING_TEXT',
+				text: `-${actualTowerDamage}`,
+				color: 'var(--color-text-damage)',
+				target: {kind: 'BUILDING_TOWER'}
+			})
 		}
 
 		const fear = enemyInfo.fear ?? 0
 		if (fear > 0) {
-			result.push({type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type: 'CHANGE_FEAR', amount: fear}})
-			result.push({type: 'SHOW_FLOATING_TEXT', text: `+${fear}`, color: 'var(--color-text-damage)', target: {kind: 'FEARAMID'}})
+			result.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {type: 'CHANGE_FEAR', amount: fear}
+			})
+			result.push({
+				type: 'SHOW_FLOATING_TEXT',
+				text: `+${fear}`,
+				color: 'var(--color-text-damage)',
+				target: {kind: 'FEARAMID'}
+			})
 		}
 
 		return result
@@ -56,10 +103,24 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			const gateDamage = Math.min(1, state.bGateHealth)
 			return [
 				{type: 'ENEMY_ROW_REMOVE_INSTANCE', enemyCard: discardEnemy},
-				...(gateDamage > 0 ? [
-					{type: 'EXECUTE_GAME_STATE_UPDATE' as const, gameStateAction: {type: 'BUILDING_CHANGE_HEALTH' as const, building: 'gate' as const, healthChange: -gateDamage}},
-					{type: 'SHOW_FLOATING_TEXT' as const, text: `-${gateDamage}`, color: 'var(--color-text-damage)', target: {kind: 'BUILDING_GATE' as const}}
-				] : []),
+				...(gateDamage > 0
+					? [
+							{
+								type: 'EXECUTE_GAME_STATE_UPDATE' as const,
+								gameStateAction: {
+									type: 'BUILDING_CHANGE_HEALTH' as const,
+									building: 'gate' as const,
+									healthChange: -gateDamage
+								}
+							},
+							{
+								type: 'SHOW_FLOATING_TEXT' as const,
+								text: `-${gateDamage}`,
+								color: 'var(--color-text-damage)',
+								target: {kind: 'BUILDING_GATE' as const}
+							}
+						]
+					: []),
 				{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 			]
 		}

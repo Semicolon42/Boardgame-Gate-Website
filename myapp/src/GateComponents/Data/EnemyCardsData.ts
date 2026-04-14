@@ -110,7 +110,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		attack: {
 			tower: 2
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 7,
@@ -136,7 +136,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		attack: {
 			farm: 2
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 9,
@@ -148,8 +148,8 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		health: 7,
 		attack: {
 			farm: 1,
-			gate: 1, 
-			tower: 1,
+			gate: 1,
+			tower: 1
 		},
 		fear: 1,
 		specialAbility: 'generic'

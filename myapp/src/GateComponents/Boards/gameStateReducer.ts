@@ -261,28 +261,37 @@ export function gameStateReducer(
 				case 'farm':
 					return {
 						...state,
-						bFarmHealth: Math.max(0, Math.min(
-							state.bFarmHealth + action.healthChange,
-							state.bFarmHealthMAX
-						)),
+						bFarmHealth: Math.max(
+							0,
+							Math.min(
+								state.bFarmHealth + action.healthChange,
+								state.bFarmHealthMAX
+							)
+						),
 						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
-						bGateHealth: Math.max(0, Math.min(
-							state.bGateHealth + action.healthChange,
-							state.bGateHealthMAX
-						)),
+						bGateHealth: Math.max(
+							0,
+							Math.min(
+								state.bGateHealth + action.healthChange,
+								state.bGateHealthMAX
+							)
+						),
 						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
-						bTowerHealth: Math.max(0, Math.min(
-							state.bTowerHealth + action.healthChange,
-							state.bTowerHealthMAX
-						)),
+						bTowerHealth: Math.max(
+							0,
+							Math.min(
+								state.bTowerHealth + action.healthChange,
+								state.bTowerHealthMAX
+							)
+						),
 						stateActionLogs: newActionLog
 					}
 				default:
