@@ -35,6 +35,12 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			type: 'EXECUTE_GAME_STATE_UPDATE',
 			gameStateAction: {type: 'CLEAR_PLAYED_CARDS'}
 		},
+		{
+			type: 'EXECUTE_GAME_STATE_UPDATE',
+			gameStateAction: {
+				type: 'TURN_START_RESET',
+			}
+		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
 	ENQ_GAME_OVER: (_action, _state: GameState): SubActionType[] => {
@@ -64,21 +70,30 @@ export const atomicHandlers: Partial<
 			{type: 'SHOW_FLOATING_TEXT'}
 		>
 		let rect: DOMRect | undefined
-		if (target.kind === 'ENEMY_CARD') {
-			const idx = ctx.currentState.eEnemyRow.findIndex(
-				c => c.instanceId === target.instanceId
-			)
-			if (idx >= 0) {
-				const offset =
-					ctx.currentState.eEnemyRowMax - ctx.currentState.eEnemyRow.length
-				rect = ctx.enemySlotsRef.current[offset + idx]?.getBoundingClientRect()
-			}
-		} else if (target.kind === 'BUILDING_FARM') {
-			rect = ctx.farmRef.current?.getBoundingClientRect()
-		} else if (target.kind === 'BUILDING_GATE') {
-			rect = ctx.gateRef.current?.getBoundingClientRect()
-		} else if (target.kind === 'BUILDING_TOWER') {
-			rect = ctx.towerRef.current?.getBoundingClientRect()
+		switch(target.kind) {
+			case 'ENEMY_CARD':
+				const idx = ctx.currentState.eEnemyRow.findIndex(
+					c => c.instanceId === target.instanceId
+				)
+				if (idx >= 0) {
+					const offset =
+						ctx.currentState.eEnemyRowMax - ctx.currentState.eEnemyRow.length
+					rect = ctx.enemySlotsRef.current[offset + idx]?.getBoundingClientRect()
+				}
+				break;
+			case 'BUILDING_FARM':
+				rect = ctx.farmRef.current?.getBoundingClientRect()
+				break;
+			case 'BUILDING_GATE':
+				rect = ctx.gateRef.current?.getBoundingClientRect()
+				break;
+			case 'BUILDING_TOWER':
+				rect = ctx.towerRef.current?.getBoundingClientRect()
+				break;
+			case 'FEARAMID':
+				rect = ctx.fearamidRef.current?.getBoundingClientRect()
+				break;
+			default:
 		}
 		if (rect === undefined) {
 			ctx.setQueue(q => q.slice(1))

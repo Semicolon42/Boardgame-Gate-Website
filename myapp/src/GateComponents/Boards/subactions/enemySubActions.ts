@@ -33,12 +33,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		if (targetEnemey === undefined) {
 			return []
 		}
+		let totalDamage = damage + state.bTowerBonusDamageCurrent
 		const actionsDamageEnemy: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
 					type: 'UPADTE_RESOURCES',
-					attack: -damage
+					attack: -damage,
+					towerBonusDmaageCurrent: -state.bTowerBonusDamageCurrent,
 				}
 			},
 			{

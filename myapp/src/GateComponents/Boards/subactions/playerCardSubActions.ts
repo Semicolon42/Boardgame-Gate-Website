@@ -81,6 +81,21 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		return [{type: 'PLAYER_DRAW_CARD', card}]
 	},
 
+	ENQ_CALM_FEARAMID: (action, state: GameState): SubActionType[] => {
+		const {amount} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_PLAYER_REPAIR_BUILDING'}
+		>
+		if (state.fFear < amount) {
+			return []
+		}
+		return [
+			{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'CHANGE_FEAR', amount:-amount}},
+			{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'UPADTE_RESOURCES', calm:-amount}},
+			{type: 'SHOW_FLOATING_TEXT', target: {kind: 'FEARAMID'}, color: 'green', text: ''+amount}
+		]
+	},
+
 	ENQ_PLAYER_REPAIR_BUILDING: (action, state: GameState): SubActionType[] => {
 		const {building, amount} = action as Extract<
 			SubActionType,

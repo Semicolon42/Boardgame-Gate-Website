@@ -66,7 +66,8 @@ export function useSubActionQueue(
 	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>,
 	farmRef: RefObject<HTMLDivElement | null>,
 	gateRef: RefObject<HTMLDivElement | null>,
-	towerRef: RefObject<HTMLDivElement | null>
+	towerRef: RefObject<HTMLDivElement | null>,
+	fearamidRef: RefObject<HTMLDivElement | null>,
 ) {
 	const [queue, setQueue] = useState<SubActionType[]>([{type: 'ENQ_GAME_START'}])
 	const [isAnimating, setIsAnimating] = useState(false)
@@ -138,7 +139,8 @@ export function useSubActionQueue(
 			enemySlotsRef,
 			farmRef,
 			gateRef,
-			towerRef
+			towerRef,
+			fearamidRef,
 		}
 
 		const handler = allAtomicActionHandlers[head.type]

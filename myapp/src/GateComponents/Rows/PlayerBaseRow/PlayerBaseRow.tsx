@@ -10,7 +10,7 @@ function PlayerBaseCard(props: {
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
 	const {name, image, health, divRef, canRepair, onRepair} = props
-	const cnBase = 'block h-[150px] w-[100px] bg-black text-white'
+	const cnBase = 'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
 	let cnOutline = 'outline-4 outline-color:var(--color-red)'
 	if (canRepair) {
 		cnOutline += ' outline-(--color-outline-active)'
@@ -32,10 +32,28 @@ function PlayerBaseCard(props: {
 	)
 }
 
-function Fearamid(props: {fear: number}) {
-	const {fear} = props
+function Fearamid(props: {
+	fear: number, 
+	onCalm?: () => undefined | undefined
+	canCalm?: boolean
+	divRef?: RefObject<HTMLDivElement | null>
+}) {
+	const {fear, onCalm, canCalm, divRef} = props
+	const cnBase = 'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
+	let cnOutline = 'outline-4 outline-color:var(--color-red)'
+	if (canCalm) {
+		cnOutline += ' outline-(--color-outline-active)'
+		cnOutline += ' hover:outline-(--color-outline-active-hover)'
+	} else {
+		cnOutline += ' outline-(--color-outline-normal)'
+		cnOutline += ' hover:outline-(--color-outline-normal-hover)'
+	}
 	return (
-		<div className='block h-[150px] w-[100px] bg-black text-white'>
+		<div 
+			className={`${cnBase} ${cnOutline}`}
+			ref={divRef}
+			{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})} 
+		>
 			<div>Fearamid</div>
 			<div>{`Fear: ${fear}`}</div>
 		</div>
@@ -46,8 +64,11 @@ interface PlayerBaseRowProps {
 	farmRef: RefObject<HTMLDivElement | null>
 	gateRef: RefObject<HTMLDivElement | null>
 	towerRef: RefObject<HTMLDivElement | null>
-	onRepair: (building: BuildingType) => void
+	fearamidRef: RefObject<HTMLDivElement | null>
 	canRepair: boolean
+	onRepair: (building: BuildingType) => void
+	canCalm: boolean
+	onCalm: () => void
 	farmHealth: number
 	gateHealth: number
 	towerHealth: number
@@ -57,8 +78,11 @@ export function PlayerBaseRow({
 	farmRef,
 	gateRef,
 	towerRef,
+	fearamidRef,
 	onRepair,
 	canRepair,
+	canCalm,
+	onCalm,
 	farmHealth,
 	gateHealth,
 	towerHealth
@@ -95,7 +119,14 @@ export function PlayerBaseRow({
 					onRepair('tower')
 				}}
 			/>
-			<Fearamid fear={0} />
+			<Fearamid 
+				fear={0} 
+				divRef={fearamidRef} 
+				canCalm={canCalm}
+				onCalm={() => {
+					onCalm()
+				}}
+			/>
 		</div>
 	)
 }

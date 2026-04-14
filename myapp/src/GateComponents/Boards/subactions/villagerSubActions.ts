@@ -25,12 +25,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			SubActionType,
 			{type: 'ENQ_VILLAGER_ROW_BUY_CARD'}
 		>
+		let cost = Math.max(0, getCitizenCard(card.cardId).cost - _state.bFarmBonusRecruitCurrent)
 		return [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
 					type: 'UPADTE_RESOURCES',
-					coins: -getCitizenCard(card.cardId).cost
+					coins: -cost,
+					farmBonusRecruitCurrent: -_state.bFarmBonusRecruitCurrent,
 				}
 			},
 			{type: 'VILLAGER_ROW_BUY_CARD', card},
@@ -38,7 +40,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		]
 	},
 
-	ENQ_VILLAGER_ROW_CLEAR: (_action, _state): SubActionType[] => [
+	ENQ_VILLAGER_ROW_CLEAR: (action, state): SubActionType[] => [
 		{type: 'VILLAGER_ROW_CLEAR'},
 		{type: 'ENQ_VILLAGER_ROW_FILL'}
 	],

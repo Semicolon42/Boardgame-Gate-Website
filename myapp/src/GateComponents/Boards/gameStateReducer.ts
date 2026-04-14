@@ -63,6 +63,7 @@ export interface GameState {
 	bFarmHealthMAX: number
 	bTowerHealthMAX: number
 	fFear: number
+	fFearMax: number
 	fFearamid: SubActionType[]
 
 	// Player card state
@@ -91,6 +92,14 @@ export interface GameState {
 	cBonusRepairGate: number
 	cBonusRepairTower: number
 	cAttack: number
+
+	// Building bonus stats
+	bTowerBonusMinHealth: number
+	bTowerBonusDamageCurrent: number
+	bTowerBonusDamage: number
+	bFarmBonusMinHealth: number
+	bFarmBonusRecruit: number
+	bFarmBonusRecruitCurrent: number
 }
 
 export type StackType =
@@ -115,6 +124,10 @@ export type GameAction =
 			healthChange: number
 	  }
 	| {
+			type: 'CHANGE_FEAR'
+			amount: number
+		}
+	| {
 			type: 'UPADTE_RESOURCES'
 			coins?: number
 			attack?: number
@@ -123,6 +136,8 @@ export type GameAction =
 			bonusRepairFarm?: number
 			bonusRepairGate?: number
 			bonusRepairTower?: number
+			towerBonusDmaageCurrent?: number
+			farmBonusRecruitCurrent?: number
 	  }
 	| {
 			type: 'MARK_CARD_PLAYED'
@@ -138,6 +153,7 @@ export type GameAction =
 	| {type: 'ENEMY_ROW_DISCARD_INSTANCE'; uuid: string}
 	| {type: 'UPDATE_GAME_OUTCOME'; outcome: GameOutcomeType}
 	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
+	| {type: 'TURN_START_RESET'}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -232,6 +248,10 @@ export function gameStateReducer(
 			return {...state, [key]: [], stateActionLogs: newActionLog}
 		}
 
+		case 'CHANGE_FEAR': {
+			return {...state, fFear: state.fFear + action.amount, stateActionLogs: newActionLog}
+		}
+
 		case 'BUILDING_CHANGE_HEALTH': {
 			// Fixed: was mutating state directly — now immutable
 			switch (action.building) {
@@ -280,6 +300,10 @@ export function gameStateReducer(
 					state.cBonusRepairGate + (action.bonusRepairGate ?? 0),
 				cBonusRepairTower:
 					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
+				bFarmBonusRecruitCurrent:
+					state.bFarmBonusRecruitCurrent + (action.farmBonusRecruitCurrent ?? 0),
+				bTowerBonusDamageCurrent:
+					state.bTowerBonusDamageCurrent + (action.towerBonusDmaageCurrent ?? 0),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -371,6 +395,15 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'TURN_START_RESET': {
+			return {
+				...state,
+				bFarmBonusRecruitCurrent: state.bFarmHealth > state.bFarmBonusMinHealth ? state.bFarmBonusRecruit : 0,
+				bTowerBonusDamageCurrent: state.bTowerHealth > state.bTowerBonusMinHealth ? state.bTowerBonusDamage : 0,
+				stateActionLogs: newActionLog
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -393,6 +426,7 @@ export const initialState: GameState = {
 	bTowerHealthMAX: 6,
 	bGateHealthMAX: 12,
 	fFear: 0,
+	fFearMax: 10,
 	fFearamid: [
 		{type: 'DEBUG_ALERT', message: 'Fear 1'},
 		{type: 'DEBUG_ALERT', message: 'Fear 1'},
@@ -429,6 +463,13 @@ export const initialState: GameState = {
 	cBonusRepairTower: 0,
 	cCalm: 0,
 	cAttack: 0,
+
+	bTowerBonusMinHealth: 1,
+	bTowerBonusDamage: 1,
+	bTowerBonusDamageCurrent: 1,
+	bFarmBonusMinHealth: 1,
+	bFarmBonusRecruit: 1,
+	bFarmBonusRecruitCurrent: 1,
 
 	stateActionLogs: []
 }

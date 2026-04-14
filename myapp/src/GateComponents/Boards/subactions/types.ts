@@ -13,6 +13,7 @@ export type FloatingTextTarget =
 	| {kind: 'BUILDING_FARM'}
 	| {kind: 'BUILDING_GATE'}
 	| {kind: 'BUILDING_TOWER'}
+	| {kind: 'FEARAMID'}
 
 export interface FloatingTextSpec {
 	text: string
@@ -44,7 +45,7 @@ export type SubActionType =
 	| {type: 'ENQ_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
-	| {type: 'ENQ_VILLAGER_ROW_CLEAR'}
+	| {type: 'ENQ_VILLAGER_ROW_CLEAR', cost?: number}
 	| {type: 'ENQ_VILLAGER_ROW_FILL'}
 	| {type: 'ENQ_VILLAGER_ROW_BUY_CARD'; card: CardInstance}
 	| {type: 'VILLAGER_ROW_DRAW_CARD'; card: CardInstance}
@@ -52,6 +53,7 @@ export type SubActionType =
 	| {type: 'VILLAGER_ROW_CLEAR'; cards?: CardInstance[]}
 	| {type: 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK'}
 	| {type: 'VILLAGER_SHUFFLE_DECK'}
+	| {type: 'ENQ_CALM_FEARAMID', amount: number}
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
@@ -110,6 +112,7 @@ export interface SubActionContext {
 	farmRef: RefObject<HTMLDivElement | null>
 	gateRef: RefObject<HTMLDivElement | null>
 	towerRef: RefObject<HTMLDivElement | null>
+	fearamidRef: RefObject<HTMLDivElement | null>
 }
 
 /** An expander turns a high-level (ENQ_*) sub-action into a sequence of atomic ones. */
