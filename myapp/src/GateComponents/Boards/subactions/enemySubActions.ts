@@ -78,9 +78,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		}
 
 		const fear = enemyInfo.fear ?? 0
-		if (fear > 0) {
-			result.push({type: 'ENQ_ADD_FEAR', amount: fear})
-		}
+		for (let i = 0; i < fear; i++) result.push({type: 'ENQ_ADD_FEAR'})
 
 		return result
 	},

@@ -57,6 +57,7 @@ export type SubActionType =
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
+	| {type: 'ENQ_ADD_FEAR'}
 	| {type: 'ENQ_ENEMY_TURN'}
 	| {type: 'ENQ_ENEMY_SINGLE_ATTACK'; enemyCard: EnemyCardInstance}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}

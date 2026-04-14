@@ -22,8 +22,11 @@ interface EnemyRowProps {
 
 export function HeroDeck(props: {cardsRemaining: number}) {
 	const {cardsRemaining} = props
+	if (cardsRemaining === 0) {
+		<CardSlot />
+	}
 	return (
-		<div className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color)'>
+		<div className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color-card-text)'>
 			<div>Hero Deck</div>
 			<div>{cardsRemaining}</div>
 		</div>

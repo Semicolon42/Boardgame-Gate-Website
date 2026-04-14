@@ -183,14 +183,15 @@ export function GameBoard() {
 						fearamidRef={fearamidRef}
 						gateHealth={gameState.bGateHealth}
 						gateRef={gateRef}
+						towerHealth={gameState.bTowerHealth}
+						towerRef={towerRef}
+						fear={gameState.fFear}
 						onCalm={() => {
 							gameCalmFear(1)
 						}}
 						onRepair={(building: BuildingType) => {
 							gameRepairBase(building, 1)
 						}}
-						towerHealth={gameState.bTowerHealth}
-						towerRef={towerRef}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>
