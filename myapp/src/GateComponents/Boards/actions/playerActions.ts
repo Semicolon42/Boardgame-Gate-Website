@@ -92,6 +92,10 @@ export function makePlayerActions(
 		}
 	}
 
+	const gameCalmFear = (amount: number) => {
+		enqueue([{type: 'ENQ_CALM_FEARAMID', amount}])
+	}
+
 	const gameRepairBase = (building: BuildingType, repairAmount: number) => {
 		enqueue([
 			{type: 'ENQ_PLAYER_REPAIR_BUILDING', building, amount: repairAmount}
@@ -105,6 +109,7 @@ export function makePlayerActions(
 		playCard,
 		gameGainGenericResource,
 		gameRepairBase,
+		gameCalmFear,
 		clearActionLogs
 	}
 }

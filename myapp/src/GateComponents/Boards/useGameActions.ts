@@ -28,6 +28,7 @@ export function useGameActions() {
 	const farmRef = useRef<HTMLDivElement>(null)
 	const gateRef = useRef<HTMLDivElement>(null)
 	const towerRef = useRef<HTMLDivElement>(null)
+	const fearamidRef = useRef<HTMLDivElement>(null)
 
 	const {
 		enqueue,
@@ -49,7 +50,8 @@ export function useGameActions() {
 		enemySlotsRef,
 		farmRef,
 		gateRef,
-		towerRef
+		towerRef,
+		fearamidRef
 	)
 
 	return {
@@ -62,6 +64,7 @@ export function useGameActions() {
 		farmRef,
 		gateRef,
 		towerRef,
+		fearamidRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,

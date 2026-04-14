@@ -20,6 +20,7 @@ export function GameBoard() {
 		farmRef,
 		gateRef,
 		towerRef,
+		fearamidRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
@@ -29,6 +30,7 @@ export function GameBoard() {
 		gameBuyCard,
 		gameAttackEnemy,
 		gameRepairBase,
+		gameCalmFear,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -79,15 +81,6 @@ export function GameBoard() {
 					>
 						End Turn
 					</WaButton>
-					<WaButton
-						disabled={isProcessing}
-						onClick={() => {
-							gameOver()
-						}}
-						variant='brand'
-					>
-						GAME OVER
-					</WaButton>
 				</div>
 
 				{/* Middle column: all game rows */}
@@ -98,6 +91,15 @@ export function GameBoard() {
 							type='ATTACK'
 							value={`${gameState.cAttack}`}
 							variant={gameState.cAttack > 0 ? 'success' : 'neutral'}
+						/>
+						<ValueBadge
+							type='ATTACK'
+							value={`T ${gameState.bTowerBonusDamageCurrent}`}
+							variant={
+								gameState.cAttack > 0 && gameState.bTowerBonusDamageCurrent > 0
+									? 'success'
+									: 'neutral'
+							}
 						/>
 					</div>
 					<EnemyRow
@@ -121,11 +123,20 @@ export function GameBoard() {
 							value={`${gameState.cCoins}`}
 							variant={gameState.cCoins > 0 ? 'success' : 'neutral'}
 						/>
+						<ValueBadge
+							type='COINS'
+							value={`F ${gameState.bFarmBonusRecruitCurrent}`}
+							variant={
+								gameState.cCoins > 0 && gameState.bFarmBonusRecruitCurrent > 0
+									? 'success'
+									: 'neutral'
+							}
+						/>
 					</div>
 					<VillageRow
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
-						currentCoins={gameState.cCoins}
+						currentCoins={gameState.cCoins + gameState.bFarmBonusRecruitCurrent}
 						onAnimationEnd={signalAnimationComplete}
 						onBuyCard={gameBuyCard}
 						villageCards={gameState.vRow}
@@ -165,11 +176,16 @@ export function GameBoard() {
 						)}
 					</div>
 					<PlayerBaseRow
+						canCalm={gameState.cCalm > 0}
 						canRepair={gameState.cRepair > 0}
 						farmHealth={gameState.bFarmHealth}
 						farmRef={farmRef}
+						fearamidRef={fearamidRef}
 						gateHealth={gameState.bGateHealth}
 						gateRef={gateRef}
+						onCalm={() => {
+							gameCalmFear(1)
+						}}
 						onRepair={(building: BuildingType) => {
 							gameRepairBase(building, 1)
 						}}
@@ -217,7 +233,7 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 1}
 							onClick={() => {
-								gameVillagerRowClear()
+								gameVillagerRowClear(1)
 							}}
 							type='button'
 						>
