@@ -180,18 +180,18 @@ export function GameBoard() {
 						canRepair={gameState.cRepair > 0}
 						farmHealth={gameState.bFarmHealth}
 						farmRef={farmRef}
+						fear={gameState.fFear}
 						fearamidRef={fearamidRef}
 						gateHealth={gameState.bGateHealth}
 						gateRef={gateRef}
-						towerHealth={gameState.bTowerHealth}
-						towerRef={towerRef}
-						fear={gameState.fFear}
 						onCalm={() => {
 							gameCalmFear(1)
 						}}
 						onRepair={(building: BuildingType) => {
 							gameRepairBase(building, 1)
 						}}
+						towerHealth={gameState.bTowerHealth}
+						towerRef={towerRef}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>

@@ -89,7 +89,7 @@ export function PlayerBaseRow({
 	farmHealth,
 	gateHealth,
 	towerHealth,
-	fear,
+	fear
 }: PlayerBaseRowProps) {
 	return (
 		<div className='flex space-x-3 p-[2px]'>

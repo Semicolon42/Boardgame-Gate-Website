@@ -131,7 +131,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			}
 		]
 		const fearAction = state.fFearamid[newFear]
-		if (fearAction !== undefined) result.push(...fearActionToSubActions(fearAction))
+		if (fearAction !== undefined)
+			result.push(...fearActionToSubActions(fearAction))
 		if (newFear >= state.fFearMax) {
 			result.push({
 				type: 'EXECUTE_GAME_STATE_UPDATE',

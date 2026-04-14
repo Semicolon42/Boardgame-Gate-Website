@@ -1,7 +1,14 @@
-import {WaBadge, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement} from 'react'
 
-export type EnemyValueBadgeType = 'HEALTH' | 'FARM' | 'GATE' | 'TOWER' | 'FEAR' | 'MULTI_ATTACK' | 'UNKNOWN'
+export type EnemyValueBadgeType =
+	| 'HEALTH'
+	| 'FARM'
+	| 'GATE'
+	| 'TOWER'
+	| 'FEAR'
+	| 'MULTI_ATTACK'
+	| 'UNKNOWN'
 
 export function EnemyValueBadge(props: {
 	value: string
@@ -12,29 +19,29 @@ export function EnemyValueBadge(props: {
 	switch (type) {
 		case 'HEALTH':
 			icon = <WaIcon name='heart' variant='regular' />
-			break;
+			break
 		case 'FARM':
 			icon = <WaIcon name='house' variant='regular' />
-			break;
+			break
 		case 'GATE':
-			icon = <WaIcon name='dungeon' variant='classic'/>
-			break;
+			icon = <WaIcon name='dungeon' variant='classic' />
+			break
 		case 'TOWER':
 			icon = <WaIcon name='chess-rook' variant='regular' />
-			break;
+			break
 		case 'FEAR':
 			icon = <WaIcon name='eye' variant='regular' />
-			break;
+			break
 		case 'MULTI_ATTACK':
 			icon = <WaIcon name='city' variant='regular' />
-			break;
+			break
 		case 'UNKNOWN':
 			icon = <WaIcon name='question' variant='regular' />
-			break;
+			break
 		default:
 			icon = <WaIcon name='circle-question' variant='regular' />
 	}
-	
+
 	const cn: string = [
 		'outline-2',
 		'outline-transparent bg-transparent',

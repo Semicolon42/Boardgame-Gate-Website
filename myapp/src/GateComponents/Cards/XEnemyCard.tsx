@@ -5,8 +5,8 @@ import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
+import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
-import { EnemyValueBadge, type EnemyValueBadgeType } from '../UIComponents/EnemyValueBadge'
 
 interface XEnemyCardProps {
 	card: EnemyCardInstance
@@ -29,9 +29,16 @@ function EnemyAttackValue(props: {enemyCard: IEnemyCard}) {
 	const typeMap = {farm: 'FARM', gate: 'GATE', tower: 'TOWER'} as const
 	let divEnemyAttack: ReactElement | undefined
 	if (attackEntries.length > 1 && firstAttack) {
-		divEnemyAttack = <EnemyValueBadge type='MULTI_ATTACK' value={`${firstAttack.value}`} />
+		divEnemyAttack = (
+			<EnemyValueBadge type='MULTI_ATTACK' value={`${firstAttack.value}`} />
+		)
 	} else if (firstAttack) {
-		divEnemyAttack = <EnemyValueBadge type={typeMap[firstAttack.building]} value={`${firstAttack.value}`} />
+		divEnemyAttack = (
+			<EnemyValueBadge
+				type={typeMap[firstAttack.building]}
+				value={`${firstAttack.value}`}
+			/>
+		)
 	}
 	return divEnemyAttack
 }
@@ -90,9 +97,11 @@ export function XEnemyCard({
 			</div>
 			<div>
 				<div className='flex flex-col w-[40px]'>
-					<EnemyValueBadge type='HEALTH' value={''+card.health} />
-					<EnemyAttackValue enemyCard={enemyInfo}/>
-					{enemyInfo.fear && <EnemyValueBadge type='FEAR' value={''+enemyInfo.fear} />}
+					<EnemyValueBadge type='HEALTH' value={`${card.health}`} />
+					<EnemyAttackValue enemyCard={enemyInfo} />
+					{enemyInfo.fear && (
+						<EnemyValueBadge type='FEAR' value={`${enemyInfo.fear}`} />
+					)}
 				</div>
 			</div>
 		</div>

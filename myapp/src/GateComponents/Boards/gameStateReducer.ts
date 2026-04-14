@@ -8,7 +8,6 @@
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {GetRange} from '../Data/PlayerCards'
-import type {SubActionType} from './useSubActionQueue'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -47,7 +46,13 @@ export function makeEnemyCardInstances(
 	})
 }
 
-export type FearAction = 'DRAW_HERO' | 'DAMAGE_FARM' | 'DAMAGE_GATE' | 'DAMAGE_TOWER' | 'NONE' | 'GAMEOVER'
+export type FearAction =
+	| 'DRAW_HERO'
+	| 'DAMAGE_FARM'
+	| 'DAMAGE_GATE'
+	| 'DAMAGE_TOWER'
+	| 'NONE'
+	| 'GAMEOVER'
 
 // ---------------------------------------------------------------------------
 // State & action types
@@ -458,7 +463,7 @@ export const initialState: GameState = {
 		'NONE',
 		'DAMAGE_GATE',
 		'DAMAGE_GATE',
-		'GAMEOVER',
+		'GAMEOVER'
 	],
 
 	gameOutcome: undefined,
