@@ -257,33 +257,32 @@ export function gameStateReducer(
 		}
 
 		case 'BUILDING_CHANGE_HEALTH': {
-			// Fixed: was mutating state directly — now immutable
 			switch (action.building) {
 				case 'farm':
 					return {
 						...state,
-						bFarmHealth: Math.min(
+						bFarmHealth: Math.max(0, Math.min(
 							state.bFarmHealth + action.healthChange,
 							state.bFarmHealthMAX
-						),
+						)),
 						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
-						bGateHealth: Math.min(
+						bGateHealth: Math.max(0, Math.min(
 							state.bGateHealth + action.healthChange,
-							state.bFarmHealthMAX
-						),
+							state.bGateHealthMAX
+						)),
 						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
-						bTowerHealth: Math.min(
+						bTowerHealth: Math.max(0, Math.min(
 							state.bTowerHealth + action.healthChange,
-							state.bFarmHealthMAX
-						),
+							state.bTowerHealthMAX
+						)),
 						stateActionLogs: newActionLog
 					}
 				default:
