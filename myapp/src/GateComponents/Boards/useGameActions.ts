@@ -10,12 +10,12 @@
 // function (not a hook) that closes over enqueue/dispatch.
 
 import {useReducer, useRef} from 'react'
-import {gameStateReducer, initialState} from './gameStateReducer'
-import {useSubActionQueue} from './useSubActionQueue'
 import {makeBuildingActions} from './actions/buildingActions'
 import {makeEnemyActions} from './actions/enemyActions'
 import {makePlayerActions} from './actions/playerActions'
 import {makeVillagerActions} from './actions/villagerActions'
+import {gameStateReducer, initialState} from './gameStateReducer'
+import {useSubActionQueue} from './useSubActionQueue'
 
 export function useGameActions() {
 	const [state, dispatch] = useReducer(gameStateReducer, initialState)
@@ -25,6 +25,9 @@ export function useGameActions() {
 	const villageDeckRef = useRef<HTMLDivElement>(null)
 	const eDeckRef = useRef<HTMLDivElement>(null)
 	const enemySlotsRef = useRef<(HTMLDivElement | null)[]>([])
+	const farmRef = useRef<HTMLDivElement>(null)
+	const gateRef = useRef<HTMLDivElement>(null)
+	const towerRef = useRef<HTMLDivElement>(null)
 
 	const {
 		enqueue,
@@ -34,7 +37,8 @@ export function useGameActions() {
 		animatingCard,
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
-		animatingEnemyRemove
+		animatingEnemyRemove,
+		animatingFloatingText
 	} = useSubActionQueue(
 		state,
 		dispatch,
@@ -42,7 +46,10 @@ export function useGameActions() {
 		discardRef,
 		villageDeckRef,
 		eDeckRef,
-		enemySlotsRef
+		enemySlotsRef,
+		farmRef,
+		gateRef,
+		towerRef
 	)
 
 	return {
@@ -52,11 +59,15 @@ export function useGameActions() {
 		villageDeckRef,
 		eDeckRef,
 		enemySlotsRef,
+		farmRef,
+		gateRef,
+		towerRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
 		animatingEnemyRemove,
+		animatingFloatingText,
 		signalAnimationComplete,
 		queue,
 		...makePlayerActions(enqueue, dispatch),

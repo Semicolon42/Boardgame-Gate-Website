@@ -22,6 +22,9 @@ function convertActionCards(action: GameAction): ReactElement[] {
 		case 'STACK_SHUFFLE':
 		case 'BUILDING_CHANGE_HEALTH':
 		case 'ACTION_LOGS_CLEAR':
+		case 'UPADTE_RESOURCES':
+		case 'UPDATE_GAME_OUTCOME':
+		case 'MARK_CARD_PLAYED':
 			return [ActionCard(JSON.stringify(action))]
 		default:
 			return [ActionCard(`UNHANDLED LOG -- ${JSON.stringify(action)}`)]

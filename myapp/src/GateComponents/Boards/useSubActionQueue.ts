@@ -19,6 +19,7 @@ import type {
 	AnimatingVillagerRowSpec,
 	AtomicHandler,
 	Expander,
+	FloatingTextSpec,
 	SubActionContext,
 	SubActionType
 } from './subactions/types'
@@ -29,6 +30,7 @@ export type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
 	EnqueueFn,
+	FloatingTextSpec,
 	SubActionType
 } from './subactions/types'
 
@@ -61,7 +63,10 @@ export function useSubActionQueue(
 	discardRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>,
 	eDeckRef: RefObject<HTMLDivElement | null>,
-	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>
+	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>,
+	farmRef: RefObject<HTMLDivElement | null>,
+	gateRef: RefObject<HTMLDivElement | null>,
+	towerRef: RefObject<HTMLDivElement | null>
 ) {
 	const [queue, setQueue] = useState<SubActionType[]>([{type: 'ENQ_GAME_START'}])
 	const [isAnimating, setIsAnimating] = useState(false)
@@ -72,6 +77,7 @@ export function useSubActionQueue(
 		Record<string, {x: number; y: number}>
 	>({})
 	const [animatingEnemyRemove, setAnimatingEnemyRemove] = useState<string | null>(null)
+	const [animatingFloatingText, setAnimatingFloatingText] = useState<FloatingTextSpec | null>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -94,6 +100,7 @@ export function useSubActionQueue(
 		setAnimatingClearVillagerRow(null)
 		setAnimatingEnemyShifts({})
 		setAnimatingEnemyRemove(null)
+		setAnimatingFloatingText(null)
 		setIsAnimating(false)
 		setQueue(q => q.slice(1))
 	}, [])
@@ -123,11 +130,15 @@ export function useSubActionQueue(
 			setAnimatingEnemyShifts,
 			setAnimatingEnemyRemove,
 			pendingOnCompleteRef,
+			setAnimatingFloatingText,
 			deckPos: deckRef.current?.getBoundingClientRect(),
 			discardPos: discardRef.current?.getBoundingClientRect(),
 			villagerDeckPos: villagerDeckRef.current?.getBoundingClientRect(),
 			eDeckPos: eDeckRef.current?.getBoundingClientRect(),
-			enemySlotsRef
+			enemySlotsRef,
+			farmRef,
+			gateRef,
+			towerRef
 		}
 
 		const handler = allAtomicActionHandlers[head.type]
@@ -151,6 +162,7 @@ export function useSubActionQueue(
 		animatingCard,
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
-		animatingEnemyRemove
+		animatingEnemyRemove,
+		animatingFloatingText
 	}
 }

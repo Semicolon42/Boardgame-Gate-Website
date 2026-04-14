@@ -1,9 +1,11 @@
-import {WaButton, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {FloatingText} from '../Cards/FloatingText'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {ValueBadge} from '../UIComponents/ValueBadge'
+import type {BuildingType} from './gameStateReducer'
 import {useGameActions} from './useGameActions'
 
 export function GameBoard() {
@@ -15,17 +17,25 @@ export function GameBoard() {
 		villageDeckRef,
 		eDeckRef,
 		enemySlotsRef,
+		farmRef,
+		gateRef,
+		towerRef,
 		isProcessing,
 		animatingCard,
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
 		animatingEnemyRemove,
+		animatingFloatingText,
 		gameBuyCard,
+		gameAttackEnemy,
+		gameRepairBase,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
-		clearActionLogs
+		gameGainGenericResource,
+		clearActionLogs,
+		gameOver
 	} = useGameActions()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
@@ -35,26 +45,26 @@ export function GameBoard() {
 		'flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
 
 	return (
-		<div className='flex'>
+		<div className='flex bg-(--color-gameboard-background)'>
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={villageDeckRef}
 					>
 						Village:
 						{gameState?.vDeck?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-400 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={discardRef}
 					>
 						Discard:
 						{gameState?.pDiscard?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-gray-900 text-white'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 						ref={deckRef}
 					>
 						Deck:
@@ -68,6 +78,15 @@ export function GameBoard() {
 						variant='brand'
 					>
 						End Turn
+					</WaButton>
+					<WaButton
+						disabled={isProcessing}
+						onClick={() => {
+							gameOver()
+						}}
+						variant='brand'
+					>
+						GAME OVER
 					</WaButton>
 				</div>
 
@@ -91,7 +110,9 @@ export function GameBoard() {
 						enemyRowMax={gameState.eEnemyRowMax}
 						enemySlotsRef={enemySlotsRef}
 						heroCardsRemaining={gameState.hDeck.length}
+						isAttackable={gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
+						onAttack={gameAttackEnemy}
 					/>
 					{/* Second Row Village cards to buy */}
 					<div className={statusBarClass}>
@@ -143,12 +164,26 @@ export function GameBoard() {
 							/>
 						)}
 					</div>
-					<PlayerBaseRow />
+					<PlayerBaseRow
+						canRepair={gameState.cRepair > 0}
+						farmHealth={gameState.bFarmHealth}
+						farmRef={farmRef}
+						gateHealth={gameState.bGateHealth}
+						gateRef={gateRef}
+						onRepair={(building: BuildingType) => {
+							gameRepairBase(building, 1)
+						}}
+						towerHealth={gameState.bTowerHealth}
+						towerRef={towerRef}
+					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							onClick={() => {
+								gameGainGenericResource('ATTACK', 1, 2)
+							}}
 							type='button'
 						>
 							<div className='flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'>
@@ -159,6 +194,9 @@ export function GameBoard() {
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							onClick={() => {
+								gameGainGenericResource('REPAIR', 1, 2)
+							}}
 							type='button'
 						>
 							<div className={costCircleClass}>2</div>
@@ -167,6 +205,9 @@ export function GameBoard() {
 						<button
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
+							onClick={() => {
+								gameGainGenericResource('CALM', 1, 2)
+							}}
 							type='button'
 						>
 							<div className={costCircleClass}>2</div>
@@ -194,24 +235,34 @@ export function GameBoard() {
 				</div>
 			</div>
 			<div className='flex-1'>
-				{/* Top of column for some elements */}
-				<div />
-				{/* bottom of column to show the action list for the current turn */}
 				<div className='flex-1'>
-					<WaButton
-						onClick={() => {
-							clearActionLogs()
-						}}
-						variant='brand'
-					>
-						Clear Log
-					</WaButton>
-					{/* <ActionColumn actionLog={gameState.actionLogs} /> */}
 					{queue.map(it => {
-						return <div key={crypto.randomUUID()}>{JSON.stringify(it)}</div>
+						return (
+							<div className='bg-cyan-400' key={crypto.randomUUID()}>
+								{JSON.stringify(it)}
+							</div>
+						)
 					})}
 				</div>
 			</div>
+			<WaDialog open={gameState.gameOutcome !== undefined}>
+				GAME OVER
+				{gameState.gameOutcome}
+				<WaButton
+					appearance='filled'
+					data-dialog='close'
+					slot='footer'
+					variant='brand'
+				>
+					Close
+				</WaButton>
+			</WaDialog>
+			{animatingFloatingText && (
+				<FloatingText
+					onAnimationEnd={signalAnimationComplete}
+					spec={animatingFloatingText}
+				/>
+			)}
 		</div>
 	)
 }

@@ -13,6 +13,8 @@ interface XEnemyCardProps {
 	moveFrom?: {x: number; y: number} | undefined
 	moveTo?: {x: number; y: number} | undefined
 	isFadingOut?: boolean
+	isAttackable?: boolean | undefined
+	onAttack?: ((enemy: EnemyCardInstance, amount: number) => void) | undefined
 	/** CSS class injected by parent — used for grid-area stacking. */
 	className?: string
 }
@@ -23,9 +25,11 @@ export function XEnemyCard({
 	moveFrom,
 	moveTo,
 	isFadingOut = false,
+	isAttackable = false,
+	onAttack,
 	className = ''
 }: XEnemyCardProps) {
-	const ref = useRef<HTMLDivElement>(null)
+	const ref = useRef<HTMLElement>(null)
 	const enemyInfo = getEnemyCard(card.cardId)
 
 	useLayoutEffect(() => {
@@ -47,12 +51,20 @@ export function XEnemyCard({
 		}
 	}, [moveFrom, moveTo])
 
-	return (
-		<div
-			className={`flex h-[140px] w-[100px] shrink-0 flex-col items-start rounded-xl bg-red-800 p-[5px] text-white XENEMYCARD ${isFadingOut ? 'card-fade-out-animate' : ''} ${className} outline-4 outline-black`}
-			onAnimationEnd={onAnimationEnd}
-			ref={ref as RefObject<HTMLDivElement>}
-		>
+	const outlineClass = isAttackable
+		? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover) cursor-pointer'
+		: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+
+	const containerClass = [
+		'flex h-[140px] w-[100px] shrink-0 flex-col items-start justify-start rounded-xl p-[5px] text-white text-left XENEMYCARD outline-4',
+		'bg-(--color-enemy-card-face)',
+		isFadingOut ? 'card-fade-out-animate' : '',
+		outlineClass,
+		className
+	].join(' ')
+
+	const inner = (
+		<div>
 			<div className='flex items-center gap-[4px] px-[5px] w-full'>
 				<ScaledName text={enemyInfo.name} />
 				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs text-black'>
@@ -63,6 +75,29 @@ export function XEnemyCard({
 				<div className='text-xs'>Type: {card.cardId}</div>
 				<div className='text-xs'>HP: {card.health}</div>
 			</div>
+		</div>
+	)
+	if (isAttackable && onAttack !== undefined) {
+		return (
+			<button
+				className={containerClass}
+				onAnimationEnd={onAnimationEnd}
+				onClick={() => onAttack(card, 1)}
+				ref={ref as RefObject<HTMLButtonElement>}
+				type='button'
+			>
+				{inner}
+			</button>
+		)
+	}
+
+	return (
+		<div
+			className={containerClass}
+			onAnimationEnd={onAnimationEnd}
+			ref={ref as RefObject<HTMLDivElement>}
+		>
+			{inner}
 		</div>
 	)
 }
