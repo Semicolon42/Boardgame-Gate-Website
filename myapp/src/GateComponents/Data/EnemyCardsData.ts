@@ -51,7 +51,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 	},
 	{
 		id: 2,
-		name: 'Skulipede',
+		name: 'Skulepede',
 		image: 'generic',
 		type: 'L1',
 
@@ -63,16 +63,16 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 	},
 	{
 		id: 3,
-		name: 'LEVEL 1-C',
+		name: 'Plague Rat',
 		image: 'generic',
-		type: 'L2',
+		type: 'L1',
 
 		stars: 3,
-		health: 3,
+		health: 4,
 		attack: {
 			farm: 1
 		},
-		fear: 2
+		fear: 1
 	},
 	{
 		id: 4,
@@ -101,17 +101,16 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 	},
 	{
 		id: 6,
-		name: 'LEVEL 2-C',
+		name: 'Dark Priest',
 		image: 'generic',
 		type: 'L2',
 
 		stars: 6,
-		health: 1,
+		health: 5,
 		attack: {
-			farm: 1
+			tower: 2
 		},
 		fear: 1,
-		specialAbility: 'generic'
 	},
 	{
 		id: 7,
@@ -133,23 +132,24 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		type: 'L3',
 
 		stars: 8,
-		health: 7,
+		health: 6,
 		attack: {
 			farm: 2
 		},
 		fear: 1,
-		specialAbility: 'generic'
 	},
 	{
 		id: 9,
-		name: 'LEVEL 3-C',
+		name: 'Grave Lord',
 		image: 'generic',
 		type: 'L3',
 
 		stars: 0,
-		health: 10,
+		health: 7,
 		attack: {
-			all: 1
+			farm: 1,
+			gate: 1, 
+			tower: 1,
 		},
 		fear: 1,
 		specialAbility: 'generic'
