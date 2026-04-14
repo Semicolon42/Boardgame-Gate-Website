@@ -79,16 +79,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 
 		const fear = enemyInfo.fear ?? 0
 		if (fear > 0) {
-			result.push({
-				type: 'EXECUTE_GAME_STATE_UPDATE',
-				gameStateAction: {type: 'CHANGE_FEAR', amount: fear}
-			})
-			result.push({
-				type: 'SHOW_FLOATING_TEXT',
-				text: `+${fear}`,
-				color: 'var(--color-text-damage)',
-				target: {kind: 'FEARAMID'}
-			})
+			result.push({type: 'ENQ_ADD_FEAR', amount: fear})
 		}
 
 		return result

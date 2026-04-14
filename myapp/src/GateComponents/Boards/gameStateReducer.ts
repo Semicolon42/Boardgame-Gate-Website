@@ -47,6 +47,8 @@ export function makeEnemyCardInstances(
 	})
 }
 
+export type FearAction = 'DRAW_HERO' | 'DAMAGE_FARM' | 'DAMAGE_GATE' | 'DAMAGE_TOWER' | 'NONE' | 'GAMEOVER'
+
 // ---------------------------------------------------------------------------
 // State & action types
 // ---------------------------------------------------------------------------
@@ -64,7 +66,7 @@ export interface GameState {
 	bTowerHealthMAX: number
 	fFear: number
 	fFearMax: number
-	fFearamid: SubActionType[]
+	fFearamid: FearAction[]
 
 	// Player card state
 	pDeck: CardInstance[]
@@ -446,11 +448,17 @@ export const initialState: GameState = {
 	bTowerHealthMAX: 6,
 	bGateHealthMAX: 12,
 	fFear: 0,
-	fFearMax: 10,
+	fFearMax: 9,
 	fFearamid: [
-		{type: 'DEBUG_ALERT', message: 'Fear 1'},
-		{type: 'DEBUG_ALERT', message: 'Fear 1'},
-		{type: 'DEBUG_ALERT', message: 'Fear 1'}
+		'DRAW_HERO',
+		'DAMAGE_FARM',
+		'DRAW_HERO',
+		'DAMAGE_TOWER',
+		'DRAW_HERO',
+		'NONE',
+		'DAMAGE_GATE',
+		'DAMAGE_GATE',
+		'GAMEOVER',
 	],
 
 	gameOutcome: undefined,

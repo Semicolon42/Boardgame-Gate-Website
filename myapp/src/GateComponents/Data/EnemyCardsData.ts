@@ -163,7 +163,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 9,
 		health: 11,
 		attack: {
-			all: 2
+			farm: 2,
+			gate: 2,
+			tower: 2,
 		},
 		fear: 2
 	}
