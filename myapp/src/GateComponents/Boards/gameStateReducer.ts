@@ -126,7 +126,7 @@ export type GameAction =
 	| {
 			type: 'CHANGE_FEAR'
 			amount: number
-		}
+	  }
 	| {
 			type: 'UPADTE_RESOURCES'
 			coins?: number
@@ -249,7 +249,11 @@ export function gameStateReducer(
 		}
 
 		case 'CHANGE_FEAR': {
-			return {...state, fFear: state.fFear + action.amount, stateActionLogs: newActionLog}
+			return {
+				...state,
+				fFear: state.fFear + action.amount,
+				stateActionLogs: newActionLog
+			}
 		}
 
 		case 'BUILDING_CHANGE_HEALTH': {
@@ -301,9 +305,11 @@ export function gameStateReducer(
 				cBonusRepairTower:
 					state.cBonusRepairTower + (action.bonusRepairTower ?? 0),
 				bFarmBonusRecruitCurrent:
-					state.bFarmBonusRecruitCurrent + (action.farmBonusRecruitCurrent ?? 0),
+					state.bFarmBonusRecruitCurrent +
+					(action.farmBonusRecruitCurrent ?? 0),
 				bTowerBonusDamageCurrent:
-					state.bTowerBonusDamageCurrent + (action.towerBonusDmaageCurrent ?? 0),
+					state.bTowerBonusDamageCurrent +
+					(action.towerBonusDmaageCurrent ?? 0),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -398,8 +404,14 @@ export function gameStateReducer(
 		case 'TURN_START_RESET': {
 			return {
 				...state,
-				bFarmBonusRecruitCurrent: state.bFarmHealth > state.bFarmBonusMinHealth ? state.bFarmBonusRecruit : 0,
-				bTowerBonusDamageCurrent: state.bTowerHealth > state.bTowerBonusMinHealth ? state.bTowerBonusDamage : 0,
+				bFarmBonusRecruitCurrent:
+					state.bFarmHealth > state.bFarmBonusMinHealth
+						? state.bFarmBonusRecruit
+						: 0,
+				bTowerBonusDamageCurrent:
+					state.bTowerHealth > state.bTowerBonusMinHealth
+						? state.bTowerBonusDamage
+						: 0,
 				stateActionLogs: newActionLog
 			}
 		}

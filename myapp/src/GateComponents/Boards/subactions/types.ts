@@ -45,7 +45,7 @@ export type SubActionType =
 	| {type: 'ENQ_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
-	| {type: 'ENQ_VILLAGER_ROW_CLEAR', cost?: number}
+	| {type: 'ENQ_VILLAGER_ROW_CLEAR'; cost?: number}
 	| {type: 'ENQ_VILLAGER_ROW_FILL'}
 	| {type: 'ENQ_VILLAGER_ROW_BUY_CARD'; card: CardInstance}
 	| {type: 'VILLAGER_ROW_DRAW_CARD'; card: CardInstance}
@@ -53,7 +53,7 @@ export type SubActionType =
 	| {type: 'VILLAGER_ROW_CLEAR'; cards?: CardInstance[]}
 	| {type: 'VILLAGER_SHUFFLE_DISCARD_INTO_DECK'}
 	| {type: 'VILLAGER_SHUFFLE_DECK'}
-	| {type: 'ENQ_CALM_FEARAMID', amount: number}
+	| {type: 'ENQ_CALM_FEARAMID'; amount: number}
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}

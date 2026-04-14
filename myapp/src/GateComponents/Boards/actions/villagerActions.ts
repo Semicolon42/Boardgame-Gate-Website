@@ -2,12 +2,12 @@ import type {CardInstance} from '../gameStateReducer'
 import type {EnqueueFn, SubActionType} from '../useSubActionQueue'
 
 export function makeVillagerActions(enqueue: EnqueueFn) {
-	const gameVillagerRowClear = (cost? : number | undefined): void => {
+	const gameVillagerRowClear = (cost?: number | undefined): void => {
 		const actionQueue: SubActionType[] = []
-		if (cost)	{
+		if (cost) {
 			actionQueue.push({
-				type: 'EXECUTE_GAME_STATE_UPDATE', 
-				gameStateAction:{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
 					type: 'UPADTE_RESOURCES',
 					coins: -cost
 				}

@@ -38,7 +38,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		{
 			type: 'EXECUTE_GAME_STATE_UPDATE',
 			gameStateAction: {
-				type: 'TURN_START_RESET',
+				type: 'TURN_START_RESET'
 			}
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
@@ -70,29 +70,31 @@ export const atomicHandlers: Partial<
 			{type: 'SHOW_FLOATING_TEXT'}
 		>
 		let rect: DOMRect | undefined
-		switch(target.kind) {
-			case 'ENEMY_CARD':
+		switch (target.kind) {
+			case 'ENEMY_CARD': {
 				const idx = ctx.currentState.eEnemyRow.findIndex(
 					c => c.instanceId === target.instanceId
 				)
 				if (idx >= 0) {
 					const offset =
 						ctx.currentState.eEnemyRowMax - ctx.currentState.eEnemyRow.length
-					rect = ctx.enemySlotsRef.current[offset + idx]?.getBoundingClientRect()
+					rect =
+						ctx.enemySlotsRef.current[offset + idx]?.getBoundingClientRect()
 				}
-				break;
+				break
+			}
 			case 'BUILDING_FARM':
 				rect = ctx.farmRef.current?.getBoundingClientRect()
-				break;
+				break
 			case 'BUILDING_GATE':
 				rect = ctx.gateRef.current?.getBoundingClientRect()
-				break;
+				break
 			case 'BUILDING_TOWER':
 				rect = ctx.towerRef.current?.getBoundingClientRect()
-				break;
+				break
 			case 'FEARAMID':
 				rect = ctx.fearamidRef.current?.getBoundingClientRect()
-				break;
+				break
 			default:
 		}
 		if (rect === undefined) {

@@ -95,7 +95,11 @@ export function GameBoard() {
 						<ValueBadge
 							type='ATTACK'
 							value={`T ${gameState.bTowerBonusDamageCurrent}`}
-							variant={gameState.cAttack > 0 && gameState.bTowerBonusDamageCurrent > 0 ? 'success' : 'neutral'}
+							variant={
+								gameState.cAttack > 0 && gameState.bTowerBonusDamageCurrent > 0
+									? 'success'
+									: 'neutral'
+							}
 						/>
 					</div>
 					<EnemyRow
@@ -122,7 +126,11 @@ export function GameBoard() {
 						<ValueBadge
 							type='COINS'
 							value={`F ${gameState.bFarmBonusRecruitCurrent}`}
-							variant={gameState.cCoins > 0 && gameState.bFarmBonusRecruitCurrent > 0 ? 'success' : 'neutral'}
+							variant={
+								gameState.cCoins > 0 && gameState.bFarmBonusRecruitCurrent > 0
+									? 'success'
+									: 'neutral'
+							}
 						/>
 					</div>
 					<VillageRow
@@ -168,21 +176,21 @@ export function GameBoard() {
 						)}
 					</div>
 					<PlayerBaseRow
+						canCalm={gameState.cCalm > 0}
+						canRepair={gameState.cRepair > 0}
 						farmHealth={gameState.bFarmHealth}
 						farmRef={farmRef}
+						fearamidRef={fearamidRef}
 						gateHealth={gameState.bGateHealth}
 						gateRef={gateRef}
-						canRepair={gameState.cRepair > 0}
-						onRepair={(building: BuildingType) => {
-							gameRepairBase(building, 1)
-						}}
-						canCalm={gameState.cCalm > 0}
 						onCalm={() => {
 							gameCalmFear(1)
 						}}
+						onRepair={(building: BuildingType) => {
+							gameRepairBase(building, 1)
+						}}
 						towerHealth={gameState.bTowerHealth}
 						towerRef={towerRef}
-						fearamidRef={fearamidRef}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>

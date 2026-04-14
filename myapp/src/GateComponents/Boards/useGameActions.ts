@@ -51,7 +51,7 @@ export function useGameActions() {
 		farmRef,
 		gateRef,
 		towerRef,
-		fearamidRef,
+		fearamidRef
 	)
 
 	return {

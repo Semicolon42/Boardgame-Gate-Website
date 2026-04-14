@@ -10,7 +10,8 @@ function PlayerBaseCard(props: {
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
 	const {name, image, health, divRef, canRepair, onRepair} = props
-	const cnBase = 'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
+	const cnBase =
+		'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
 	let cnOutline = 'outline-4 outline-color:var(--color-red)'
 	if (canRepair) {
 		cnOutline += ' outline-(--color-outline-active)'
@@ -33,13 +34,14 @@ function PlayerBaseCard(props: {
 }
 
 function Fearamid(props: {
-	fear: number, 
+	fear: number
 	onCalm?: () => undefined | undefined
 	canCalm?: boolean
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
 	const {fear, onCalm, canCalm, divRef} = props
-	const cnBase = 'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
+	const cnBase =
+		'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
 	let cnOutline = 'outline-4 outline-color:var(--color-red)'
 	if (canCalm) {
 		cnOutline += ' outline-(--color-outline-active)'
@@ -49,10 +51,10 @@ function Fearamid(props: {
 		cnOutline += ' hover:outline-(--color-outline-normal-hover)'
 	}
 	return (
-		<div 
+		<div
 			className={`${cnBase} ${cnOutline}`}
 			ref={divRef}
-			{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})} 
+			{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})}
 		>
 			<div>Fearamid</div>
 			<div>{`Fear: ${fear}`}</div>
@@ -119,10 +121,10 @@ export function PlayerBaseRow({
 					onRepair('tower')
 				}}
 			/>
-			<Fearamid 
-				fear={0} 
-				divRef={fearamidRef} 
+			<Fearamid
 				canCalm={canCalm}
+				divRef={fearamidRef}
+				fear={0}
 				onCalm={() => {
 					onCalm()
 				}}

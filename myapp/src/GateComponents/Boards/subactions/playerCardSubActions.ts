@@ -90,9 +90,20 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			return []
 		}
 		return [
-			{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'CHANGE_FEAR', amount:-amount}},
-			{type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'UPADTE_RESOURCES', calm:-amount}},
-			{type: 'SHOW_FLOATING_TEXT', target: {kind: 'FEARAMID'}, color: 'green', text: ''+amount}
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {type: 'CHANGE_FEAR', amount: -amount}
+			},
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {type: 'UPADTE_RESOURCES', calm: -amount}
+			},
+			{
+				type: 'SHOW_FLOATING_TEXT',
+				target: {kind: 'FEARAMID'},
+				color: 'green',
+				text: `${amount}`
+			}
 		]
 	},
 

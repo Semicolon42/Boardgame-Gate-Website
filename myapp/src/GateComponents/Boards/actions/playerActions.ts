@@ -93,9 +93,7 @@ export function makePlayerActions(
 	}
 
 	const gameCalmFear = (amount: number) => {
-		enqueue([
-			{type: 'ENQ_CALM_FEARAMID', amount: amount},
-		])
+		enqueue([{type: 'ENQ_CALM_FEARAMID', amount}])
 	}
 
 	const gameRepairBase = (building: BuildingType, repairAmount: number) => {
