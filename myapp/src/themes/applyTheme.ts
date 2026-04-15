@@ -49,6 +49,8 @@ export function applyTheme(theme: GateTheme): void {
 
 	r.style.setProperty('--text-vp-stroke-width', theme.vp.strokeWidthPx+'px')
 	r.style.setProperty('--text-vp-stroke-color', theme.vp.strokeColor)
+	r.style.setProperty('--fearamid-color-highlight', theme.fearamid.highlightColor)
+	
 
 	// Card animations
 	r.style.setProperty(

@@ -252,6 +252,7 @@ export function GameBoard() {
 						healthTower={gameState.bTowerHealth}
 						healthTowerMax={gameState.bTowerHealthMAX}
 						fear={gameState.fFear}
+					fearamid={gameState.fFearamid}
 						farmRef={farmRef}
 						gateRef={gateRef}
 						towerRef={towerRef}
