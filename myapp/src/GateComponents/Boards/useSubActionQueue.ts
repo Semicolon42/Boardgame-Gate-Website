@@ -17,6 +17,7 @@ import * as playerCard from './subactions/playerCardSubActions'
 import type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
+	AttackVisualizationSpec,
 	AtomicHandler,
 	Expander,
 	FloatingTextSpec,
@@ -30,6 +31,7 @@ import * as villager from './subactions/villagerSubActions'
 export type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
+	AttackVisualizationSpec,
 	EnqueueFn,
 	FloatingTextSpec,
 	HeroCardToDiscardSpec,
@@ -83,6 +85,8 @@ export function useSubActionQueue(
 	const [animatingEnemyRemove, setAnimatingEnemyRemove] = useState<string | null>(null)
 	const [animatingFloatingText, setAnimatingFloatingText] = useState<FloatingTextSpec | null>(null)
 	const [animatingHeroToDiscard, setAnimatingHeroToDiscard] = useState<HeroCardToDiscardSpec | null>(null)
+	const [animatingAttackVisualization, setAnimatingAttackVisualization] =
+		useState<AttackVisualizationSpec | null>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -107,6 +111,7 @@ export function useSubActionQueue(
 		setAnimatingEnemyRemove(null)
 		setAnimatingFloatingText(null)
 		setAnimatingHeroToDiscard(null)
+		setAnimatingAttackVisualization(null)
 		setIsAnimating(false)
 		setQueue(q => q.slice(1))
 	}, [])
@@ -138,6 +143,7 @@ export function useSubActionQueue(
 			pendingOnCompleteRef,
 			setAnimatingFloatingText,
 			setAnimatingHeroToDiscard,
+			setAnimatingAttackVisualization,
 			deckPos: deckRef.current?.getBoundingClientRect(),
 			discardPos: discardRef.current?.getBoundingClientRect(),
 			hDeckPos: hDeckRef.current?.getBoundingClientRect(),
@@ -173,6 +179,7 @@ export function useSubActionQueue(
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		animatingFloatingText,
-		animatingHeroToDiscard
+		animatingHeroToDiscard,
+		animatingAttackVisualization
 	}
 }

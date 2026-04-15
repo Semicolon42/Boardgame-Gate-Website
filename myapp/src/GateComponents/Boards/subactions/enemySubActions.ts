@@ -41,7 +41,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				text: `-${actualFarmDamage}`,
 				color: 'var(--color-text-damage)',
-				target: {kind: 'BUILDING_FARM'}
+				target: {kind: 'BUILDING_FARM'},
+				attackingEnemyInstanceId: enemyCard.instanceId
 			})
 		}
 		if (actualGateDamage > 0) {
@@ -57,7 +58,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				text: `-${actualGateDamage}`,
 				color: 'var(--color-text-damage)',
-				target: {kind: 'BUILDING_GATE'}
+				target: {kind: 'BUILDING_GATE'},
+				attackingEnemyInstanceId: enemyCard.instanceId
 			})
 		}
 		if (actualTowerDamage > 0) {
@@ -73,12 +75,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				text: `-${actualTowerDamage}`,
 				color: 'var(--color-text-damage)',
-				target: {kind: 'BUILDING_TOWER'}
+				target: {kind: 'BUILDING_TOWER'},
+				attackingEnemyInstanceId: enemyCard.instanceId
 			})
 		}
 
 		const fear = enemyInfo.fear ?? 0
-		for (let i = 0; i < fear; i++) result.push({type: 'ENQ_ADD_FEAR'})
+		for (let i = 0; i < fear; i++)
+			result.push({type: 'ENQ_ADD_FEAR', attackingEnemyInstanceId: enemyCard.instanceId})
 
 		return result
 	},

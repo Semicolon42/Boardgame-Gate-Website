@@ -6,7 +6,7 @@ import {
 	makeCardInstances,
 	makeEnemyCardInstances
 } from '../gameStateReducer'
-import type {AtomicHandler, Expander, SubActionType} from './types'
+import type {AttackVisualizationSpec, AtomicHandler, Expander, SubActionType} from './types'
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
@@ -202,7 +202,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
-	ENQ_ADD_FEAR: (_action, state: GameState): SubActionType[] => {
+	ENQ_ADD_FEAR: (action, state: GameState): SubActionType[] => {
+		const {attackingEnemyInstanceId} = action as Extract<SubActionType, {type: 'ENQ_ADD_FEAR'}>
 		const oldFear = state.fFear
 		const newFear = Math.min(oldFear + 1, state.fFearMax)
 		if (newFear === oldFear) return []
@@ -215,7 +216,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				text: '+1',
 				color: 'var(--color-text-damage)',
-				target: {kind: 'FEARAMID'}
+				target: {kind: 'FEARAMID'},
+				attackingEnemyInstanceId
 			}
 		]
 		const fearAction = state.fFearamid[newFear]
@@ -251,7 +253,7 @@ export const atomicHandlers: Partial<
 		ctx.setQueue(q => q.slice(1))
 	},
 	SHOW_FLOATING_TEXT: (action, ctx) => {
-		const {text, color, target} = action as Extract<
+		const {text, color, target, attackingEnemyInstanceId} = action as Extract<
 			SubActionType,
 			{type: 'SHOW_FLOATING_TEXT'}
 		>
@@ -286,6 +288,9 @@ export const atomicHandlers: Partial<
 		if (rect === undefined) {
 			ctx.setQueue(q => q.slice(1))
 			return
+		}
+		if (attackingEnemyInstanceId !== undefined && target.kind !== 'ENEMY_CARD') {
+			ctx.setAnimatingAttackVisualization({attackingEnemyInstanceId, attackTarget: target})
 		}
 		ctx.setAnimatingFloatingText({
 			text,

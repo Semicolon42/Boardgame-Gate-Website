@@ -1,5 +1,5 @@
 import type { FearAction } from "@/GateComponents/Boards/gameStateReducer"
-import { WaTooltip } from "@awesome.me/webawesome/dist/react"
+import { WaIcon, WaTooltip } from "@awesome.me/webawesome/dist/react"
 import { useId, type RefObject } from "react"
 
 function fearIcon(action: FearAction): {name: string, variant: string, tooltip?: string} {
@@ -13,6 +13,7 @@ function fearIcon(action: FearAction): {name: string, variant: string, tooltip?:
 		default: return {name: 'question', variant: 'classic', tooltip: '?'}
 	}
 }
+
 
 // Pyramid row layout: each sub-array is a row (top→bottom), values are 0-based fearamid indices
 const FEARAMID_ROWS = [[9], [7, 8], [4, 5, 6], [0, 1, 2, 3]] as const
@@ -44,9 +45,10 @@ export function Fearamid(props: {
 	fearamid: FearAction[]
 	onCalm?: () => undefined | undefined
 	canCalm?: boolean
+	isUnderAttack?: boolean
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
-	const {fear, fearamid, onCalm, canCalm, divRef} = props
+	const {fear, fearamid, onCalm, canCalm, isUnderAttack, divRef} = props
 	const id = useId()
 	let cn = [
 		'h-[150px] w-[100px] flex flex-col',
@@ -56,6 +58,8 @@ export function Fearamid(props: {
 	].join(' ')
 	if (canCalm) {
 		cn += ' cursor-pointer outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+	} else if (isUnderAttack) {
+		cn += ' outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
 	} else {
 		cn += ' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	}

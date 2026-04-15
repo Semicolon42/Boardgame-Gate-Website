@@ -1,6 +1,5 @@
-import {useId, type RefObject} from 'react'
+import {type RefObject} from 'react'
 import type {BuildingType, FearAction} from '@/GateComponents/Boards/gameStateReducer'
-import { WaIcon, WaTooltip } from '@awesome.me/webawesome/dist/react'
 import { PlayerBaseCard } from './BaseRowCard'
 import { Fearamid } from './Fearamid'
 
@@ -21,6 +20,8 @@ interface PlayerBaseRowProps {
 	healthTowerMax: number
 	fear: number
 	fearamid: FearAction[]
+	attackedTarget?: 'farm' | 'gate' | 'tower' | 'fearamid' | null
+	fearamidAttacking?: boolean
 }
 
 export function PlayerBaseRow({
@@ -30,7 +31,7 @@ export function PlayerBaseRow({
 	fearamidRef,
 	onRepair,
 	canRepair,
-	canCalm,	
+	canCalm,
 	onCalm,
 	healthFarm,
 	healthMaxFarm,
@@ -39,7 +40,9 @@ export function PlayerBaseRow({
 	healthTower,
 	healthTowerMax,
 	fear,
-	fearamid
+	fearamid,
+	attackedTarget,
+	fearamidAttacking = false
 }: PlayerBaseRowProps) {
 	return (
 		<div className='flex space-x-3 p-[2px]'>
@@ -49,6 +52,7 @@ export function PlayerBaseRow({
 				health={healthFarm}
 				maxHealth={healthMaxFarm}
 				image='farm'
+				isUnderAttack={attackedTarget === 'farm'}
 				name='Farm'
 				onRepair={() => {
 					onRepair('farm')
@@ -60,6 +64,7 @@ export function PlayerBaseRow({
 				health={healthGate}
 				maxHealth={healthGateMax}
 				image='gate'
+				isUnderAttack={attackedTarget === 'gate'}
 				name='Gate'
 				onRepair={() => {
 					onRepair('gate')
@@ -71,6 +76,7 @@ export function PlayerBaseRow({
 				health={healthTower}
 				maxHealth={healthTowerMax}
 				image='tower'
+				isUnderAttack={attackedTarget === 'tower'}
 				name='Tower'
 				onRepair={() => {
 					onRepair('tower')
@@ -81,6 +87,7 @@ export function PlayerBaseRow({
 				divRef={fearamidRef}
 				fear={fear}
 				fearamid={fearamid}
+				isUnderAttack={attackedTarget === 'fearamid' || fearamidAttacking}
 				onCalm={() => {
 					onCalm()
 				}}

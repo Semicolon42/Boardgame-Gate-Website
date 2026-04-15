@@ -27,6 +27,17 @@ export interface HeroCardToDiscardSpec {
 	to: {x: number; y: number}
 }
 
+export type AttackVisualizationTarget =
+	| {kind: 'BUILDING_FARM'}
+	| {kind: 'BUILDING_GATE'}
+	| {kind: 'BUILDING_TOWER'}
+	| {kind: 'FEARAMID'}
+
+export interface AttackVisualizationSpec {
+	attackingEnemyInstanceId: string
+	attackTarget: AttackVisualizationTarget
+}
+
 // ---------------------------------------------------------------------------
 // SubActionType — discriminated union
 // Each variant carries exactly the fields it needs, mirroring GameAction.
@@ -65,7 +76,7 @@ export type SubActionType =
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
-	| {type: 'ENQ_ADD_FEAR'}
+	| {type: 'ENQ_ADD_FEAR'; attackingEnemyInstanceId?: string}
 	| {type: 'ENQ_ENEMY_TURN'}
 	| {type: 'ENQ_ENEMY_SINGLE_ATTACK'; enemyCard: EnemyCardInstance}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
@@ -80,6 +91,7 @@ export type SubActionType =
 			text: string
 			color: string
 			target: FloatingTextTarget
+			attackingEnemyInstanceId?: string
 	  }
 	| {type: 'DEBUG_ALERT'; message: string}
 
@@ -116,6 +128,7 @@ export interface SubActionContext {
 	pendingOnCompleteRef: MutableRefObject<(() => void) | null>
 	setAnimatingFloatingText: (v: FloatingTextSpec | null) => void
 	setAnimatingHeroToDiscard: (v: HeroCardToDiscardSpec | null) => void
+	setAnimatingAttackVisualization: (v: AttackVisualizationSpec | null) => void
 	// DOM snapshot positions (captured before dispatch):
 	deckPos: DOMRect | undefined
 	discardPos: DOMRect | undefined

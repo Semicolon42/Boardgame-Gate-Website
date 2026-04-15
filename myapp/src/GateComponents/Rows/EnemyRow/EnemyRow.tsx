@@ -20,6 +20,7 @@ interface EnemyRowProps {
 	enemySlotsRef?: RefObject<(HTMLDivElement | null)[]>
 	animatingEnemyShifts?: Record<string, {x: number; y: number}>
 	animatingEnemyRemove?: string | null
+	attackingEnemyInstanceId?: string | null
 	onViewEnemyDeck?: (() => void) | undefined
 	onViewHeroDeck?: (() => void) | undefined
 }
@@ -117,6 +118,7 @@ export function EnemyRow({
 	enemySlotsRef,
 	animatingEnemyShifts = {},
 	animatingEnemyRemove = null,
+	attackingEnemyInstanceId = null,
 	onViewEnemyDeck = undefined,
 	onViewHeroDeck = undefined
 }: EnemyRowProps) {
@@ -176,6 +178,7 @@ export function EnemyRow({
 									? {onAnimationEnd: cardOnAnimEnd}
 									: {})}
 								isAttackable={isAttackable}
+								isAttacking={card.instanceId === attackingEnemyInstanceId}
 								onAttack={onAttack}
 							/>
 						)}

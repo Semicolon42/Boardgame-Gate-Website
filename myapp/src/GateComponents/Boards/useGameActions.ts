@@ -41,7 +41,8 @@ export function useGameActions() {
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		animatingFloatingText,
-		animatingHeroToDiscard
+		animatingHeroToDiscard,
+		animatingAttackVisualization
 	} = useSubActionQueue(
 		state,
 		dispatch,
@@ -75,6 +76,7 @@ export function useGameActions() {
 		animatingEnemyRemove,
 		animatingFloatingText,
 		animatingHeroToDiscard,
+		animatingAttackVisualization,
 		hDeckRef,
 		signalAnimationComplete,
 		queue,

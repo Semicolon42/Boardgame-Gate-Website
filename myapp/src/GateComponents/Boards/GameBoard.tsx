@@ -14,6 +14,7 @@ import {
 	type EnemyCardInstance,
 	makeEnemyCardInstances
 } from './gameStateReducer'
+import {AttackLine} from './AttackLine'
 import {useGameActions} from './useGameActions'
 
 export function GameBoard() {
@@ -36,6 +37,7 @@ export function GameBoard() {
 		animatingEnemyRemove,
 		animatingFloatingText,
 		animatingHeroToDiscard,
+		animatingAttackVisualization,
 		hDeckRef,
 		gameBuyCard,
 		gameAttackEnemy,
@@ -174,6 +176,7 @@ export function GameBoard() {
 						enemySlotsRef={enemySlotsRef}
 						hDeckRef={hDeckRef}
 						heroCardsRemaining={gameState.hDeckRemaining}
+						attackingEnemyInstanceId={animatingAttackVisualization?.attackingEnemyInstanceId ?? null}
 						isAttackable={!isProcessing && gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
@@ -243,6 +246,13 @@ export function GameBoard() {
 						)}
 					</div>
 					<PlayerBaseRow
+						attackedTarget={
+							animatingAttackVisualization?.attackTarget.kind === 'BUILDING_FARM' ? 'farm'
+							: animatingAttackVisualization?.attackTarget.kind === 'BUILDING_GATE' ? 'gate'
+							: animatingAttackVisualization?.attackTarget.kind === 'BUILDING_TOWER' ? 'tower'
+							: animatingAttackVisualization?.attackTarget.kind === 'FEARAMID' ? 'fearamid'
+							: null
+						}
 						canCalm={!isProcessing && gameState.cCalm > 0}
 						canRepair={!isProcessing && gameState.cRepair > 0}
 						healthFarm={gameState.bFarmHealth}
@@ -345,6 +355,18 @@ export function GameBoard() {
 					Close
 				</WaButton>
 			</WaDialog>
+			{animatingAttackVisualization && (
+				<AttackLine
+					enemyCards={gameState.eEnemyRow}
+					enemyRowMax={gameState.eEnemyRowMax}
+					enemySlotsRef={enemySlotsRef}
+					farmRef={farmRef}
+					fearamidRef={fearamidRef}
+					gateRef={gateRef}
+					spec={animatingAttackVisualization}
+					towerRef={towerRef}
+				/>
+			)}
 			{animatingFloatingText && (
 				<FloatingText
 					onAnimationEnd={signalAnimationComplete}

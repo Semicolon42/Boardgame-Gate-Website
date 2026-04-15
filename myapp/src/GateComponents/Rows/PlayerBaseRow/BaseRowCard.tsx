@@ -46,9 +46,10 @@ export function PlayerBaseCard(props: {
 	maxHealth: number
 	onRepair?: () => undefined | undefined
 	canRepair?: boolean
+	isUnderAttack?: boolean
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
-	const {name, image, health, maxHealth, divRef, canRepair, onRepair} = props
+	const {name, image, health, maxHealth, divRef, canRepair, isUnderAttack, onRepair} = props
 	const id = useId()
 	let icon = {name: 'question', variant: 'classic'}
 	let buildingText = ''
@@ -81,6 +82,8 @@ export function PlayerBaseCard(props: {
 			' outline-(--color-outline-active)',
 			' hover:outline-(--color-outline-active-hover)'
 		].join(' ')
+	} else if (isUnderAttack) {
+		cn += ' outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
 	} else {
 		cn += [
 			' cursor-pointer',
