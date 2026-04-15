@@ -16,7 +16,14 @@ export function FloatingText({spec, onAnimationEnd}: FloatingTextProps) {
 		const el = elRef.current
 		if (!el) return
 
-		const {durationMs, speedPxPerMs, gravityPxPerMs2, angleRangeDeg, opacityFadeStartProgress, keyframeSteps} = theme.floatingText
+		const {
+			durationMs,
+			speedPxPerMs,
+			gravityPxPerMs2,
+			angleRangeDeg,
+			opacityFadeStartProgress,
+			keyframeSteps
+		} = theme.floatingText
 
 		const angleDeg = 90 + (Math.random() - 0.5) * angleRangeDeg
 		const angleRad = (angleDeg * Math.PI) / 180
@@ -28,7 +35,12 @@ export function FloatingText({spec, onAnimationEnd}: FloatingTextProps) {
 			const t = progress * durationMs
 			const x = vx * t
 			const y = vy * t + 0.5 * gravityPxPerMs2 * t * t
-			const opacity = progress < opacityFadeStartProgress ? 1 : 1 - (progress - opacityFadeStartProgress) / (1 - opacityFadeStartProgress)
+			const opacity =
+				progress < opacityFadeStartProgress
+					? 1
+					: 1 -
+						(progress - opacityFadeStartProgress) /
+							(1 - opacityFadeStartProgress)
 			return {transform: `translate(${x}px, ${y}px)`, opacity, offset: progress}
 		})
 

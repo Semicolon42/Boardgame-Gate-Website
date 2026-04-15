@@ -1,9 +1,10 @@
 import type {ReactElement, RefObject} from 'react'
-import {useLayoutEffect, useRef} from 'react'
+import {useEffect, useLayoutEffect, useRef} from 'react'
 import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
+import theme from '@/themes'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
@@ -13,7 +14,7 @@ interface XEnemyCardProps {
 	onAnimationEnd?: () => void
 	moveFrom?: {x: number; y: number} | undefined
 	moveTo?: {x: number; y: number} | undefined
-	isFadingOut?: boolean
+	isDiscarded?: boolean
 	isAttackable?: boolean | undefined
 	onAttack?: ((enemy: EnemyCardInstance, amount: number) => void) | undefined
 	/** CSS class injected by parent — used for grid-area stacking. */
@@ -48,13 +49,16 @@ export function XEnemyCard({
 	onAnimationEnd,
 	moveFrom,
 	moveTo,
-	isFadingOut = false,
+	isDiscarded = false,
 	isAttackable = false,
 	onAttack,
 	className = ''
 }: XEnemyCardProps) {
 	const ref = useRef<HTMLElement>(null)
 	const enemyInfo = getEnemyCard(card.cardId)
+
+	const onAnimationEndRef = useRef(onAnimationEnd)
+	onAnimationEndRef.current = onAnimationEnd
 
 	useLayoutEffect(() => {
 		const el = ref.current
@@ -75,6 +79,53 @@ export function XEnemyCard({
 		}
 	}, [moveFrom, moveTo])
 
+	useEffect(() => {
+		if (!isDiscarded) return
+		const el = ref.current
+		if (!el) return
+
+		const {
+			durationMs,
+			speedPxPerMs,
+			gravityPxPerMs2,
+			minRotationDeg,
+			maxRotationDeg,
+			opacityFadeStartProgress,
+			keyframeSteps
+		} = theme.enemyDiscard
+		const sign = Math.random() < 0.5 ? 1 : -1
+		const finalRotation =
+			sign *
+			(minRotationDeg + Math.random() * (maxRotationDeg - minRotationDeg))
+		const vy = -speedPxPerMs
+
+		const keyframes = Array.from({length: keyframeSteps + 1}, (_, i) => {
+			const progress = i / keyframeSteps
+			const t = progress * durationMs
+			const y = vy * t + 0.5 * gravityPxPerMs2 * t * t
+			const rotateDeg = progress * finalRotation
+			const opacity =
+				progress < opacityFadeStartProgress
+					? 1
+					: 1 -
+						(progress - opacityFadeStartProgress) /
+							(1 - opacityFadeStartProgress)
+			return {
+				transform: `translate(0px, ${y}px) rotate(${rotateDeg}deg)`,
+				opacity,
+				offset: progress
+			}
+		})
+
+		const anim = el.animate(keyframes, {duration: durationMs, fill: 'forwards'})
+		anim.onfinish = () => {
+			onAnimationEndRef.current?.()
+		}
+		return () => {
+			anim.cancel()
+		}
+	}, [isDiscarded])
+
 	const outlineClass = isAttackable
 		? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover) cursor-pointer'
 		: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
@@ -82,7 +133,7 @@ export function XEnemyCard({
 	const containerClass = [
 		'flex h-[140px] w-[100px] shrink-0 flex-col items-start justify-start rounded-xl p-[5px] text-white text-left XENEMYCARD outline-4',
 		'bg-(--color-enemy-card-face)',
-		isFadingOut ? 'card-fade-out-animate' : '',
+		isDiscarded ? 'card-fade-out-animate' : '',
 		outlineClass,
 		className
 	].join(' ')

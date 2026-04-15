@@ -17,24 +17,13 @@
 }
 
 .card-move-from-animate {
-	animation: card-move-from var(--duration-card-draw) var(--easing-card-draw) forwards;
+	animation: card-move-from var(--duration-card-draw) var(--easing-card-draw)
+		forwards;
 }
 
 .card-move-to-animate {
-	animation: card-move-to var(--duration-card-discard) var(--easing-card-discard) forwards;
-}
-
-@keyframes card-fade-out {
-	from {
-		opacity: 1;
-	}
-	to {
-		opacity: 0;
-	}
-}
-
-.card-fade-out-animate {
-	animation: card-fade-out var(--duration-card-fade-out) var(--easing-card-fade-out) forwards;
+	animation: card-move-to var(--duration-card-discard)
+		var(--easing-card-discard) forwards;
 }
 
 .card-action-btn {

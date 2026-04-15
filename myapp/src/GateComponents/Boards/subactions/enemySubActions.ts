@@ -129,14 +129,17 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		if (targetEnemey === undefined) {
 			return []
 		}
-		const totalDamage = damage + state.bTowerBonusDamageCurrent
+		const delta = targetEnemey.health - damage
+		const bonusUsed = Math.max(state.bTowerBonusDamageCurrent, delta, 0)
+		const damageUsed = Math.max(damage, targetEnemey.health, 0)
+		const totalDamage = damageUsed + bonusUsed 
 		const actionsDamageEnemy: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
 					type: 'UPADTE_RESOURCES',
-					attack: -totalDamage,
-					towerBonusDmaageCurrent: -state.bTowerBonusDamageCurrent
+					attack: -damageUsed,
+					towerBonusDmaageCurrent: -bonusUsed
 				}
 			},
 			{
@@ -144,13 +147,13 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				gameStateAction: {
 					type: 'ENEMY_DAMAGE',
 					targetInstanceId: targetEnemey.instanceId,
-					damage
+					damage: totalDamage
 				}
 			},
 			{
 				type: 'SHOW_FLOATING_TEXT',
 				color: 'red',
-				text: `${damage}`,
+				text: `${totalDamage}`,
 				target: {kind: 'ENEMY_CARD', instanceId: targetEnemey.instanceId}
 			}
 		]

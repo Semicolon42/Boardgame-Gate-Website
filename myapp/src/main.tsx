@@ -1,9 +1,10 @@
 import './global.css'
-import {applyTheme} from './themes/applyTheme'
-import theme from './themes'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import theme from './themes'
+import {applyTheme} from './themes/applyTheme'
 
 applyTheme(theme)
+
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'

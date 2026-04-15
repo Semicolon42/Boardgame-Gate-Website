@@ -1,7 +1,12 @@
-import { GetRange as GetPlayerCardRange } from '@/GateComponents/Data/PlayerCards'
-import {makeCardInstances, makeEnemyCardInstances, type FearAction, type GameState} from '../gameStateReducer'
+import {GetEnemyCardRange} from '@/GateComponents/Data/EnemyCardsData'
+import {GetRange as GetPlayerCardRange} from '@/GateComponents/Data/PlayerCards'
+import {
+	type FearAction,
+	type GameState,
+	makeCardInstances,
+	makeEnemyCardInstances
+} from '../gameStateReducer'
 import type {AtomicHandler, Expander, SubActionType} from './types'
-import { GetEnemyCardRange } from '@/GateComponents/Data/EnemyCardsData'
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
@@ -86,7 +91,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		const startingEnemeyDeck = makeEnemyCardInstances([
 			...GetEnemyCardRange('L1').sort(() => 0.5 - Math.random()),
 			...GetEnemyCardRange('L2').sort(() => 0.5 - Math.random()),
-			...GetEnemyCardRange('L3').sort(() => 0.5 - Math.random()),
+			...GetEnemyCardRange('L3').sort(() => 0.5 - Math.random())
 		])
 		const newState: GameState = {
 			bFarmHealth: 6,
@@ -109,9 +114,9 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				'DAMAGE_GATE',
 				'GAMEOVER'
 			],
-		
+
 			gameOutcome: undefined,
-		
+
 			pDeck: starterPlayerDeck,
 			pHand: [],
 			pPlayed: {},
@@ -119,15 +124,15 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			hDeck: startingHeroDeck,
 			hDeckRemaining: startingHeroDeck.length,
 			vDeck: startingVillagerDeck,
-		
+
 			eEnemyDeck: startingEnemeyDeck,
 			eEnemyRow: [],
 			eEnemyDiscard: [],
 			eEnemyRowMax: 2,
-		
+
 			vRow: [],
 			vDiscard: [],
-		
+
 			cCoins: 0,
 			cRepair: 0,
 			cBonusRepairFarm: 0,
@@ -135,19 +140,25 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			cBonusRepairTower: 0,
 			cCalm: 0,
 			cAttack: 0,
-		
+
 			bTowerBonusMinHealth: 1,
 			bTowerBonusDamage: 1,
 			bTowerBonusDamageCurrent: 1,
 			bFarmBonusMinHealth: 1,
 			bFarmBonusRecruit: 1,
 			bFarmBonusRecruitCurrent: 1,
-		
+
 			stateActionLogs: []
 		}
-		return [{type:'EXECUTE_GAME_STATE_UPDATE', gameStateAction:{
-			type: 'SET_GAME_STATE', nextState: newState
-		}}]
+		return [
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'SET_GAME_STATE',
+					nextState: newState
+				}
+			}
+		]
 	},
 	ENQ_GAME_START: (_action, _state: GameState): SubActionType[] => {
 		return [
