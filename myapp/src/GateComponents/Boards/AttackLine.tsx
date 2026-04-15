@@ -25,9 +25,8 @@ export function AttackLine({
 }: AttackLineProps) {
 	let sourceRect: DOMRect | undefined
 	if (spec.attackSource.kind === 'ENEMY') {
-		const idx = enemyCards.findIndex(
-			c => c.instanceId === spec.attackSource.instanceId
-		)
+		const {instanceId} = spec.attackSource
+		const idx = enemyCards.findIndex(c => c.instanceId === instanceId)
 		const offset = enemyRowMax - enemyCards.length
 		const el = idx >= 0 ? enemySlotsRef.current[offset + idx] : null
 		sourceRect = el?.getBoundingClientRect()
