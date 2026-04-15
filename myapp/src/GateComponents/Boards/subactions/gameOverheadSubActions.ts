@@ -6,7 +6,12 @@ import {
 	makeCardInstances,
 	makeEnemyCardInstances
 } from '../gameStateReducer'
-import type {AtomicHandler, Expander, SubActionType} from './types'
+import type {
+	AtomicHandler,
+	AttackSource,
+	Expander,
+	SubActionType
+} from './types'
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
@@ -26,7 +31,8 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 					type: 'SHOW_FLOATING_TEXT',
 					text: '-1',
 					color: 'var(--color-text-damage)',
-					target: {kind: 'BUILDING_FARM'}
+					target: {kind: 'BUILDING_FARM'},
+					attackSource: {kind: 'FEARAMID'} satisfies AttackSource
 				}
 			]
 		case 'DAMAGE_GATE':
@@ -43,7 +49,8 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 					type: 'SHOW_FLOATING_TEXT',
 					text: '-1',
 					color: 'var(--color-text-damage)',
-					target: {kind: 'BUILDING_GATE'}
+					target: {kind: 'BUILDING_GATE'},
+					attackSource: {kind: 'FEARAMID'} satisfies AttackSource
 				}
 			]
 		case 'DAMAGE_TOWER':
@@ -60,7 +67,8 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 					type: 'SHOW_FLOATING_TEXT',
 					text: '-1',
 					color: 'var(--color-text-damage)',
-					target: {kind: 'BUILDING_TOWER'}
+					target: {kind: 'BUILDING_TOWER'},
+					attackSource: {kind: 'FEARAMID'} satisfies AttackSource
 				}
 			]
 		case 'NONE':
@@ -202,7 +210,11 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
-	ENQ_ADD_FEAR: (_action, state: GameState): SubActionType[] => {
+	ENQ_ADD_FEAR: (action, state: GameState): SubActionType[] => {
+		const {attackSource} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_ADD_FEAR'}
+		>
 		const oldFear = state.fFear
 		const newFear = Math.min(oldFear + 1, state.fFearMax)
 		if (newFear === oldFear) return []
@@ -215,7 +227,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'SHOW_FLOATING_TEXT',
 				text: '+1',
 				color: 'var(--color-text-damage)',
-				target: {kind: 'FEARAMID'}
+				target: {kind: 'FEARAMID'},
+				attackSource
 			}
 		]
 		const fearAction = state.fFearamid[newFear]
@@ -251,7 +264,7 @@ export const atomicHandlers: Partial<
 		ctx.setQueue(q => q.slice(1))
 	},
 	SHOW_FLOATING_TEXT: (action, ctx) => {
-		const {text, color, target} = action as Extract<
+		const {text, color, target, attackSource} = action as Extract<
 			SubActionType,
 			{type: 'SHOW_FLOATING_TEXT'}
 		>
@@ -286,6 +299,9 @@ export const atomicHandlers: Partial<
 		if (rect === undefined) {
 			ctx.setQueue(q => q.slice(1))
 			return
+		}
+		if (attackSource !== undefined && target.kind !== 'ENEMY_CARD') {
+			ctx.setAnimatingAttackVisualization({attackSource, attackTarget: target})
 		}
 		ctx.setAnimatingFloatingText({
 			text,

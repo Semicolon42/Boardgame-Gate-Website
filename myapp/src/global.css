@@ -9,6 +9,5 @@
 }
 
 @utility text-stroke-enemy-vp {
-	-webkit-text-stroke: var(--text-vp-stroke-width)
-		var(--text-vp-stroke-color);
+	-webkit-text-stroke: var(--text-vp-stroke-width) var(--text-vp-stroke-color);
 }

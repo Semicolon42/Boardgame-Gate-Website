@@ -17,6 +17,7 @@ import * as playerCard from './subactions/playerCardSubActions'
 import type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
+	AttackVisualizationSpec,
 	AtomicHandler,
 	Expander,
 	FloatingTextSpec,
@@ -30,6 +31,8 @@ import * as villager from './subactions/villagerSubActions'
 export type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
+	AttackSource,
+	AttackVisualizationSpec,
 	EnqueueFn,
 	FloatingTextSpec,
 	HeroCardToDiscardSpec,
@@ -83,6 +86,8 @@ export function useSubActionQueue(
 	const [animatingEnemyRemove, setAnimatingEnemyRemove] = useState<string | null>(null)
 	const [animatingFloatingText, setAnimatingFloatingText] = useState<FloatingTextSpec | null>(null)
 	const [animatingHeroToDiscard, setAnimatingHeroToDiscard] = useState<HeroCardToDiscardSpec | null>(null)
+	const [animatingAttackVisualization, setAnimatingAttackVisualization] =
+		useState<AttackVisualizationSpec | null>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -98,6 +103,18 @@ export function useSubActionQueue(
 	 * Call this from a card's onAnimationEnd to advance the queue.
 	 * Also runs any deferred dispatch (e.g. removing a card from state after its exit animation).
 	 */
+	/**
+	 * Call this from an exile animation's onAnimationEnd when the exile runs
+	 * alongside another animation (e.g. floating text). Runs the deferred state
+	 * removal and clears the exile visual, but does NOT advance the queue — the
+	 * companion animation's onAnimationEnd will call signalAnimationComplete.
+	 */
+	const signalExileComplete = useCallback(() => {
+		pendingOnCompleteRef.current?.()
+		pendingOnCompleteRef.current = null
+		setAnimatingEnemyRemove(null)
+	}, [])
+
 	const signalAnimationComplete = useCallback(() => {
 		pendingOnCompleteRef.current?.()
 		pendingOnCompleteRef.current = null
@@ -107,6 +124,7 @@ export function useSubActionQueue(
 		setAnimatingEnemyRemove(null)
 		setAnimatingFloatingText(null)
 		setAnimatingHeroToDiscard(null)
+		setAnimatingAttackVisualization(null)
 		setIsAnimating(false)
 		setQueue(q => q.slice(1))
 	}, [])
@@ -138,6 +156,8 @@ export function useSubActionQueue(
 			pendingOnCompleteRef,
 			setAnimatingFloatingText,
 			setAnimatingHeroToDiscard,
+			setAnimatingAttackVisualization,
+			signalExileComplete,
 			deckPos: deckRef.current?.getBoundingClientRect(),
 			discardPos: discardRef.current?.getBoundingClientRect(),
 			hDeckPos: hDeckRef.current?.getBoundingClientRect(),
@@ -166,6 +186,7 @@ export function useSubActionQueue(
 		enqueue,
 		queue,
 		signalAnimationComplete,
+		signalExileComplete,
 		/** True whenever the queue is non-empty (including mid-animation). */
 		isProcessing: queue.length > 0,
 		animatingCard,
@@ -173,6 +194,7 @@ export function useSubActionQueue(
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		animatingFloatingText,
-		animatingHeroToDiscard
+		animatingHeroToDiscard,
+		animatingAttackVisualization
 	}
 }

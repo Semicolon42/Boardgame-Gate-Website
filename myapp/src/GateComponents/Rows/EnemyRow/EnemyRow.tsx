@@ -20,6 +20,8 @@ interface EnemyRowProps {
 	enemySlotsRef?: RefObject<(HTMLDivElement | null)[]>
 	animatingEnemyShifts?: Record<string, {x: number; y: number}>
 	animatingEnemyRemove?: string | null
+	attackingEnemyInstanceId?: string | null | undefined
+	onExileAnimationEnd?: (() => void) | undefined
 	onViewEnemyDeck?: (() => void) | undefined
 	onViewHeroDeck?: (() => void) | undefined
 }
@@ -46,9 +48,8 @@ function HeroDeck(props: {
 			ref={hDeckRef}
 			{...(onViewHeroDeck ? {role: 'button', onClick: onViewHeroDeck} : {})}
 		>
-			<div>Hero Deck</div>
+			<div className='absolute top-1 text-lg'>Hero Deck</div>
 			<WaIcon className='text-6xl' name='dungeon' variant='classic' />
-			<div>{cardsRemaining} Heros</div>
 		</div>
 	)
 }
@@ -117,6 +118,8 @@ export function EnemyRow({
 	enemySlotsRef,
 	animatingEnemyShifts = {},
 	animatingEnemyRemove = null,
+	attackingEnemyInstanceId = null,
+	onExileAnimationEnd = undefined,
 	onViewEnemyDeck = undefined,
 	onViewHeroDeck = undefined
 }: EnemyRowProps) {
@@ -139,9 +142,13 @@ export function EnemyRow({
 				const shiftPos =
 					card !== null ? animatingEnemyShifts[card.instanceId] : undefined
 
-				// Only the fading-out or entering card fires onAnimationEnd — never shift cards.
-				const cardOnAnimEnd =
-					isDiscarded || isEntering ? onAnimationEnd : undefined
+				// Discarded card uses onExileAnimationEnd when provided (combined exile+attack),
+				// otherwise falls back to onAnimationEnd. Entering card always uses onAnimationEnd.
+				const cardOnAnimEnd = isDiscarded
+					? (onExileAnimationEnd ?? onAnimationEnd)
+					: isEntering
+						? onAnimationEnd
+						: undefined
 
 				let moveFromAnim: {x: number; y: number} | undefined
 				if (isEntering) {
@@ -162,13 +169,13 @@ export function EnemyRow({
 							if (enemySlotsRef) enemySlotsRef.current[slotIndex] = el
 						}}
 					>
-						<div style={{gridArea: '1/1'}}>
+						<div className='[grid-area:1/1]'>
 							<CardSlot />
 						</div>
 						{card !== null && (
 							<XEnemyCard
 								card={card}
-								className='[grid-area:1/1]'
+								className='z-[1] [grid-area:1/1]'
 								isDiscarded={isDiscarded}
 								key={card.instanceId}
 								{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
@@ -176,6 +183,7 @@ export function EnemyRow({
 									? {onAnimationEnd: cardOnAnimEnd}
 									: {})}
 								isAttackable={isAttackable}
+								isAttacking={card.instanceId === attackingEnemyInstanceId}
 								onAttack={onAttack}
 							/>
 						)}

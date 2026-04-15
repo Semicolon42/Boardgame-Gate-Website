@@ -17,6 +17,7 @@ interface XEnemyCardProps {
 	moveTo?: {x: number; y: number} | undefined
 	isDiscarded?: boolean
 	isAttackable?: boolean | undefined
+	isAttacking?: boolean | undefined
 	onAttack?: ((enemy: EnemyCardInstance, amount: number) => void) | undefined
 	/** CSS class injected by parent — used for grid-area stacking. */
 	className?: string
@@ -52,6 +53,7 @@ export function XEnemyCard({
 	moveTo,
 	isDiscarded = false,
 	isAttackable = false,
+	isAttacking = false,
 	onAttack,
 	className = ''
 }: XEnemyCardProps) {
@@ -129,11 +131,14 @@ export function XEnemyCard({
 
 	const outlineClass = isAttackable
 		? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover) cursor-pointer'
-		: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		: isAttacking
+			? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
+			: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 
 	const containerClass = [
-		'flex h-[140px] w-[100px] shrink-0 flex-col items-start justify-start rounded-xl p-[5px] text-white text-left XENEMYCARD outline-4',
-		'bg-(--color-enemy-card-face)',
+		'flex flex-col h-[140px] w-[100px]',
+		'shrink-0 items-start justify-start rounded-xl p-[5px] text-white text-left',
+		'bg-(--color-enemy-card-face) outline-4',
 		isDiscarded ? 'card-fade-out-animate' : '',
 		outlineClass,
 		className
