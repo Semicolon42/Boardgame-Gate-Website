@@ -2,7 +2,7 @@ import type {BuildingType} from '../Boards/gameStateReducer'
 
 export type EnemyCardType = 'DEBUG' | 'L1' | 'L2' | 'L3' | 'Z'
 
-export function GetRange(type: EnemyCardType) {
+export function GetEnemyCardRange(type: EnemyCardType) {
 	return ENEMY_CARD_LIST.filter(c => c.type === type).map(c => c.id)
 }
 

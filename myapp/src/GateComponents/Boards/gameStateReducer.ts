@@ -79,6 +79,7 @@ export interface GameState {
 	pPlayed: {[key: string]: CardPlayType | undefined}
 	pDiscard: CardInstance[]
 	hDeck: CardInstance[]
+	hDeckRemaining: number
 
 	// Enemy cards state
 	eEnemyDeck: EnemyCardInstance[]
@@ -113,6 +114,7 @@ export type StackType =
 	| 'HAND'
 	| 'DECK'
 	| 'DISCARD'
+	| 'HERO_DECK'
 	| 'VILLAGER_DECK'
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
@@ -161,6 +163,7 @@ export type GameAction =
 	| {type: 'UPDATE_GAME_OUTCOME'; outcome: GameOutcomeType}
 	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
 	| {type: 'TURN_START_RESET'}
+	| {type: 'SET_GAME_STATE'; nextState: GameState}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -170,6 +173,7 @@ export type StackKey =
 	| 'pHand'
 	| 'pDeck'
 	| 'pDiscard'
+	| 'hDeck'
 	| 'vDeck'
 	| 'vRow'
 	| 'vDiscard'
@@ -182,6 +186,8 @@ export function stackKey(stack: StackType): StackKey {
 			return 'pDeck'
 		case 'DISCARD':
 			return 'pDiscard'
+		case 'HERO_DECK':
+			return 'hDeck'
 		case 'VILLAGER_DECK':
 			return 'vDeck'
 		case 'VILLAGER_ROW':
@@ -225,6 +231,9 @@ export function gameStateReducer(
 			return {
 				...state,
 				[key]: [...state[key], ...action.cards],
+				...(action.stack === 'HERO_DECK'
+					? {hDeckRemaining: state.hDeckRemaining + action.cards.length}
+					: {}),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -237,6 +246,9 @@ export function gameStateReducer(
 				[key]: state[key].filter(
 					(c: CardInstance) => !toRemove.has(c.instanceId)
 				),
+				...(action.stack === 'HERO_DECK'
+					? {hDeckRemaining: state.hDeckRemaining - action.instanceIds.length}
+					: {}),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -431,6 +443,14 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'SET_GAME_STATE': {
+			return {
+				...state,
+				...action.nextState,
+				stateActionLogs: newActionLog
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -445,6 +465,9 @@ export function gameStateReducer(
 
 export const HAND_SIZE = 3
 
+const heroDeck = makeCardInstances(
+	GetRange('HERO').sort(() => 0.5 - Math.random())
+)
 export const initialState: GameState = {
 	bFarmHealth: 6,
 	bTowerHealth: 6,
@@ -455,6 +478,7 @@ export const initialState: GameState = {
 	fFear: 0,
 	fFearMax: 9,
 	fFearamid: [
+		'NONE',
 		'DRAW_HERO',
 		'DAMAGE_FARM',
 		'DRAW_HERO',
@@ -472,7 +496,8 @@ export const initialState: GameState = {
 	pHand: [],
 	pPlayed: {},
 	pDiscard: [],
-	hDeck: makeCardInstances(GetRange('HERO').sort(() => 0.5 - Math.random())),
+	hDeck: heroDeck,
+	hDeckRemaining: heroDeck.length,
 	vDeck: makeCardInstances(
 		GetRange('VILLAGER').sort(() => 0.5 - Math.random())
 	),

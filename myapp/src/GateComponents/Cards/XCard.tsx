@@ -80,6 +80,9 @@ interface XcardProps {
 	// Disable all functions
 	disabled?: boolean
 	isPlayed?: CardPlayType | undefined
+	// Renders the card shape with the card-back colour and no content.
+	// Used for animations where a face-down card travels between positions.
+	cardback?: boolean
 }
 
 export function XCard({
@@ -90,10 +93,9 @@ export function XCard({
 	onPlayCard,
 	onBuyCard,
 	isPlayed,
-	disabled = false
+	disabled = false,
+	cardback = false
 }: XcardProps) {
-	const info = getCitizenCard(card.cardId)
-
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
 	// Typed as HTMLElement — the common base for both <div> (hand) and <button> (village).
@@ -129,8 +131,7 @@ export function XCard({
 		}
 	}, [moveFrom, moveTo])
 
-	let containerClass =
-		'flex h-[140px] w-[100px] items-start rounded-xl bg-(--color-card-face) text-(--color-card-text) XCARD outline-4'
+	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {
 		containerClass += ' pointer-events-none'
 		containerClass +=
@@ -142,6 +143,18 @@ export function XCard({
 		containerClass +=
 			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 	}
+
+	if (cardback) {
+		return (
+			<div
+				className={containerClass}
+				onAnimationEnd={onAnimationEnd}
+				ref={ref as RefObject<HTMLDivElement>}
+			/>
+		)
+	}
+
+	const info = getCitizenCard(card.cardId)
 
 	// Hand mode: action fields shown as individual clickable divs.
 	// Village mode: action fields are read-only (whole card is the button).

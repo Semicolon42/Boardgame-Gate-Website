@@ -1,10 +1,12 @@
-import type {FearAction, GameState} from '../gameStateReducer'
+import { GetRange as GetPlayerCardRange } from '@/GateComponents/Data/PlayerCards'
+import {makeCardInstances, makeEnemyCardInstances, type FearAction, type GameState} from '../gameStateReducer'
 import type {AtomicHandler, Expander, SubActionType} from './types'
+import { GetEnemyCardRange } from '@/GateComponents/Data/EnemyCardsData'
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
 		case 'DRAW_HERO':
-			return []
+			return [{type: 'HERO_DECK_DRAW_TO_DISCARD'}]
 		case 'DAMAGE_FARM':
 			return [
 				{
@@ -73,6 +75,80 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 }
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
+	ENQ_GAME_SETUP_NORMAL: (_action, _state: GameState): SubActionType[] => {
+		const starterPlayerDeck = makeCardInstances([1, 2, 3])
+		const startingVillagerDeck = makeCardInstances(
+			GetPlayerCardRange('VILLAGER').sort(() => 0.5 - Math.random())
+		)
+		const startingHeroDeck = makeCardInstances(
+			GetPlayerCardRange('HERO').sort(() => 0.5 - Math.random())
+		)
+		const startingEnemeyDeck = makeEnemyCardInstances([
+			...GetEnemyCardRange('L1').sort(() => 0.5 - Math.random()),
+			...GetEnemyCardRange('L2').sort(() => 0.5 - Math.random()),
+			...GetEnemyCardRange('L3').sort(() => 0.5 - Math.random()),
+		])
+		const newState: GameState = {
+			bFarmHealth: 6,
+			bTowerHealth: 6,
+			bGateHealth: 12,
+			bFarmHealthMAX: 6,
+			bTowerHealthMAX: 6,
+			bGateHealthMAX: 12,
+			fFear: 0,
+			fFearMax: 9,
+			fFearamid: [
+				'NONE',
+				'DRAW_HERO',
+				'DAMAGE_FARM',
+				'DRAW_HERO',
+				'DAMAGE_TOWER',
+				'DRAW_HERO',
+				'NONE',
+				'DAMAGE_GATE',
+				'DAMAGE_GATE',
+				'GAMEOVER'
+			],
+		
+			gameOutcome: undefined,
+		
+			pDeck: starterPlayerDeck,
+			pHand: [],
+			pPlayed: {},
+			pDiscard: [],
+			hDeck: startingHeroDeck,
+			hDeckRemaining: startingHeroDeck.length,
+			vDeck: startingVillagerDeck,
+		
+			eEnemyDeck: startingEnemeyDeck,
+			eEnemyRow: [],
+			eEnemyDiscard: [],
+			eEnemyRowMax: 2,
+		
+			vRow: [],
+			vDiscard: [],
+		
+			cCoins: 0,
+			cRepair: 0,
+			cBonusRepairFarm: 0,
+			cBonusRepairGate: 0,
+			cBonusRepairTower: 0,
+			cCalm: 0,
+			cAttack: 0,
+		
+			bTowerBonusMinHealth: 1,
+			bTowerBonusDamage: 1,
+			bTowerBonusDamageCurrent: 1,
+			bFarmBonusMinHealth: 1,
+			bFarmBonusRecruit: 1,
+			bFarmBonusRecruitCurrent: 1,
+		
+			stateActionLogs: []
+		}
+		return [{type:'EXECUTE_GAME_STATE_UPDATE', gameStateAction:{
+			type: 'SET_GAME_STATE', nextState: newState
+		}}]
+	},
 	ENQ_GAME_START: (_action, _state: GameState): SubActionType[] => {
 		return [
 			// Prepare the player starter deck
@@ -80,6 +156,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			// Prepare the enemy deck
 			// Draw the enemy card
 			{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'},
+			{type: 'ENQ_VILLAGER_ROW_FILL'},
 			// Draw the player's first cards
 			{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 		]
