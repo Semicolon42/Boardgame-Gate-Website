@@ -1,0 +1,44 @@
+export interface GateTheme {
+	colors: {
+		gameboardBackground: string
+		cardText: string
+		cardBack: string
+		cardFace: string
+		enemyCardBack: string
+		enemyCardFace: string
+		baseBack: string
+		baseText: string
+		cardActionPlayed: string
+		outlineNormal: string
+		outlineNormalHover: string
+		outlineActive: string
+		outlineActiveHover: string
+		outlineAttackable: string
+		outlineAttackableHover: string
+		outlineInactive: string
+		outlineInactiveHover: string
+		textPrimary: string
+		textSecondary: string
+		textDamage: string
+		textHealing: string
+	}
+	cardAnimation: {
+		drawDurationMs: number
+		drawEasing: string
+		discardDurationMs: number
+		discardEasing: string
+		fadeOutDurationMs: number
+		fadeOutEasing: string
+	}
+	floatingText: {
+		fontSizeRem: number
+		strokeWidthPx: number
+		strokeColor: string
+		durationMs: number
+		speedPxPerMs: number
+		gravityPxPerMs2: number
+		angleRangeDeg: number
+		opacityFadeStartProgress: number
+		keyframeSteps: number
+	}
+}

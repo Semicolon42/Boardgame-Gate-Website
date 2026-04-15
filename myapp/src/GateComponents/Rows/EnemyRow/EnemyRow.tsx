@@ -29,9 +29,15 @@ export function HeroDeck(props: {
 	if (cardsRemaining === 0) {
 		return <CardSlot />
 	}
+	const cn = [
+		'h-[140px] w-[100px]',
+		'rounded-xl bg-(--color-card-back) text-(--color-card-text)',
+		'outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) '
+	].join(' ')
+	
 	return (
 		<div
-			className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color-card-text)'
+			className={cn}
 			ref={hDeckRef}
 		>
 			<div>Hero Deck</div>

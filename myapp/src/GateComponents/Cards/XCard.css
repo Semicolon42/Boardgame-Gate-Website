@@ -17,11 +17,11 @@
 }
 
 .card-move-from-animate {
-	animation: card-move-from 0.6s ease-out forwards;
+	animation: card-move-from var(--duration-card-draw) var(--easing-card-draw) forwards;
 }
 
 .card-move-to-animate {
-	animation: card-move-to 0.6s ease-in forwards;
+	animation: card-move-to var(--duration-card-discard) var(--easing-card-discard) forwards;
 }
 
 .card-action-btn {
