@@ -23,10 +23,15 @@ export function AttackLine({
 	towerRef,
 	fearamidRef
 }: AttackLineProps) {
-	const idx = enemyCards.findIndex(c => c.instanceId === spec.attackingEnemyInstanceId)
-	const offset = enemyRowMax - enemyCards.length
-	const enemyEl = idx >= 0 ? enemySlotsRef.current[offset + idx] : null
-	const enemyRect = enemyEl?.getBoundingClientRect()
+	let sourceRect: DOMRect | undefined
+	if (spec.attackSource.kind === 'ENEMY') {
+		const idx = enemyCards.findIndex(c => c.instanceId === spec.attackSource.instanceId)
+		const offset = enemyRowMax - enemyCards.length
+		const el = idx >= 0 ? enemySlotsRef.current[offset + idx] : null
+		sourceRect = el?.getBoundingClientRect()
+	} else {
+		sourceRect = fearamidRef.current?.getBoundingClientRect()
+	}
 
 	const targetRef =
 		spec.attackTarget.kind === 'BUILDING_FARM'
@@ -38,7 +43,7 @@ export function AttackLine({
 					: fearamidRef
 	const targetRect = targetRef.current?.getBoundingClientRect()
 
-	if (!enemyRect || !targetRect) return null
+	if (!sourceRect || !targetRect) return null
 
 	return (
 		<svg
@@ -52,8 +57,8 @@ export function AttackLine({
 			}}
 		>
 			<line
-				x1={enemyRect.left + enemyRect.width / 2}
-				y1={enemyRect.top + enemyRect.height / 2}
+				x1={sourceRect.left + sourceRect.width / 2}
+				y1={sourceRect.top + sourceRect.height / 2}
 				x2={targetRect.left + targetRect.width / 2}
 				y2={targetRect.top + targetRect.height / 2}
 				stroke='rgb(200, 0, 0)'

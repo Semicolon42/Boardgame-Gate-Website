@@ -176,7 +176,11 @@ export function GameBoard() {
 						enemySlotsRef={enemySlotsRef}
 						hDeckRef={hDeckRef}
 						heroCardsRemaining={gameState.hDeckRemaining}
-						attackingEnemyInstanceId={animatingAttackVisualization?.attackingEnemyInstanceId ?? null}
+						attackingEnemyInstanceId={
+						animatingAttackVisualization?.attackSource.kind === 'ENEMY'
+							? animatingAttackVisualization.attackSource.instanceId
+							: null
+					}
 						isAttackable={!isProcessing && gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
@@ -253,6 +257,7 @@ export function GameBoard() {
 							: animatingAttackVisualization?.attackTarget.kind === 'FEARAMID' ? 'fearamid'
 							: null
 						}
+						fearamidAttacking={animatingAttackVisualization?.attackSource.kind === 'FEARAMID'}
 						canCalm={!isProcessing && gameState.cCalm > 0}
 						canRepair={!isProcessing && gameState.cRepair > 0}
 						healthFarm={gameState.bFarmHealth}

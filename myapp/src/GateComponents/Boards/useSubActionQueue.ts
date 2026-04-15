@@ -31,6 +31,7 @@ import * as villager from './subactions/villagerSubActions'
 export type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec,
+	AttackSource,
 	AttackVisualizationSpec,
 	EnqueueFn,
 	FloatingTextSpec,

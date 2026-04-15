@@ -33,8 +33,12 @@ export type AttackVisualizationTarget =
 	| {kind: 'BUILDING_TOWER'}
 	| {kind: 'FEARAMID'}
 
+export type AttackSource =
+	| {kind: 'ENEMY'; instanceId: string}
+	| {kind: 'FEARAMID'}
+
 export interface AttackVisualizationSpec {
-	attackingEnemyInstanceId: string
+	attackSource: AttackSource
 	attackTarget: AttackVisualizationTarget
 }
 
@@ -76,7 +80,7 @@ export type SubActionType =
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
-	| {type: 'ENQ_ADD_FEAR'; attackingEnemyInstanceId?: string}
+	| {type: 'ENQ_ADD_FEAR'; attackSource?: AttackSource}
 	| {type: 'ENQ_ENEMY_TURN'}
 	| {type: 'ENQ_ENEMY_SINGLE_ATTACK'; enemyCard: EnemyCardInstance}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
@@ -91,7 +95,7 @@ export type SubActionType =
 			text: string
 			color: string
 			target: FloatingTextTarget
-			attackingEnemyInstanceId?: string
+			attackSource?: AttackSource
 	  }
 	| {type: 'DEBUG_ALERT'; message: string}
 

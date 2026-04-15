@@ -20,7 +20,7 @@ interface EnemyRowProps {
 	enemySlotsRef?: RefObject<(HTMLDivElement | null)[]>
 	animatingEnemyShifts?: Record<string, {x: number; y: number}>
 	animatingEnemyRemove?: string | null
-	attackingEnemyInstanceId?: string | null
+	attackingEnemyInstanceId?: string | null | undefined
 	onViewEnemyDeck?: (() => void) | undefined
 	onViewHeroDeck?: (() => void) | undefined
 }
