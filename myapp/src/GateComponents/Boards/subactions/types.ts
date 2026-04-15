@@ -94,6 +94,8 @@ export interface AnimatingCardSpec {
 	moveFrom?: {x: number; y: number} | undefined
 	/** Exit animation: card slides FROM its DOM slot TO this screen position. */
 	moveTo?: {x: number; y: number} | undefined
+	/** Exit animation: card falls away in place (used for played hero cards). */
+	fallAway?: boolean
 }
 
 export interface AnimatingVillagerRowSpec {

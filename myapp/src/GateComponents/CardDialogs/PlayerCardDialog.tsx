@@ -12,7 +12,14 @@ export function PlayerEnemyCardDialog(props: {
 }) {
 	const {title, playerCards = [], enemyCards = [], isOpen, onClose} = props
 	return (
-		<WaDialog label={title} onWaHide={onClose} open={isOpen} lightDismiss>
+		<WaDialog
+			label={title}
+			lightDismiss={true}
+			onWaAfterHide={e => {
+				if (e.target === e.currentTarget) onClose()
+			}}
+			open={isOpen}
+		>
 			<div className='grid grid-cols-3 gap-1'>
 				{playerCards.map(card => (
 					<XCard card={card} isPlayable={false} />

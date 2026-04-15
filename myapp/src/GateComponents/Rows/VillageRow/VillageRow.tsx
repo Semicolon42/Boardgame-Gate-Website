@@ -4,12 +4,14 @@ import type {
 	AnimatingVillagerRowSpec
 } from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
+import type {XCardAnimSpec} from '@/GateComponents/Cards/XCard'
 import {XCard} from '@/GateComponents/Cards/XCard'
 import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 
 interface VillageRowProps {
 	currentCoins: number
 	villageCards: CardInstance[]
+	isBuyable: boolean
 	onAnimationEnd?: () => void
 	animatingClearVillagerRow?: AnimatingVillagerRowSpec | null
 	animatingCard?: AnimatingCardSpec | null
@@ -19,10 +21,11 @@ interface VillageRowProps {
 export function VillageRow({
 	currentCoins,
 	villageCards,
+	isBuyable,
+	onBuyCard,
 	onAnimationEnd,
 	animatingClearVillagerRow,
-	animatingCard,
-	onBuyCard
+	animatingCard
 }: VillageRowProps) {
 	const SlotCount = 4
 	const slots = Array.from(
@@ -38,17 +41,20 @@ export function VillageRow({
 					return <CardSlot key={`slot-${slotIndex}`} />
 				}
 				const cardInfo = getCitizenCard(card.cardId)
-				const buyable: boolean = currentCoins >= cardInfo.cost
+				const buyable: boolean = currentCoins >= cardInfo.cost && isBuyable
 				const cardAnimSpec =
 					animatingCard?.type === 'VILLAGER' &&
 					animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
-				let moveToAnim = rowAnimSpec?.moveTo ?? undefined
-				if (moveToAnim === undefined) {
-					moveToAnim = cardAnimSpec?.moveTo
+				const moveToPos = rowAnimSpec?.moveTo ?? cardAnimSpec?.moveTo
+				const moveFromPos = cardAnimSpec?.moveFrom ?? undefined
+				let animSpec: XCardAnimSpec | undefined
+				if (moveFromPos) {
+					animSpec = {type: 'FROM', pos: moveFromPos}
+				} else if (moveToPos) {
+					animSpec = {type: 'TO', pos: moveToPos}
 				}
-				const moveFromAnim = cardAnimSpec?.moveFrom ?? undefined
 				// For the row-clear animation, only the first card fires onAnimationEnd
 				// to avoid signalling completion once per card (which drops draw actions).
 				const isSignalCard = !rowAnimSpec?.moveTo || slotIndex === 0
@@ -58,8 +64,7 @@ export function VillageRow({
 						disabled={!buyable}
 						key={card.instanceId}
 						{...(buyable && onBuyCard ? {onBuyCard} : {})}
-						{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
-						{...(moveToAnim ? {moveTo: moveToAnim} : {})}
+						{...(animSpec !== undefined ? {animSpec} : {})}
 						{...(isSignalCard && onAnimationEnd !== undefined
 							? {onAnimationEnd}
 							: {})}

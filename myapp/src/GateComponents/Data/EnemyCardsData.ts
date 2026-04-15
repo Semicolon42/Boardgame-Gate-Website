@@ -12,7 +12,7 @@ export interface IEnemyCard {
 	image: string
 	type: EnemyCardType
 
-	stars: number
+	vp: number
 	health: number
 	attack: Partial<Record<BuildingType, number>>
 	fear?: number | undefined
@@ -25,7 +25,7 @@ const GENERIC_DEBUG_ENEMY: IEnemyCard = {
 	image: 'generic',
 	type: 'DEBUG',
 
-	stars: 0,
+	vp: 0,
 	health: 1,
 	attack: {
 		farm: 1
@@ -42,7 +42,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L1',
 
-		stars: 1,
+		vp: 1,
 		health: 3,
 		attack: {
 			gate: 1
@@ -55,7 +55,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L1',
 
-		stars: 2,
+		vp: 2,
 		health: 3,
 		attack: {
 			tower: 2
@@ -67,7 +67,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L1',
 
-		stars: 3,
+		vp: 3,
 		health: 4,
 		attack: {
 			farm: 1
@@ -80,7 +80,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L2',
 
-		stars: 4,
+		vp: 4,
 		health: 5,
 		attack: {
 			farm: 2
@@ -93,7 +93,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L2',
 
-		stars: 5,
+		vp: 5,
 		health: 6,
 		attack: {
 			gate: 2
@@ -105,7 +105,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L2',
 
-		stars: 6,
+		vp: 6,
 		health: 5,
 		attack: {
 			tower: 2
@@ -118,7 +118,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L3',
 
-		stars: 7,
+		vp: 7,
 		health: 1,
 		attack: {
 			tower: 1
@@ -131,7 +131,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L3',
 
-		stars: 8,
+		vp: 8,
 		health: 6,
 		attack: {
 			farm: 2
@@ -144,7 +144,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'generic',
 		type: 'L3',
 
-		stars: 0,
+		vp: 9,
 		health: 7,
 		attack: {
 			farm: 1,
@@ -160,7 +160,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		image: 'zoltar',
 		type: 'Z',
 
-		stars: 9,
+		vp: 9,
 		health: 11,
 		attack: {
 			farm: 2,

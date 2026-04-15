@@ -28,9 +28,9 @@ export function HeroCardToDiscard({
 			}}
 		>
 			<XCard
+				animSpec={{type: 'TO', pos: spec.to}}
 				card={fakeCard}
 				cardback={true}
-				moveTo={spec.to}
 				onAnimationEnd={onAnimationEnd}
 			/>
 		</div>

@@ -1,7 +1,11 @@
 import type {CardInstance} from '../../Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '../../Boards/useSubActionQueue'
 import {CardSlot} from '../../Cards/CardSlot'
-import type {CardPlayHandler, CardPlayType} from '../../Cards/XCard'
+import type {
+	CardPlayHandler,
+	CardPlayType,
+	XCardAnimSpec
+} from '../../Cards/XCard'
 import {XCard} from '../../Cards/XCard'
 
 const MIN_DISPLAY_SLOTS = 4
@@ -12,6 +16,13 @@ interface PlayerHandProps {
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
 	onPlayCard?: CardPlayHandler
+}
+
+function toXCardAnimSpec(spec: AnimatingCardSpec): XCardAnimSpec | undefined {
+	if (spec.moveFrom) return {type: 'FROM', pos: spec.moveFrom}
+	if (spec.moveTo) return {type: 'TO', pos: spec.moveTo}
+	if (spec.fallAway) return {type: 'FALL_AWAY'}
+	return undefined
 }
 
 export function PlayerHand({
@@ -36,6 +47,7 @@ export function PlayerHand({
 					animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
+				const animSpec = spec ? toXCardAnimSpec(spec) : undefined
 				return (
 					<XCard
 						card={card}
@@ -49,8 +61,7 @@ export function PlayerHand({
 							playedInstanceIds ? playedInstanceIds[card.instanceId] : undefined
 						}
 						key={card.instanceId}
-						{...(spec?.moveFrom ? {moveFrom: spec.moveFrom} : {})}
-						{...(spec?.moveTo ? {moveTo: spec.moveTo} : {})}
+						{...(animSpec !== undefined ? {animSpec} : {})}
 						{...(spec !== null && onAnimationEnd !== undefined
 							? {onAnimationEnd}
 							: {})}

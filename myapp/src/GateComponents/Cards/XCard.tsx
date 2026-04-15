@@ -1,6 +1,6 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
-import {useLayoutEffect, useRef} from 'react'
+import {useEffect, useLayoutEffect, useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
 import {getCitizenCard} from '../Data/PlayerCards'
 
@@ -49,6 +49,7 @@ function ActionButton({
 
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
+import theme from '@/themes'
 import {FitText, ScaledName} from '../UIComponents/misc'
 
 export type CardPlayType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
@@ -61,17 +62,23 @@ export type CardPlayHandler = (
 	disabled?: boolean
 ) => void
 
+/**
+ * Animation spec for a single card. Discriminated union keeps variants
+ * mutually exclusive and the call site self-documenting.
+ *
+ * FROM  — card enters: animates from external position into its DOM slot.
+ * TO    — card exits:  animates from its DOM slot to an external position.
+ * FALL_AWAY — card exits: falls and fades in place (played hero cards removed from game).
+ */
+export type XCardAnimSpec =
+	| {type: 'FROM'; pos: {x: number; y: number}}
+	| {type: 'TO'; pos: {x: number; y: number}}
+	| {type: 'FALL_AWAY'}
+
 interface XcardProps {
 	card: CardInstance
 	onAnimationEnd?: () => void
-	// Enter animation: card is already at its destination in the DOM.
-	// Animates FROM this position TO the card's self-measured DOM position.
-	// Used for draw (deck → hand).
-	moveFrom?: {x: number; y: number} | undefined
-	// Exit animation: card is at its current DOM position.
-	// Animates FROM the card's self-measured DOM position TO this position.
-	// Used for discard (hand → discard pile).
-	moveTo?: {x: number; y: number} | undefined
+	animSpec?: XCardAnimSpec
 	// Hand mode: individual action buttons are clickable.
 	onPlayCard?: CardPlayHandler | undefined
 	// Village mode: the whole card is one button to buy it.
@@ -89,8 +96,7 @@ interface XcardProps {
 export function XCard({
 	card,
 	onAnimationEnd,
-	moveFrom,
-	moveTo,
+	animSpec,
 	onPlayCard,
 	onBuyCard,
 	isPlayed,
@@ -103,16 +109,19 @@ export function XCard({
 	// Typed as HTMLElement — the common base for both <div> (hand) and <button> (village).
 	const ref = useRef<HTMLElement>(null)
 
+	const onAnimationEndRef = useRef(onAnimationEnd)
+	onAnimationEndRef.current = onAnimationEnd
+
 	// useLayoutEffect fires synchronously after the DOM is updated but BEFORE the
 	// browser paints. This is critical for animation setup: we need to measure the
 	// card's position (getBoundingClientRect) and set CSS custom properties before
 	// the frame is painted, so the animation starts from the correct position with
 	// no visible flash or jump.
 	//
-	// moveFrom (enter): card is at its destination — animate from external position to self.
+	// FROM (enter): card is at its destination — animate from external position to self.
 	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(delta) → translate(0,0)
 	//
-	// moveTo (exit): card is at its source — animate from self to external position.
+	// TO (exit): card is at its source — animate from self to external position.
 	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(0,0) → translate(delta)
 	useLayoutEffect(() => {
 		const el = ref.current
@@ -120,18 +129,64 @@ export function XCard({
 
 		el.classList.remove('card-move-from-animate', 'card-move-to-animate')
 
-		const rect = el.getBoundingClientRect()
-
-		if (moveFrom) {
-			el.style.setProperty('--slide-x', `${moveFrom.x - rect.left}px`)
-			el.style.setProperty('--slide-y', `${moveFrom.y - rect.top}px`)
-			el.classList.add('card-move-from-animate')
-		} else if (moveTo) {
-			el.style.setProperty('--slide-x', `${moveTo.x - rect.left}px`)
-			el.style.setProperty('--slide-y', `${moveTo.y - rect.top}px`)
-			el.classList.add('card-move-to-animate')
+		if (animSpec?.type === 'FROM' || animSpec?.type === 'TO') {
+			const rect = el.getBoundingClientRect()
+			el.style.setProperty('--slide-x', `${animSpec.pos.x - rect.left}px`)
+			el.style.setProperty('--slide-y', `${animSpec.pos.y - rect.top}px`)
+			el.classList.add(
+				animSpec.type === 'FROM'
+					? 'card-move-from-animate'
+					: 'card-move-to-animate'
+			)
 		}
-	}, [moveFrom, moveTo])
+	}, [animSpec])
+
+	useEffect(() => {
+		if (animSpec?.type !== 'FALL_AWAY') return
+		const el = ref.current
+		if (!el) return
+
+		const {
+			durationMs,
+			speedPxPerMs,
+			gravityPxPerMs2,
+			minRotationDeg,
+			maxRotationDeg,
+			opacityFadeStartProgress,
+			keyframeSteps
+		} = theme.enemyDiscard
+		const sign = Math.random() < 0.5 ? 1 : -1
+		const finalRotation =
+			sign *
+			(minRotationDeg + Math.random() * (maxRotationDeg - minRotationDeg))
+		const vy = -speedPxPerMs
+
+		const keyframes = Array.from({length: keyframeSteps + 1}, (_, i) => {
+			const progress = i / keyframeSteps
+			const t = progress * durationMs
+			const y = vy * t + 0.5 * gravityPxPerMs2 * t * t
+			const rotateDeg = progress * finalRotation
+			const opacity =
+				progress < opacityFadeStartProgress
+					? 1
+					: 1 -
+						(progress - opacityFadeStartProgress) /
+							(1 - opacityFadeStartProgress)
+			return {
+				transform: `translate(0px, ${y}px) rotate(${rotateDeg}deg)`,
+				opacity,
+				offset: progress
+			}
+		})
+
+		const anim = el.animate(keyframes, {duration: durationMs, fill: 'forwards'})
+		anim.onfinish = () => {
+			onAnimationEndRef.current?.()
+		}
+		return () => {
+			anim.cancel()
+		}
+	}, [animSpec])
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {
@@ -152,7 +207,9 @@ export function XCard({
 				className={containerClass}
 				onAnimationEnd={onAnimationEnd}
 				ref={ref as RefObject<HTMLDivElement>}
-			/>
+			>
+				<WaIcon className='text-6xl' name='dungeon' variant='classic' />
+			</div>
 		)
 	}
 
