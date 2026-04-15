@@ -25,7 +25,9 @@ export function AttackLine({
 }: AttackLineProps) {
 	let sourceRect: DOMRect | undefined
 	if (spec.attackSource.kind === 'ENEMY') {
-		const idx = enemyCards.findIndex(c => c.instanceId === spec.attackSource.instanceId)
+		const idx = enemyCards.findIndex(
+			c => c.instanceId === spec.attackSource.instanceId
+		)
 		const offset = enemyRowMax - enemyCards.length
 		const el = idx >= 0 ? enemySlotsRef.current[offset + idx] : null
 		sourceRect = el?.getBoundingClientRect()
@@ -57,13 +59,13 @@ export function AttackLine({
 			}}
 		>
 			<line
-				x1={sourceRect.left + sourceRect.width / 2}
-				y1={sourceRect.top + sourceRect.height / 2}
-				x2={targetRect.left + targetRect.width / 2}
-				y2={targetRect.top + targetRect.height / 2}
 				stroke='rgb(200, 0, 0)'
-				strokeWidth={4}
 				strokeLinecap='round'
+				strokeWidth={4}
+				x1={sourceRect.left + sourceRect.width / 2}
+				x2={targetRect.left + targetRect.width / 2}
+				y1={sourceRect.top + sourceRect.height / 2}
+				y2={targetRect.top + targetRect.height / 2}
 			/>
 		</svg>
 	)

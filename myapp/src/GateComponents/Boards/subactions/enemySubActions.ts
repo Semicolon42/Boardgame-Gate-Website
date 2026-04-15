@@ -82,7 +82,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 
 		const fear = enemyInfo.fear ?? 0
 		for (let i = 0; i < fear; i++)
-			result.push({type: 'ENQ_ADD_FEAR', attackSource: {kind: 'ENEMY', instanceId: enemyCard.instanceId}})
+			result.push({
+				type: 'ENQ_ADD_FEAR',
+				attackSource: {kind: 'ENEMY', instanceId: enemyCard.instanceId}
+			})
 
 		return result
 	},
@@ -90,30 +93,22 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		// Check if there are any cards left in the enemy deck
 		if (state.eEnemyDeck.length === 0) return []
 
-		// Check if the enemy row is full.  If so, remove the leftmost enemy then draw
+		// Check if the enemy row is full.  If so, exile the oldest enemy (it attacks the gate) then draw
 		if (state.eEnemyRow.length >= state.eEnemyRowMax) {
 			const discardEnemy = state.eEnemyRow[0]
+			if (discardEnemy === undefined) return []
 			const gateDamage = Math.min(1, state.bGateHealth)
 			return [
-				{type: 'ENEMY_ROW_REMOVE_INSTANCE', enemyCard: discardEnemy},
-				...(gateDamage > 0
-					? [
-							{
-								type: 'EXECUTE_GAME_STATE_UPDATE' as const,
-								gameStateAction: {
-									type: 'BUILDING_CHANGE_HEALTH' as const,
-									building: 'gate' as const,
-									healthChange: -gateDamage
-								}
-							},
-							{
-								type: 'SHOW_FLOATING_TEXT' as const,
-								text: `-${gateDamage}`,
-								color: 'var(--color-text-damage)',
-								target: {kind: 'BUILDING_GATE' as const}
-							}
-						]
-					: []),
+				gateDamage > 0
+					? {
+							type: 'ENEMY_EXILE_WITH_GATE_ATTACK' as const,
+							enemyCard: discardEnemy,
+							gateDamage
+						}
+					: {
+							type: 'ENEMY_ROW_REMOVE_INSTANCE' as const,
+							enemyCard: discardEnemy
+						},
 				{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 			]
 		}
@@ -205,6 +200,46 @@ export const atomicHandlers: Partial<
 			ctx.dispatch({type: 'ENEMY_ROW_DISCARD_OLDEST'})
 		}
 		ctx.setAnimatingEnemyRemove(oldest.instanceId)
+		ctx.setIsAnimating(true)
+	},
+
+	ENEMY_EXILE_WITH_GATE_ATTACK: (action, ctx) => {
+		const {enemyCard, gateDamage} = action as Extract<
+			SubActionType,
+			{type: 'ENEMY_EXILE_WITH_GATE_ATTACK'}
+		>
+
+		// Immediate gate damage
+		ctx.dispatch({
+			type: 'BUILDING_CHANGE_HEALTH',
+			building: 'gate',
+			healthChange: -gateDamage
+		})
+
+		// Exile animation — defer enemy removal until signalExileComplete fires
+		ctx.setAnimatingEnemyRemove(enemyCard.instanceId)
+		ctx.pendingOnCompleteRef.current = () => {
+			ctx.dispatch({
+				type: 'ENEMY_ROW_DISCARD_INSTANCE',
+				uuid: enemyCard.instanceId
+			})
+		}
+
+		// Floating text + attack visualization — signalAnimationComplete advances queue
+		const gateRect = ctx.gateRef.current?.getBoundingClientRect()
+		if (gateRect) {
+			ctx.setAnimatingFloatingText({
+				text: `-${gateDamage}`,
+				color: 'var(--color-text-damage)',
+				x: gateRect.left + gateRect.width / 2,
+				y: gateRect.top + gateRect.height / 2
+			})
+			ctx.setAnimatingAttackVisualization({
+				attackSource: {kind: 'ENEMY', instanceId: enemyCard.instanceId},
+				attackTarget: {kind: 'BUILDING_GATE'}
+			})
+		}
+
 		ctx.setIsAnimating(true)
 	},
 

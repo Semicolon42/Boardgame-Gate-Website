@@ -6,12 +6,17 @@ import {
 	makeCardInstances,
 	makeEnemyCardInstances
 } from '../gameStateReducer'
-import type {AttackVisualizationSpec, AttackSource, AtomicHandler, Expander, SubActionType} from './types'
+import type {
+	AtomicHandler,
+	AttackSource,
+	Expander,
+	SubActionType
+} from './types'
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
 		case 'DRAW_HERO':
-			return [{type: 'HERO_DECK_DRAW_TO_DISCARD'}]
+			return [{type: 'HERO_DECK_DRAW_TO_DISCARD'},]
 		case 'DAMAGE_FARM':
 			return [
 				{
@@ -206,7 +211,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
 	ENQ_ADD_FEAR: (action, state: GameState): SubActionType[] => {
-		const {attackSource} = action as Extract<SubActionType, {type: 'ENQ_ADD_FEAR'}>
+		const {attackSource} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_ADD_FEAR'}
+		>
 		const oldFear = state.fFear
 		const newFear = Math.min(oldFear + 1, state.fFearMax)
 		if (newFear === oldFear) return []

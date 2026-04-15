@@ -32,9 +32,9 @@ const theme: GateTheme = {
 		strokeWidthPx: 3
 	},
 	cardAnimation: {
-		drawDurationMs: 600,
+		drawDurationMs: 200,
 		drawEasing: 'ease-out',
-		discardDurationMs: 600,
+		discardDurationMs: 200,
 		discardEasing: 'ease-in'
 	},
 	enemyDiscard: {

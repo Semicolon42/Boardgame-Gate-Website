@@ -91,6 +91,11 @@ export type SubActionType =
 	  }
 	| {type: 'ENEMY_ROW_DRAW_CARD'; enemyCard: EnemyCardInstance}
 	| {
+			type: 'ENEMY_EXILE_WITH_GATE_ATTACK'
+			enemyCard: EnemyCardInstance
+			gateDamage: number
+	  }
+	| {
 			type: 'SHOW_FLOATING_TEXT'
 			text: string
 			color: string
@@ -133,6 +138,7 @@ export interface SubActionContext {
 	setAnimatingFloatingText: (v: FloatingTextSpec | null) => void
 	setAnimatingHeroToDiscard: (v: HeroCardToDiscardSpec | null) => void
 	setAnimatingAttackVisualization: (v: AttackVisualizationSpec | null) => void
+	signalExileComplete: () => void
 	// DOM snapshot positions (captured before dispatch):
 	deckPos: DOMRect | undefined
 	discardPos: DOMRect | undefined

@@ -1,7 +1,10 @@
-import {type RefObject} from 'react'
-import type {BuildingType, FearAction} from '@/GateComponents/Boards/gameStateReducer'
-import { PlayerBaseCard } from './BaseRowCard'
-import { Fearamid } from './Fearamid'
+import type {RefObject} from 'react'
+import type {
+	BuildingType,
+	FearAction
+} from '@/GateComponents/Boards/gameStateReducer'
+import {PlayerBaseCard} from './BaseRowCard'
+import {Fearamid} from './Fearamid'
 
 interface PlayerBaseRowProps {
 	farmRef: RefObject<HTMLDivElement | null>
@@ -50,9 +53,9 @@ export function PlayerBaseRow({
 				canRepair={canRepair}
 				divRef={farmRef}
 				health={healthFarm}
-				maxHealth={healthMaxFarm}
 				image='farm'
 				isUnderAttack={attackedTarget === 'farm'}
+				maxHealth={healthMaxFarm}
 				name='Farm'
 				onRepair={() => {
 					onRepair('farm')
@@ -62,9 +65,9 @@ export function PlayerBaseRow({
 				canRepair={canRepair}
 				divRef={gateRef}
 				health={healthGate}
-				maxHealth={healthGateMax}
 				image='gate'
 				isUnderAttack={attackedTarget === 'gate'}
+				maxHealth={healthGateMax}
 				name='Gate'
 				onRepair={() => {
 					onRepair('gate')
@@ -74,9 +77,9 @@ export function PlayerBaseRow({
 				canRepair={canRepair}
 				divRef={towerRef}
 				health={healthTower}
-				maxHealth={healthTowerMax}
 				image='tower'
 				isUnderAttack={attackedTarget === 'tower'}
+				maxHealth={healthTowerMax}
 				name='Tower'
 				onRepair={() => {
 					onRepair('tower')

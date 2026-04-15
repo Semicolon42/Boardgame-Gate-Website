@@ -103,6 +103,18 @@ export function useSubActionQueue(
 	 * Call this from a card's onAnimationEnd to advance the queue.
 	 * Also runs any deferred dispatch (e.g. removing a card from state after its exit animation).
 	 */
+	/**
+	 * Call this from an exile animation's onAnimationEnd when the exile runs
+	 * alongside another animation (e.g. floating text). Runs the deferred state
+	 * removal and clears the exile visual, but does NOT advance the queue — the
+	 * companion animation's onAnimationEnd will call signalAnimationComplete.
+	 */
+	const signalExileComplete = useCallback(() => {
+		pendingOnCompleteRef.current?.()
+		pendingOnCompleteRef.current = null
+		setAnimatingEnemyRemove(null)
+	}, [])
+
 	const signalAnimationComplete = useCallback(() => {
 		pendingOnCompleteRef.current?.()
 		pendingOnCompleteRef.current = null
@@ -145,6 +157,7 @@ export function useSubActionQueue(
 			setAnimatingFloatingText,
 			setAnimatingHeroToDiscard,
 			setAnimatingAttackVisualization,
+			signalExileComplete,
 			deckPos: deckRef.current?.getBoundingClientRect(),
 			discardPos: discardRef.current?.getBoundingClientRect(),
 			hDeckPos: hDeckRef.current?.getBoundingClientRect(),
@@ -173,6 +186,7 @@ export function useSubActionQueue(
 		enqueue,
 		queue,
 		signalAnimationComplete,
+		signalExileComplete,
 		/** True whenever the queue is non-empty (including mid-animation). */
 		isProcessing: queue.length > 0,
 		animatingCard,

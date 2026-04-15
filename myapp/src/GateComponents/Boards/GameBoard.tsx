@@ -8,14 +8,15 @@ import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {ValueBadge} from '../UIComponents/ValueBadge'
+import {AttackLine} from './AttackLine'
 import {
 	type BuildingType,
 	type CardInstance,
 	type EnemyCardInstance,
 	makeEnemyCardInstances
 } from './gameStateReducer'
-import {AttackLine} from './AttackLine'
 import {useGameActions} from './useGameActions'
+import { CardSlot } from '../Cards/CardSlot'
 
 export function GameBoard() {
 	const {
@@ -38,6 +39,7 @@ export function GameBoard() {
 		animatingFloatingText,
 		animatingHeroToDiscard,
 		animatingAttackVisualization,
+		signalExileComplete,
 		hDeckRef,
 		gameBuyCard,
 		gameAttackEnemy,
@@ -89,7 +91,7 @@ export function GameBoard() {
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+						className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
 						onClick={() => {
 							setCardDialog({
 								title: 'Villager Deck',
@@ -100,39 +102,44 @@ export function GameBoard() {
 						ref={villageDeckRef}
 						role='button'
 					>
-						Village:
-						{gameState?.vDeck?.length ?? 'XXX'}
+						<div className='absolute top-1 text-lg'>Village</div>
+						<WaIcon className='text-6xl' name='dungeon' variant='classic' />
 					</div>
-					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-						onClick={() => {
-							setCardDialog({
-								title: 'Player Discard',
-								playerCards: gameState.pDiscard,
-								enemyCards: []
-							})
-						}}
-						ref={discardRef}
-						role='button'
-					>
-						Discard:
-						{gameState?.pDiscard?.length ?? 'XXX'}
-					</div>
-					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-						onClick={() => {
-							setCardDialog({
-								title: 'Player Deck',
-								playerCards: gameState.pDeck,
-								enemyCards: []
-							})
-						}}
-						ref={deckRef}
-						role='button'
-					>
-						Deck:
-						{gameState?.pDeck?.length ?? 'XXX'}
-					</div>
+					{gameState?.pDiscard?.length > 0 ? (
+						<div
+							className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+							onClick={() => {
+								setCardDialog({
+									title: 'Player Discard',
+									playerCards: gameState.pDiscard,
+									enemyCards: []
+								})
+							}}
+							ref={discardRef}
+							role='button'
+						>
+						  Discard:
+							{gameState?.pDiscard?.length ?? 'XXX'}
+						</div>
+						) : <CardSlot title='Discard' ref={discardRef}/>
+					}
+					{gameState?.pDeck?.length > 0 ? (
+						<div
+							className='relative flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+							onClick={() => {
+								setCardDialog({
+									title: 'Player Deck',
+									playerCards: gameState.pDeck,
+									enemyCards: []
+								})
+							}}
+							ref={deckRef}
+							role='button'
+						>
+							<div className='absolute top-1 text-lg'>Deck</div>
+							<WaIcon className='text-6xl' name='dungeon' variant='classic' />
+						</div>
+					) : <CardSlot title='Deck' ref={deckRef}/>}
 					<WaButton
 						disabled={isProcessing}
 						onClick={() => {
@@ -169,6 +176,11 @@ export function GameBoard() {
 						animatingCard={animatingCard}
 						animatingEnemyRemove={animatingEnemyRemove}
 						animatingEnemyShifts={animatingEnemyShifts}
+						attackingEnemyInstanceId={
+							animatingAttackVisualization?.attackSource.kind === 'ENEMY'
+								? animatingAttackVisualization.attackSource.instanceId
+								: null
+						}
 						eDeckRef={eDeckRef}
 						enemyCards={gameState.eEnemyRow}
 						enemyDeckCards={gameState.eEnemyDeck}
@@ -176,14 +188,14 @@ export function GameBoard() {
 						enemySlotsRef={enemySlotsRef}
 						hDeckRef={hDeckRef}
 						heroCardsRemaining={gameState.hDeckRemaining}
-						attackingEnemyInstanceId={
-						animatingAttackVisualization?.attackSource.kind === 'ENEMY'
-							? animatingAttackVisualization.attackSource.instanceId
-							: null
-					}
 						isAttackable={!isProcessing && gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
+						onExileAnimationEnd={
+							animatingAttackVisualization?.attackSource.kind === 'ENEMY'
+								? signalExileComplete
+								: signalAnimationComplete
+						}
 						onViewEnemyDeck={onViewEnemyDeck}
 						onViewHeroDeck={onViewHeroDeck}
 					/>
@@ -251,33 +263,43 @@ export function GameBoard() {
 					</div>
 					<PlayerBaseRow
 						attackedTarget={
-							animatingAttackVisualization?.attackTarget.kind === 'BUILDING_FARM' ? 'farm'
-							: animatingAttackVisualization?.attackTarget.kind === 'BUILDING_GATE' ? 'gate'
-							: animatingAttackVisualization?.attackTarget.kind === 'BUILDING_TOWER' ? 'tower'
-							: animatingAttackVisualization?.attackTarget.kind === 'FEARAMID' ? 'fearamid'
-							: null
+							animatingAttackVisualization?.attackTarget.kind ===
+							'BUILDING_FARM'
+								? 'farm'
+								: animatingAttackVisualization?.attackTarget.kind ===
+										'BUILDING_GATE'
+									? 'gate'
+									: animatingAttackVisualization?.attackTarget.kind ===
+											'BUILDING_TOWER'
+										? 'tower'
+										: animatingAttackVisualization?.attackTarget.kind ===
+												'FEARAMID'
+											? 'fearamid'
+											: null
 						}
-						fearamidAttacking={animatingAttackVisualization?.attackSource.kind === 'FEARAMID'}
 						canCalm={!isProcessing && gameState.cCalm > 0}
 						canRepair={!isProcessing && gameState.cRepair > 0}
+						farmRef={farmRef}
+						fear={gameState.fFear}
+						fearamid={gameState.fFearamid}
+						fearamidAttacking={
+							animatingAttackVisualization?.attackSource.kind === 'FEARAMID'
+						}
+						fearamidRef={fearamidRef}
+						gateRef={gateRef}
 						healthFarm={gameState.bFarmHealth}
-						healthMaxFarm={gameState.bFarmHealthMAX}
 						healthGate={gameState.bGateHealth}
 						healthGateMax={gameState.bGateHealthMAX}
+						healthMaxFarm={gameState.bFarmHealthMAX}
 						healthTower={gameState.bTowerHealth}
 						healthTowerMax={gameState.bTowerHealthMAX}
-						fear={gameState.fFear}
-					fearamid={gameState.fFearamid}
-						farmRef={farmRef}
-						gateRef={gateRef}
-						towerRef={towerRef}
-						fearamidRef={fearamidRef}
 						onCalm={() => {
 							gameCalmFear(1)
 						}}
 						onRepair={(building: BuildingType) => {
 							gameRepairBase(building, 1)
 						}}
+						towerRef={towerRef}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>
