@@ -189,7 +189,7 @@ export function EnemyRow({
 			{enemyDeckCards.length <= 0 ?
 				<CardSlot />
 			: (
-				<EnemyDeck eDeckRef={eDeckRef} enemyDeck={enemyCards} onViewDeck={onViewEnemyDeck}/>
+				<EnemyDeck eDeckRef={eDeckRef} enemyDeck={enemyDeckCards} onViewDeck={onViewEnemyDeck}/>
 			)}
 
 			<HeroDeck cardsRemaining={heroCardsRemaining} hDeckRef={hDeckRef} onViewHeroDeck={onViewHeroDeck} />

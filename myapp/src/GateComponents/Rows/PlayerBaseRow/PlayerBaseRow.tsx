@@ -10,19 +10,28 @@ function PlayerBaseCard(props: {
 	divRef?: RefObject<HTMLDivElement | null>
 }) {
 	const {name, image, health, divRef, canRepair, onRepair} = props
-	const cnBase =
-		'block h-[150px] w-[100px] bg-(--color-base-back-normal) text-(--color-base-text)'
-	let cnOutline = 'outline-4 outline-color:var(--color-red)'
+	let cn = [
+		'h-[150px] w-[100px] flex flex-col',
+		'items-center justify-center gap-2',
+		'bg-(--color-base-back-normal) text-(--color-base-text)',
+		'outline-4 outline-color:var(--color-red)'
+	].join(' ')
 	if (canRepair) {
-		cnOutline += ' outline-(--color-outline-active)'
-		cnOutline += ' hover:outline-(--color-outline-active-hover)'
+		cn += [
+			' cursor-pointer',
+			' outline-(--color-outline-active)',
+			' hover:outline-(--color-outline-active-hover)'
+		].join(' ')
 	} else {
-		cnOutline += ' outline-(--color-outline-normal)'
-		cnOutline += ' hover:outline-(--color-outline-normal-hover)'
+		cn += [
+			' cursor-pointer',
+			' outline-(--color-outline-normal)',
+			' hover:outline-(--color-outline-normal-hover)',
+		].join(' ')
 	}
 	return (
 		<div
-			className={`${cnBase} ${cnOutline}`}
+			className={cn}
 			ref={divRef}
 			{...(onRepair && canRepair ? {role: 'button', onClick: onRepair} : {})}
 		>
