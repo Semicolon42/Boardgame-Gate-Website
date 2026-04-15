@@ -10,7 +10,7 @@ function ActionButton({
 	isPlayed,
 	isDisabled,
 	icon,
-	isHandMode,
+	isPlayable,
 	onAction
 }: {
 	cardClass: string
@@ -18,7 +18,7 @@ function ActionButton({
 	isPlayed: boolean
 	isDisabled: boolean
 	icon: ReactElement
-	isHandMode: boolean
+	isPlayable: boolean
 	onAction: () => void
 }) {
 	let buttonClass = `card-action-btn outline-2 ${cardClass}`
@@ -30,14 +30,14 @@ function ActionButton({
 			' outline-(--color-card-action-played) bg-(--color-card-action-played)'
 	} else {
 		buttonClass += ' outline-transparent bg-transparent '
-		buttonClass += isHandMode
+		buttonClass += isPlayable
 			? 'hover:outline-(--color-outline-active-hover)'
 			: ''
 	}
 	return (
 		<div
 			className={buttonClass}
-			{...(isHandMode && !isDisabled
+			{...(isPlayable && !isDisabled
 				? {role: 'button', onClick: onAction}
 				: {})}
 		>
@@ -83,6 +83,7 @@ interface XcardProps {
 	// Renders the card shape with the card-back colour and no content.
 	// Used for animations where a face-down card travels between positions.
 	cardback?: boolean
+	isPlayable?: boolean
 }
 
 export function XCard({
@@ -94,7 +95,8 @@ export function XCard({
 	onBuyCard,
 	isPlayed,
 	disabled = false,
-	cardback = false
+	cardback = false,
+	isPlayable = false
 }: XcardProps) {
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -158,11 +160,10 @@ export function XCard({
 
 	// Hand mode: action fields shown as individual clickable divs.
 	// Village mode: action fields are read-only (whole card is the button).
-	const isHandMode = onBuyCard === undefined
 
 	const cardInner = (
 		<div className='w-full'>
-			<div className='flex items-center gap-[4px] px-[5px] stroke-2 stroke-amber-100'>
+			<div className='flex items-center gap-[4px] px-[5px]'>
 				<ScaledName text={info.name} />
 				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs text-black'>
 					{info.cost}
@@ -174,7 +175,7 @@ export function XCard({
 						cardClass='@cardCoins'
 						icon={<WaIcon name='circle' variant='regular' />}
 						isDisabled={info.actionCoins === 0}
-						isHandMode={isHandMode}
+						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'COINS'}
 						onAction={() =>
 							onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)
@@ -185,7 +186,7 @@ export function XCard({
 						cardClass='@cardRepair'
 						icon={<WaIcon name='plus' />}
 						isDisabled={info.actionRepair === 0}
-						isHandMode={isHandMode}
+						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'REPAIR'}
 						onAction={() =>
 							onPlayCard?.(
@@ -201,7 +202,7 @@ export function XCard({
 						cardClass='@cardCalm'
 						icon={<WaIcon name='eye' variant='regular' />}
 						isDisabled={info.actionCalm === 0}
-						isHandMode={isHandMode}
+						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'CALM'}
 						onAction={() =>
 							onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)
@@ -212,7 +213,7 @@ export function XCard({
 						cardClass='@cardFight'
 						icon={<WaIcon name='arrow-trend-up' />}
 						isDisabled={info.actionAttack === 0}
-						isHandMode={isHandMode}
+						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'ATTACK'}
 						onAction={() =>
 							onPlayCard?.(

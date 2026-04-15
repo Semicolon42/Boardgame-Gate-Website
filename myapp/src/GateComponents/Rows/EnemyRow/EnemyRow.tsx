@@ -19,6 +19,7 @@ interface EnemyRowProps {
 	enemySlotsRef?: RefObject<(HTMLDivElement | null)[]>
 	animatingEnemyShifts?: Record<string, {x: number; y: number}>
 	animatingEnemyRemove?: string | null
+	onViewEnemyDeck?: () => undefined | undefined
 }
 
 export function HeroDeck(props: {
@@ -56,7 +57,8 @@ export function EnemyRow({
 	hDeckRef,
 	enemySlotsRef,
 	animatingEnemyShifts = {},
-	animatingEnemyRemove = null
+	animatingEnemyRemove = null,
+	onViewEnemyDeck = undefined
 }: EnemyRowProps) {
 	// Right-aligned: newest card occupies rightmost slot.
 	// eEnemyRow = [oldest, ..., newest]; slot[offset + i] = eEnemyRow[i]
@@ -128,8 +130,14 @@ export function EnemyRow({
 
 			{/* Enemy deck ref node — used by animation system to measure source position */}
 			<div
-				className='flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-white'
+				className={`flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color-card-text) ${onViewEnemyDeck ? 'cursor-pointer' : ''}`}
 				ref={eDeckRef}
+				{...(onViewEnemyDeck
+					? {
+							role: 'button',
+							onClick: onViewEnemyDeck
+						}
+					: {})}
 			>
 				<div>Enemy Deck</div>
 				<div>{enemyDeckCards.length} Cards</div>

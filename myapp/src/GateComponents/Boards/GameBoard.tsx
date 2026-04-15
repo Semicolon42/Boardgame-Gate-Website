@@ -1,4 +1,6 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {useState} from 'react'
+import {PlayerEnemyCardDialog} from '../CardDialogs/PlayerCardDialog'
 import {FloatingText} from '../Cards/FloatingText'
 import {HeroCardToDiscard} from '../Cards/HeroCardToDiscard'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
@@ -6,7 +8,12 @@ import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {ValueBadge} from '../UIComponents/ValueBadge'
-import type {BuildingType} from './gameStateReducer'
+import {
+	type BuildingType,
+	type CardInstance,
+	type EnemyCardInstance,
+	makeEnemyCardInstances
+} from './gameStateReducer'
 import {useGameActions} from './useGameActions'
 
 export function GameBoard() {
@@ -49,28 +56,70 @@ export function GameBoard() {
 	const costCircleClass =
 		'flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
 
+	const [cardDialog, setCardDialog] = useState<
+		| {
+				title: string
+				playerCards: CardInstance[]
+				enemyCards: EnemyCardInstance[]
+		  }
+		| undefined
+	>(undefined)
+
+	const onViewEnemyDeck = () => {
+		const temp = makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9])
+		setCardDialog({
+			title: 'Enemy Deck',
+			playerCards: [],
+			enemyCards: temp
+		})
+	}
+
 	return (
 		<div className='flex bg-(--color-gameboard-background)'>
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+						onClick={() => {
+							setCardDialog({
+								title: 'Villager Deck',
+								playerCards: [...gameState.vDeck, ...gameState.vDiscard],
+								enemyCards: []
+							})
+						}}
 						ref={villageDeckRef}
+						role='button'
 					>
 						Village:
 						{gameState?.vDeck?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+						onClick={() => {
+							setCardDialog({
+								title: 'Player Discard',
+								playerCards: gameState.pDiscard,
+								enemyCards: []
+							})
+						}}
 						ref={discardRef}
+						role='button'
 					>
 						Discard:
 						{gameState?.pDiscard?.length ?? 'XXX'}
 					</div>
 					<div
-						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-white outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+						className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+						onClick={() => {
+							setCardDialog({
+								title: 'Player Deck',
+								playerCards: gameState.pDeck,
+								enemyCards: []
+							})
+						}}
 						ref={deckRef}
+						role='button'
 					>
 						Deck:
 						{gameState?.pDeck?.length ?? 'XXX'}
@@ -121,6 +170,7 @@ export function GameBoard() {
 						isAttackable={gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
+						onViewEnemyDeck={onViewEnemyDeck}
 					/>
 					{/* Second Row Village cards to buy */}
 					<div className={statusBarClass}>
@@ -294,6 +344,15 @@ export function GameBoard() {
 					spec={animatingHeroToDiscard}
 				/>
 			)}
+			<PlayerEnemyCardDialog
+				enemyCards={cardDialog?.enemyCards ?? []}
+				isOpen={cardDialog !== undefined}
+				onClose={() => {
+					setCardDialog(undefined)
+				}}
+				playerCards={cardDialog?.playerCards ?? []}
+				title={cardDialog?.title ?? ''}
+			/>
 		</div>
 	)
 }

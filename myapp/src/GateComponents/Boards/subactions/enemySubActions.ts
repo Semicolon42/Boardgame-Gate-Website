@@ -132,7 +132,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		const delta = targetEnemey.health - damage
 		const bonusUsed = Math.max(state.bTowerBonusDamageCurrent, delta, 0)
 		const damageUsed = Math.max(damage, targetEnemey.health, 0)
-		const totalDamage = damageUsed + bonusUsed 
+		const totalDamage = damageUsed + bonusUsed
 		const actionsDamageEnemy: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',

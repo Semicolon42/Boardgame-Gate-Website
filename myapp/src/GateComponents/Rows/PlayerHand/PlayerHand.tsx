@@ -44,6 +44,7 @@ export function PlayerHand({
 								? true
 								: false
 						}
+						isPlayable={true}
 						isPlayed={
 							playedInstanceIds ? playedInstanceIds[card.instanceId] : undefined
 						}
