@@ -31,7 +31,7 @@ export function HeroCardToDiscard({
 				animSpec={{type: 'TO', pos: spec.to}}
 				card={fakeCard}
 				cardback={true}
-				onAnimationEnd={()=>{
+				onAnimationEnd={() => {
 					onAnimationEnd()
 				}}
 			/>

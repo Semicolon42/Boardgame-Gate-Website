@@ -16,7 +16,7 @@ import type {
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
 		case 'DRAW_HERO':
-			return [{type: 'HERO_DECK_DRAW_TO_DISCARD'},]
+			return [{type: 'HERO_DECK_DRAW_TO_DISCARD'}]
 		case 'DAMAGE_FARM':
 			return [
 				{

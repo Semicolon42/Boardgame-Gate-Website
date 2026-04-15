@@ -1,6 +1,7 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
 import {useState} from 'react'
 import {PlayerEnemyCardDialog} from '../CardDialogs/PlayerCardDialog'
+import {CardSlot} from '../Cards/CardSlot'
 import {FloatingText} from '../Cards/FloatingText'
 import {HeroCardToDiscard} from '../Cards/HeroCardToDiscard'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
@@ -16,7 +17,6 @@ import {
 	makeEnemyCardInstances
 } from './gameStateReducer'
 import {useGameActions} from './useGameActions'
-import { CardSlot } from '../Cards/CardSlot'
 
 export function GameBoard() {
 	const {
@@ -118,11 +118,12 @@ export function GameBoard() {
 							ref={discardRef}
 							role='button'
 						>
-						  Discard:
+							Discard:
 							{gameState?.pDiscard?.length ?? 'XXX'}
 						</div>
-						) : <CardSlot title='Discard' ref={discardRef}/>
-					}
+					) : (
+						<CardSlot ref={discardRef} title='Discard' />
+					)}
 					{gameState?.pDeck?.length > 0 ? (
 						<div
 							className='relative flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
@@ -139,7 +140,9 @@ export function GameBoard() {
 							<div className='absolute top-1 text-lg'>Deck</div>
 							<WaIcon className='text-6xl' name='dungeon' variant='classic' />
 						</div>
-					) : <CardSlot title='Deck' ref={deckRef}/>}
+					) : (
+						<CardSlot ref={deckRef} title='Deck' />
+					)}
 					<WaButton
 						disabled={isProcessing}
 						onClick={() => {

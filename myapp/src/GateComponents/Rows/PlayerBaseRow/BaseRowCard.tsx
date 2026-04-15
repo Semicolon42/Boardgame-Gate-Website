@@ -125,7 +125,7 @@ export function PlayerBaseCard(props: {
 				<HealthDice health={health} maxHealth={maxHealth} />
 				<div className='text-xs'>{buildingText} </div>
 			</div>
-			{tooltipRepair !== '' && (
+			{tooltipRepair && (
 				<WaTooltip for={id} placement='top'>
 					{tooltipRepair}
 				</WaTooltip>

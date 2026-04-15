@@ -100,7 +100,7 @@ export type SubActionType =
 			text: string
 			color: string
 			target: FloatingTextTarget
-			attackSource?: AttackSource
+			attackSource?: AttackSource | undefined
 	  }
 	| {type: 'DEBUG_ALERT'; message: string}
 
