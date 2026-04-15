@@ -47,6 +47,9 @@ export function applyTheme(theme: GateTheme): void {
 	r.style.setProperty('--color-text-damage', theme.colors.textDamage)
 	r.style.setProperty('--color-text-healing', theme.colors.textHealing)
 
+	r.style.setProperty('--text-vp-stroke-width', theme.vp.strokeWidthPx+'px')
+	r.style.setProperty('--text-vp-stroke-color', theme.vp.strokeColor)
+
 	// Card animations
 	r.style.setProperty(
 		'--duration-card-draw',
