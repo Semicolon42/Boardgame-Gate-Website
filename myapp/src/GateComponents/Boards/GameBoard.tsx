@@ -203,8 +203,8 @@ export function GameBoard() {
 						animatingCard={animatingCard}
 						animatingClearVillagerRow={animatingClearVillagerRow}
 						currentCoins={gameState.cCoins + gameState.bFarmBonusRecruitCurrent}
-						onAnimationEnd={signalAnimationComplete}
 						isBuyable={!isProcessing}
+						onAnimationEnd={signalAnimationComplete}
 						onBuyCard={gameBuyCard}
 						villageCards={gameState.vRow}
 					/>

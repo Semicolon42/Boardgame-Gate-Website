@@ -26,7 +26,7 @@ function PlayerBaseCard(props: {
 		cn += [
 			' cursor-pointer',
 			' outline-(--color-outline-normal)',
-			' hover:outline-(--color-outline-normal-hover)',
+			' hover:outline-(--color-outline-normal-hover)'
 		].join(' ')
 	}
 	return (

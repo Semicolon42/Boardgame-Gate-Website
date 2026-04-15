@@ -217,7 +217,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionCalm: 0,
 		actionAttack: 0,
 		actionBonusId: 'blacksmith',
-		actionBonusText: 'You may double the attack of another card'
+		actionBonusText: 'Double attack of the next card'
 	},
 	{
 		id: 20,
@@ -231,7 +231,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionCalm: 1,
 		actionAttack: 1,
 		actionBonusId: 'swindler',
-		actionBonusText: 'You may draw 1 more card'
+		actionBonusText: 'Draw 1 card'
 	},
 	{
 		id: 21,
@@ -355,7 +355,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionCalm: 1,
 		actionAttack: 1,
 		actionBonusId: 'traveler',
-		actionBonusText: 'You may draw 2 more cards'
+		actionBonusText: 'Draw 2 cards'
 	}
 ]
 

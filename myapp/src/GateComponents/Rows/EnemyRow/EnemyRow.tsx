@@ -1,10 +1,10 @@
+import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {RefObject} from 'react'
 import type {EnemyCardInstance} from '@/GateComponents/Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
 import {XEnemyCard} from '@/GateComponents/Cards/XEnemyCard'
 import {getEnemyCard} from '@/GateComponents/Data/EnemyCardsData'
-import { WaIcon } from '@awesome.me/webawesome/dist/react'
 
 interface EnemyRowProps {
 	enemyCards: EnemyCardInstance[]
@@ -41,13 +41,13 @@ function HeroDeck(props: {
 	].join(' ')
 
 	return (
-		<div className={cn} ref={hDeckRef}
-			{...(onViewHeroDeck
-					? {role: 'button', onClick: onViewHeroDeck}
-					: {})}
+		<div
+			className={cn}
+			ref={hDeckRef}
+			{...(onViewHeroDeck ? {role: 'button', onClick: onViewHeroDeck} : {})}
 		>
 			<div>Hero Deck</div>
-			<WaIcon name='dungeon' variant='classic' className='text-6xl' />
+			<WaIcon className='text-6xl' name='dungeon' variant='classic' />
 			<div>{cardsRemaining} Heros</div>
 		</div>
 	)
@@ -71,22 +71,22 @@ function EnemyDeck(props: {
 
 	let topdDeckLevel = '<empty>'
 	if (enemyDeck.length > 0) {
-		switch(getEnemyCard(enemyDeck[0]?.cardId ?? 0).type) {
+		switch (getEnemyCard(enemyDeck[0]?.cardId ?? 0).type) {
 			case 'L1':
 				topdDeckLevel = 'WAVE 1'
-				break;
+				break
 			case 'L2':
 				topdDeckLevel = 'WAVE 2'
-				break;
+				break
 			case 'L3':
 				topdDeckLevel = 'WAVE 3'
-				break;
+				break
 			case 'Z':
 				topdDeckLevel = 'ZOLTAR'
-				break;
+				break
 			default:
 				topdDeckLevel = 'default'
-				break;
+				break
 		}
 	}
 
@@ -94,12 +94,10 @@ function EnemyDeck(props: {
 		<div
 			className={cn}
 			ref={eDeckRef}
-			{...(onViewEnemyDeck
-				? {role: 'button', onClick: onViewEnemyDeck}
-				: {})}
+			{...(onViewEnemyDeck ? {role: 'button', onClick: onViewEnemyDeck} : {})}
 		>
 			<div>Enemy Deck</div>
-			<WaIcon name='skull' className='text-6xl'/>
+			<WaIcon className='text-6xl' name='skull' />
 			<div>{topdDeckLevel}</div>
 		</div>
 	)
@@ -120,7 +118,7 @@ export function EnemyRow({
 	animatingEnemyShifts = {},
 	animatingEnemyRemove = null,
 	onViewEnemyDeck = undefined,
-	onViewHeroDeck = undefined,
+	onViewHeroDeck = undefined
 }: EnemyRowProps) {
 	// Right-aligned: newest card occupies rightmost slot.
 	// eEnemyRow = [oldest, ..., newest]; slot[offset + i] = eEnemyRow[i]
@@ -186,13 +184,21 @@ export function EnemyRow({
 			})}
 
 			{/* Enemy deck ref node — used by animation system to measure source position */}
-			{enemyDeckCards.length <= 0 ?
+			{enemyDeckCards.length <= 0 ? (
 				<CardSlot />
-			: (
-				<EnemyDeck eDeckRef={eDeckRef} enemyDeck={enemyDeckCards} onViewDeck={onViewEnemyDeck}/>
+			) : (
+				<EnemyDeck
+					eDeckRef={eDeckRef}
+					enemyDeck={enemyDeckCards}
+					onViewDeck={onViewEnemyDeck}
+				/>
 			)}
 
-			<HeroDeck cardsRemaining={heroCardsRemaining} hDeckRef={hDeckRef} onViewHeroDeck={onViewHeroDeck} />
+			<HeroDeck
+				cardsRemaining={heroCardsRemaining}
+				hDeckRef={hDeckRef}
+				onViewHeroDeck={onViewHeroDeck}
+			/>
 		</div>
 	)
 }

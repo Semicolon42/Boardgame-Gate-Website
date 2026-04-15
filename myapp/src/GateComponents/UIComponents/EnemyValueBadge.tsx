@@ -18,31 +18,31 @@ export function EnemyValueBadge(props: {
 	const {value, type} = props
 	const id = useId()
 	let icon: ReactElement | undefined = undefined
-	let tooltipText: string | undefined = "default"
+	let tooltipText: string | undefined = 'default'
 	switch (type) {
 		case 'HEALTH':
 			icon = <WaIcon name='heart' variant='regular' />
-			tooltipText = "Health"
+			tooltipText = 'Health'
 			break
 		case 'FARM':
 			icon = <WaIcon name='house' variant='regular' />
-			tooltipText = "Attacks the Farm"
+			tooltipText = 'Attacks the Farm'
 			break
 		case 'GATE':
 			icon = <WaIcon name='archway' variant='classic' />
-			tooltipText = "Attacks the Gate"
+			tooltipText = 'Attacks the Gate'
 			break
 		case 'TOWER':
 			icon = <WaIcon name='chess-rook' variant='regular' />
-			tooltipText = "Attacks the Tower"
+			tooltipText = 'Attacks the Tower'
 			break
 		case 'FEAR':
 			icon = <WaIcon name='eye' variant='regular' />
-			tooltipText = "Causes Fear"
+			tooltipText = 'Causes Fear'
 			break
 		case 'MULTI_ATTACK':
 			icon = <WaIcon name='chess' variant='classic' />
-			tooltipText = "Attacks all buildings"
+			tooltipText = 'Attacks all buildings'
 			break
 		case 'UNKNOWN':
 			icon = <WaIcon name='question' variant='regular' />
@@ -51,20 +51,17 @@ export function EnemyValueBadge(props: {
 			icon = <WaIcon name='circle-question' variant='regular' />
 	}
 
-	const cn: string = [
-		'outline-2',
-		'outline-transparent bg-transparent'
-	].join(' ')
+	const cn: string = ['outline-2', 'outline-transparent bg-transparent'].join(
+		' '
+	)
 
 	return (
 		<>
-			<div id={id} className={cn}>
+			<div className={cn} id={id}>
 				{icon}
 				{value}
 			</div>
-			{tooltipText && <WaTooltip for={id} >
-				{tooltipText}
-			</WaTooltip>}
+			{tooltipText && <WaTooltip for={id}>{tooltipText}</WaTooltip>}
 		</>
 	)
 }

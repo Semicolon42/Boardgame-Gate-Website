@@ -208,7 +208,7 @@ export function XCard({
 				onAnimationEnd={onAnimationEnd}
 				ref={ref as RefObject<HTMLDivElement>}
 			>
-				<WaIcon name='dungeon' variant='classic' className='text-6xl' />
+				<WaIcon className='text-6xl' name='dungeon' variant='classic' />
 			</div>
 		)
 	}

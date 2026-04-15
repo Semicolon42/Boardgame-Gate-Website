@@ -25,7 +25,7 @@ export function VillageRow({
 	onBuyCard,
 	onAnimationEnd,
 	animatingClearVillagerRow,
-	animatingCard,
+	animatingCard
 }: VillageRowProps) {
 	const SlotCount = 4
 	const slots = Array.from(

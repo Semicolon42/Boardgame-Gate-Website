@@ -4,11 +4,11 @@ import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
+import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import theme from '@/themes'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
-import { WaIcon } from '@awesome.me/webawesome/dist/react'
 
 interface XEnemyCardProps {
 	card: EnemyCardInstance
@@ -145,13 +145,11 @@ export function XEnemyCard({
 				<ScaledName text={enemyInfo.name} />
 				<div className='grid h-[22px] w-[22px] shrink-0 place-items-center'>
 					<WaIcon
+						className='[grid-area:1/1] text-l color'
 						name='star'
 						variant='solid'
-						className='[grid-area:1/1] text-l color'
 					/>
-					<span
-						className='text-stroke-enemy-vp text-sm font-extrabold text-black relative z-[1] [grid-area:1/1] leading-none [paint-order:stroke_fill]'
-					>
+					<span className='text-stroke-enemy-vp text-sm font-extrabold text-black relative z-[1] [grid-area:1/1] leading-none [paint-order:stroke_fill]'>
 						{enemyInfo.vp}
 					</span>
 				</div>
