@@ -2,7 +2,7 @@ import type {BuildingType} from '../Boards/gameStateReducer'
 
 export type EnemyCardType = 'DEBUG' | 'L1' | 'L2' | 'L3' | 'Z'
 
-export function GetRange(type: EnemyCardType) {
+export function GetEnemyCardRange(type: EnemyCardType) {
 	return ENEMY_CARD_LIST.filter(c => c.type === type).map(c => c.id)
 }
 
@@ -110,7 +110,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		attack: {
 			tower: 2
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 7,
@@ -136,7 +136,7 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		attack: {
 			farm: 2
 		},
-		fear: 1,
+		fear: 1
 	},
 	{
 		id: 9,
@@ -148,8 +148,8 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		health: 7,
 		attack: {
 			farm: 1,
-			gate: 1, 
-			tower: 1,
+			gate: 1,
+			tower: 1
 		},
 		fear: 1,
 		specialAbility: 'generic'
@@ -163,7 +163,9 @@ export const ENEMY_CARD_LIST: IEnemyCard[] = [
 		stars: 9,
 		health: 11,
 		attack: {
-			all: 2
+			farm: 2,
+			gate: 2,
+			tower: 2
 		},
 		fear: 2
 	}

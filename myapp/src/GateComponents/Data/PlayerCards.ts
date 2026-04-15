@@ -1,5 +1,7 @@
 export type CitizenCardType = 'VILLAGER' | 'HERO' | 'STARTER' | 'DEBUG'
 
+export const HERO_PLACEHOLDER_CARD_ID = 99
+
 export function GetRange(type: CitizenCardType) {
 	return CITIZEN_CARD_LIST.filter(c => c.type === type).map(c => c.id)
 }
@@ -23,6 +25,18 @@ export interface IntCitizenCard {
 }
 
 export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
+	{
+		id: HERO_PLACEHOLDER_CARD_ID,
+		name: 'Hero',
+		image: 'hero_placeholder',
+		type: 'HERO',
+
+		cost: -1,
+		actionCoins: -1,
+		actionRepair: -1,
+		actionCalm: -1,
+		actionAttack: -1
+	},
 	{
 		id: 0,
 		name: 'Generic',

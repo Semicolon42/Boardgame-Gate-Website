@@ -22,6 +22,11 @@ export interface FloatingTextSpec {
 	y: number
 }
 
+export interface HeroCardToDiscardSpec {
+	from: {x: number; y: number}
+	to: {x: number; y: number}
+}
+
 // ---------------------------------------------------------------------------
 // SubActionType — discriminated union
 // Each variant carries exactly the fields it needs, mirroring GameAction.
@@ -36,12 +41,15 @@ export type SubActionType =
 			cardPlayType: CardPlayType
 	  }
 	| {type: 'PLAYER_DRAW_CARD'; card: CardInstance}
+	| {type: 'PLAYER_DRAW_HERO_CARD'; placeholderCard: CardInstance}
+	| {type: 'HERO_DECK_DRAW_TO_DISCARD'}
 	| {type: 'PLAYER_DISCARD_SINGLE_CARD'; card: CardInstance}
 	| {type: 'PLAYER_SHUFFLE_DISCARD_INTO_DECK'}
 	| {type: 'PLAYER_SHUFFLE_SHUFFLE_DECK'}
 	| {type: 'ENQ_DISCARD_HAND'}
 	| {type: 'ENQ_GAME_END_TURN'}
 	| {type: 'ENQ_GAME_START'}
+	| {type: 'ENQ_GAME_SETUP_NORMAL'}
 	| {type: 'ENQ_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
@@ -57,7 +65,9 @@ export type SubActionType =
 	| {type: 'ENEMY_ATTACK_BASE'; building: BuildingType; damage: number}
 	| {type: 'ENQ_PLAYER_REPAIR_BUILDING'; building: BuildingType; amount: number}
 	| {type: 'ENQ_ATTACK_ENEMY'; enemy: EnemyCardInstance; damage: number}
+	| {type: 'ENQ_ADD_FEAR'}
 	| {type: 'ENQ_ENEMY_TURN'}
+	| {type: 'ENQ_ENEMY_SINGLE_ATTACK'; enemyCard: EnemyCardInstance}
 	| {type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'}
 	| {type: 'ENEMY_ROW_REMOVE_OLDEST'}
 	| {
@@ -103,9 +113,11 @@ export interface SubActionContext {
 	setAnimatingEnemyRemove: (v: string | null) => void
 	pendingOnCompleteRef: MutableRefObject<(() => void) | null>
 	setAnimatingFloatingText: (v: FloatingTextSpec | null) => void
+	setAnimatingHeroToDiscard: (v: HeroCardToDiscardSpec | null) => void
 	// DOM snapshot positions (captured before dispatch):
 	deckPos: DOMRect | undefined
 	discardPos: DOMRect | undefined
+	hDeckPos: DOMRect | undefined
 	villagerDeckPos: DOMRect | undefined
 	eDeckPos: DOMRect | undefined
 	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>

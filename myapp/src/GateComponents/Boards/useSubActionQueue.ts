@@ -20,6 +20,7 @@ import type {
 	AtomicHandler,
 	Expander,
 	FloatingTextSpec,
+	HeroCardToDiscardSpec,
 	SubActionContext,
 	SubActionType
 } from './subactions/types'
@@ -31,6 +32,7 @@ export type {
 	AnimatingVillagerRowSpec,
 	EnqueueFn,
 	FloatingTextSpec,
+	HeroCardToDiscardSpec,
 	SubActionType
 } from './subactions/types'
 
@@ -61,6 +63,7 @@ export function useSubActionQueue(
 	dispatch: Dispatch<GameAction>,
 	deckRef: RefObject<HTMLDivElement | null>,
 	discardRef: RefObject<HTMLDivElement | null>,
+	hDeckRef: RefObject<HTMLDivElement | null>,
 	villagerDeckRef: RefObject<HTMLDivElement | null>,
 	eDeckRef: RefObject<HTMLDivElement | null>,
 	enemySlotsRef: RefObject<(HTMLDivElement | null)[]>,
@@ -69,7 +72,7 @@ export function useSubActionQueue(
 	towerRef: RefObject<HTMLDivElement | null>,
 	fearamidRef: RefObject<HTMLDivElement | null>,
 ) {
-	const [queue, setQueue] = useState<SubActionType[]>([{type: 'ENQ_GAME_START'}])
+	const [queue, setQueue] = useState<SubActionType[]>([{type:'ENQ_GAME_SETUP_NORMAL'},{type: 'ENQ_GAME_START'}])
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [animatingCard, setAnimatingCard] = useState<AnimatingCardSpec | null>(null)
 	const [animatingClearVillagerRow, setAnimatingClearVillagerRow] =
@@ -79,6 +82,7 @@ export function useSubActionQueue(
 	>({})
 	const [animatingEnemyRemove, setAnimatingEnemyRemove] = useState<string | null>(null)
 	const [animatingFloatingText, setAnimatingFloatingText] = useState<FloatingTextSpec | null>(null)
+	const [animatingHeroToDiscard, setAnimatingHeroToDiscard] = useState<HeroCardToDiscardSpec | null>(null)
 
 	// Track latest state in a ref to avoid stale closures inside the effect
 	// without making `state` a dependency (which would re-run the effect on
@@ -102,6 +106,7 @@ export function useSubActionQueue(
 		setAnimatingEnemyShifts({})
 		setAnimatingEnemyRemove(null)
 		setAnimatingFloatingText(null)
+		setAnimatingHeroToDiscard(null)
 		setIsAnimating(false)
 		setQueue(q => q.slice(1))
 	}, [])
@@ -132,8 +137,10 @@ export function useSubActionQueue(
 			setAnimatingEnemyRemove,
 			pendingOnCompleteRef,
 			setAnimatingFloatingText,
+			setAnimatingHeroToDiscard,
 			deckPos: deckRef.current?.getBoundingClientRect(),
 			discardPos: discardRef.current?.getBoundingClientRect(),
+			hDeckPos: hDeckRef.current?.getBoundingClientRect(),
 			villagerDeckPos: villagerDeckRef.current?.getBoundingClientRect(),
 			eDeckPos: eDeckRef.current?.getBoundingClientRect(),
 			enemySlotsRef,
@@ -149,7 +156,7 @@ export function useSubActionQueue(
 		} else {
 			setQueue(q => q.slice(1))
 		}
-	}, [queue, isAnimating, dispatch, deckRef, discardRef, villagerDeckRef, eDeckRef, enemySlotsRef])
+	}, [queue, isAnimating, dispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
 
 	const enqueue = useCallback((actions: SubActionType[]) => {
 		setQueue(q => [...q, ...actions])
@@ -165,6 +172,7 @@ export function useSubActionQueue(
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
 		animatingEnemyRemove,
-		animatingFloatingText
+		animatingFloatingText,
+		animatingHeroToDiscard
 	}
 }

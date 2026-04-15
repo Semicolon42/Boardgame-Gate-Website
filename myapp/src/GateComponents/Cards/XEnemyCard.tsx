@@ -1,10 +1,11 @@
-import type {RefObject} from 'react'
+import type {ReactElement, RefObject} from 'react'
 import {useLayoutEffect, useRef} from 'react'
 import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
 import '@/GateComponents/Cards/XEnemyCard.css'
-import {getEnemyCard} from '../Data/EnemyCardsData'
+import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
+import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
 
 interface XEnemyCardProps {
@@ -17,6 +18,29 @@ interface XEnemyCardProps {
 	onAttack?: ((enemy: EnemyCardInstance, amount: number) => void) | undefined
 	/** CSS class injected by parent — used for grid-area stacking. */
 	className?: string
+}
+
+function EnemyAttackValue(props: {enemyCard: IEnemyCard}) {
+	const {enemyCard} = props
+	const attackEntries = (['farm', 'gate', 'tower'] as const)
+		.map(b => ({building: b, value: enemyCard.attack[b] ?? 0}))
+		.filter(e => e.value > 0)
+	const firstAttack = attackEntries[0]
+	const typeMap = {farm: 'FARM', gate: 'GATE', tower: 'TOWER'} as const
+	let divEnemyAttack: ReactElement | undefined
+	if (attackEntries.length > 1 && firstAttack) {
+		divEnemyAttack = (
+			<EnemyValueBadge type='MULTI_ATTACK' value={`${firstAttack.value}`} />
+		)
+	} else if (firstAttack) {
+		divEnemyAttack = (
+			<EnemyValueBadge
+				type={typeMap[firstAttack.building]}
+				value={`${firstAttack.value}`}
+			/>
+		)
+	}
+	return divEnemyAttack
 }
 
 export function XEnemyCard({
@@ -72,8 +96,13 @@ export function XEnemyCard({
 				</div>
 			</div>
 			<div>
-				<div className='text-xs'>Type: {card.cardId}</div>
-				<div className='text-xs'>HP: {card.health}</div>
+				<div className='flex flex-col w-[40px]'>
+					<EnemyValueBadge type='HEALTH' value={`${card.health}`} />
+					<EnemyAttackValue enemyCard={enemyInfo} />
+					{enemyInfo.fear && (
+						<EnemyValueBadge type='FEAR' value={`${enemyInfo.fear}`} />
+					)}
+				</div>
 			</div>
 		</div>
 	)

@@ -15,15 +15,25 @@ interface EnemyRowProps {
 	animatingCard?: AnimatingCardSpec | null
 	onAnimationEnd?: () => void
 	eDeckRef?: RefObject<HTMLDivElement | null>
+	hDeckRef?: RefObject<HTMLDivElement | null>
 	enemySlotsRef?: RefObject<(HTMLDivElement | null)[]>
 	animatingEnemyShifts?: Record<string, {x: number; y: number}>
 	animatingEnemyRemove?: string | null
 }
 
-export function HeroDeck(props: {cardsRemaining: number}) {
-	const {cardsRemaining} = props
+export function HeroDeck(props: {
+	cardsRemaining: number
+	hDeckRef?: RefObject<HTMLDivElement | null> | undefined
+}) {
+	const {cardsRemaining, hDeckRef} = props
+	if (cardsRemaining === 0) {
+		return <CardSlot />
+	}
 	return (
-		<div className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color)'>
+		<div
+			className='h-[140px] w-[100px] rounded-xl bg-(--color-card-back) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) text-(--color-card-text)'
+			ref={hDeckRef}
+		>
 			<div>Hero Deck</div>
 			<div>{cardsRemaining}</div>
 		</div>
@@ -40,6 +50,7 @@ export function EnemyRow({
 	animatingCard,
 	onAnimationEnd,
 	eDeckRef,
+	hDeckRef,
 	enemySlotsRef,
 	animatingEnemyShifts = {},
 	animatingEnemyRemove = null
@@ -122,7 +133,7 @@ export function EnemyRow({
 				<div>{topdDeckLevel}</div>
 			</div>
 
-			<HeroDeck cardsRemaining={heroCardsRemaining} />
+			<HeroDeck cardsRemaining={heroCardsRemaining} hDeckRef={hDeckRef} />
 		</div>
 	)
 }

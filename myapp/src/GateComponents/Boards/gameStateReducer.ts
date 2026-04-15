@@ -8,7 +8,6 @@
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {GetRange} from '../Data/PlayerCards'
-import type {SubActionType} from './useSubActionQueue'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -47,6 +46,14 @@ export function makeEnemyCardInstances(
 	})
 }
 
+export type FearAction =
+	| 'DRAW_HERO'
+	| 'DAMAGE_FARM'
+	| 'DAMAGE_GATE'
+	| 'DAMAGE_TOWER'
+	| 'NONE'
+	| 'GAMEOVER'
+
 // ---------------------------------------------------------------------------
 // State & action types
 // ---------------------------------------------------------------------------
@@ -64,7 +71,7 @@ export interface GameState {
 	bTowerHealthMAX: number
 	fFear: number
 	fFearMax: number
-	fFearamid: SubActionType[]
+	fFearamid: FearAction[]
 
 	// Player card state
 	pDeck: CardInstance[]
@@ -72,6 +79,7 @@ export interface GameState {
 	pPlayed: {[key: string]: CardPlayType | undefined}
 	pDiscard: CardInstance[]
 	hDeck: CardInstance[]
+	hDeckRemaining: number
 
 	// Enemy cards state
 	eEnemyDeck: EnemyCardInstance[]
@@ -106,6 +114,7 @@ export type StackType =
 	| 'HAND'
 	| 'DECK'
 	| 'DISCARD'
+	| 'HERO_DECK'
 	| 'VILLAGER_DECK'
 	| 'VILLAGER_ROW'
 	| 'VILLAGER_DISCARD'
@@ -154,6 +163,7 @@ export type GameAction =
 	| {type: 'UPDATE_GAME_OUTCOME'; outcome: GameOutcomeType}
 	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
 	| {type: 'TURN_START_RESET'}
+	| {type: 'SET_GAME_STATE'; nextState: GameState}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -163,6 +173,7 @@ export type StackKey =
 	| 'pHand'
 	| 'pDeck'
 	| 'pDiscard'
+	| 'hDeck'
 	| 'vDeck'
 	| 'vRow'
 	| 'vDiscard'
@@ -175,6 +186,8 @@ export function stackKey(stack: StackType): StackKey {
 			return 'pDeck'
 		case 'DISCARD':
 			return 'pDiscard'
+		case 'HERO_DECK':
+			return 'hDeck'
 		case 'VILLAGER_DECK':
 			return 'vDeck'
 		case 'VILLAGER_ROW':
@@ -218,6 +231,9 @@ export function gameStateReducer(
 			return {
 				...state,
 				[key]: [...state[key], ...action.cards],
+				...(action.stack === 'HERO_DECK'
+					? {hDeckRemaining: state.hDeckRemaining + action.cards.length}
+					: {}),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -230,6 +246,9 @@ export function gameStateReducer(
 				[key]: state[key].filter(
 					(c: CardInstance) => !toRemove.has(c.instanceId)
 				),
+				...(action.stack === 'HERO_DECK'
+					? {hDeckRemaining: state.hDeckRemaining - action.instanceIds.length}
+					: {}),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -257,32 +276,40 @@ export function gameStateReducer(
 		}
 
 		case 'BUILDING_CHANGE_HEALTH': {
-			// Fixed: was mutating state directly — now immutable
 			switch (action.building) {
 				case 'farm':
 					return {
 						...state,
-						bFarmHealth: Math.min(
-							state.bFarmHealth + action.healthChange,
-							state.bFarmHealthMAX
+						bFarmHealth: Math.max(
+							0,
+							Math.min(
+								state.bFarmHealth + action.healthChange,
+								state.bFarmHealthMAX
+							)
 						),
 						stateActionLogs: newActionLog
 					}
 				case 'gate':
 					return {
 						...state,
-						bGateHealth: Math.min(
-							state.bGateHealth + action.healthChange,
-							state.bFarmHealthMAX
+						bGateHealth: Math.max(
+							0,
+							Math.min(
+								state.bGateHealth + action.healthChange,
+								state.bGateHealthMAX
+							)
 						),
 						stateActionLogs: newActionLog
 					}
 				case 'tower':
 					return {
 						...state,
-						bTowerHealth: Math.min(
-							state.bTowerHealth + action.healthChange,
-							state.bFarmHealthMAX
+						bTowerHealth: Math.max(
+							0,
+							Math.min(
+								state.bTowerHealth + action.healthChange,
+								state.bTowerHealthMAX
+							)
 						),
 						stateActionLogs: newActionLog
 					}
@@ -416,6 +443,14 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'SET_GAME_STATE': {
+			return {
+				...state,
+				...action.nextState,
+				stateActionLogs: newActionLog
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -430,6 +465,9 @@ export function gameStateReducer(
 
 export const HAND_SIZE = 3
 
+const heroDeck = makeCardInstances(
+	GetRange('HERO').sort(() => 0.5 - Math.random())
+)
 export const initialState: GameState = {
 	bFarmHealth: 6,
 	bTowerHealth: 6,
@@ -438,11 +476,18 @@ export const initialState: GameState = {
 	bTowerHealthMAX: 6,
 	bGateHealthMAX: 12,
 	fFear: 0,
-	fFearMax: 10,
+	fFearMax: 9,
 	fFearamid: [
-		{type: 'DEBUG_ALERT', message: 'Fear 1'},
-		{type: 'DEBUG_ALERT', message: 'Fear 1'},
-		{type: 'DEBUG_ALERT', message: 'Fear 1'}
+		'NONE',
+		'DRAW_HERO',
+		'DAMAGE_FARM',
+		'DRAW_HERO',
+		'DAMAGE_TOWER',
+		'DRAW_HERO',
+		'NONE',
+		'DAMAGE_GATE',
+		'DAMAGE_GATE',
+		'GAMEOVER'
 	],
 
 	gameOutcome: undefined,
@@ -451,7 +496,8 @@ export const initialState: GameState = {
 	pHand: [],
 	pPlayed: {},
 	pDiscard: [],
-	hDeck: makeCardInstances(GetRange('HERO').sort(() => 0.5 - Math.random())),
+	hDeck: heroDeck,
+	hDeckRemaining: heroDeck.length,
 	vDeck: makeCardInstances(
 		GetRange('VILLAGER').sort(() => 0.5 - Math.random())
 	),

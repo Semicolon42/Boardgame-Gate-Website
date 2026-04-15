@@ -1,4 +1,7 @@
-import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
+import {
+	getCitizenCard,
+	HERO_PLACEHOLDER_CARD_ID
+} from '@/GateComponents/Data/PlayerCards'
 import type {GameAction, GameState} from '../gameStateReducer'
 import type {
 	AtomicHandler,
@@ -78,6 +81,9 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		}
 		const card = state.pDeck[0]
 		if (card === undefined) return []
+		if (card.cardId === HERO_PLACEHOLDER_CARD_ID) {
+			return [{type: 'PLAYER_DRAW_HERO_CARD', placeholderCard: card}]
+		}
 		return [{type: 'PLAYER_DRAW_CARD', card}]
 	},
 
@@ -181,6 +187,74 @@ export const atomicHandlers: Partial<
 		ctx.setAnimatingCard({
 			type: 'PLAYER',
 			instanceId: card.instanceId,
+			moveFrom: ctx.deckPos
+				? {x: ctx.deckPos.left, y: ctx.deckPos.top}
+				: undefined
+		})
+	},
+
+	HERO_DECK_DRAW_TO_DISCARD: (_action, ctx) => {
+		const placeholderHeroCard = {
+			instanceId: crypto.randomUUID(),
+			cardId: HERO_PLACEHOLDER_CARD_ID
+		}
+		ctx.dispatch({
+			type: 'STACK_ADD_CARDS',
+			stack: 'DISCARD',
+			cards: [placeholderHeroCard]
+		})
+		if (!ctx.hDeckPos || !ctx.discardPos) {
+			ctx.setQueue(q => q.slice(1))
+			return
+		}
+		ctx.setAnimatingHeroToDiscard({
+			from: {x: ctx.hDeckPos.left, y: ctx.hDeckPos.top},
+			to: {x: ctx.discardPos.left, y: ctx.discardPos.top}
+		})
+		ctx.setIsAnimating(true)
+	},
+
+	PLAYER_DRAW_HERO_CARD: (action, ctx) => {
+		const {placeholderCard} = action as Extract<
+			SubActionType,
+			{type: 'PLAYER_DRAW_HERO_CARD'}
+		>
+		const hDeck = ctx.currentState.hDeck
+		if (hDeck.length === 0) {
+			ctx.dispatch({
+				type: 'STACK_REMOVE_CARDS',
+				stack: 'DECK',
+				instanceIds: [placeholderCard.instanceId]
+			})
+			ctx.setQueue(q => [{type: 'ENQ_PLAYER_DRAW_SINGLE_CARD'}, ...q.slice(1)])
+			return
+		}
+		const randomIdx = Math.floor(Math.random() * hDeck.length)
+		const heroCard = hDeck[randomIdx]
+		if (heroCard === undefined) {
+			ctx.setQueue(q => q.slice(1))
+			return
+		}
+		ctx.dispatch({
+			type: 'MULTI_ACTION',
+			actions: [
+				{
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'DECK',
+					instanceIds: [placeholderCard.instanceId]
+				},
+				{
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'HERO_DECK',
+					instanceIds: [heroCard.instanceId]
+				},
+				{type: 'STACK_ADD_CARDS', stack: 'HAND', cards: [heroCard]}
+			]
+		})
+		ctx.setIsAnimating(true)
+		ctx.setAnimatingCard({
+			type: 'PLAYER',
+			instanceId: heroCard.instanceId,
 			moveFrom: ctx.deckPos
 				? {x: ctx.deckPos.left, y: ctx.deckPos.top}
 				: undefined

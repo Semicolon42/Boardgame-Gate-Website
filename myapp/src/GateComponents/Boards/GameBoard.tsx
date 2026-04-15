@@ -1,5 +1,6 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
 import {FloatingText} from '../Cards/FloatingText'
+import {HeroCardToDiscard} from '../Cards/HeroCardToDiscard'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
@@ -27,6 +28,8 @@ export function GameBoard() {
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		animatingFloatingText,
+		animatingHeroToDiscard,
+		hDeckRef,
 		gameBuyCard,
 		gameAttackEnemy,
 		gameRepairBase,
@@ -96,9 +99,11 @@ export function GameBoard() {
 							type='ATTACK'
 							value={`T ${gameState.bTowerBonusDamageCurrent}`}
 							variant={
-								gameState.cAttack > 0 && gameState.bTowerBonusDamageCurrent > 0
-									? 'success'
-									: 'neutral'
+								gameState.bTowerBonusDamageCurrent <= 0
+									? 'none'
+									: gameState.cAttack > 0
+										? 'success'
+										: 'brand'
 							}
 						/>
 					</div>
@@ -111,7 +116,8 @@ export function GameBoard() {
 						enemyDeckCards={gameState.eEnemyDeck}
 						enemyRowMax={gameState.eEnemyRowMax}
 						enemySlotsRef={enemySlotsRef}
-						heroCardsRemaining={gameState.hDeck.length}
+						hDeckRef={hDeckRef}
+						heroCardsRemaining={gameState.hDeckRemaining}
 						isAttackable={gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
@@ -127,9 +133,11 @@ export function GameBoard() {
 							type='COINS'
 							value={`F ${gameState.bFarmBonusRecruitCurrent}`}
 							variant={
-								gameState.cCoins > 0 && gameState.bFarmBonusRecruitCurrent > 0
-									? 'success'
-									: 'neutral'
+								gameState.bFarmBonusRecruitCurrent <= 0
+									? 'none'
+									: gameState.cCoins > 0
+										? 'success'
+										: 'brand'
 							}
 						/>
 					</div>
@@ -180,6 +188,7 @@ export function GameBoard() {
 						canRepair={gameState.cRepair > 0}
 						farmHealth={gameState.bFarmHealth}
 						farmRef={farmRef}
+						fear={gameState.fFear}
 						fearamidRef={fearamidRef}
 						gateHealth={gameState.bGateHealth}
 						gateRef={gateRef}
@@ -277,6 +286,12 @@ export function GameBoard() {
 				<FloatingText
 					onAnimationEnd={signalAnimationComplete}
 					spec={animatingFloatingText}
+				/>
+			)}
+			{animatingHeroToDiscard && (
+				<HeroCardToDiscard
+					onAnimationEnd={signalAnimationComplete}
+					spec={animatingHeroToDiscard}
 				/>
 			)}
 		</div>

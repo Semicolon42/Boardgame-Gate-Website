@@ -22,6 +22,7 @@ export function useGameActions() {
 
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
+	const hDeckRef = useRef<HTMLDivElement>(null)
 	const villageDeckRef = useRef<HTMLDivElement>(null)
 	const eDeckRef = useRef<HTMLDivElement>(null)
 	const enemySlotsRef = useRef<(HTMLDivElement | null)[]>([])
@@ -39,12 +40,14 @@ export function useGameActions() {
 		animatingClearVillagerRow,
 		animatingEnemyShifts,
 		animatingEnemyRemove,
-		animatingFloatingText
+		animatingFloatingText,
+		animatingHeroToDiscard
 	} = useSubActionQueue(
 		state,
 		dispatch,
 		deckRef,
 		discardRef,
+		hDeckRef,
 		villageDeckRef,
 		eDeckRef,
 		enemySlotsRef,
@@ -71,6 +74,8 @@ export function useGameActions() {
 		animatingEnemyShifts,
 		animatingEnemyRemove,
 		animatingFloatingText,
+		animatingHeroToDiscard,
+		hDeckRef,
 		signalAnimationComplete,
 		queue,
 		...makePlayerActions(enqueue, dispatch),

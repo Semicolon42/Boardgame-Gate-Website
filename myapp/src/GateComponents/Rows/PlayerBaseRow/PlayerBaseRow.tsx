@@ -74,6 +74,7 @@ interface PlayerBaseRowProps {
 	farmHealth: number
 	gateHealth: number
 	towerHealth: number
+	fear: number
 }
 
 export function PlayerBaseRow({
@@ -87,7 +88,8 @@ export function PlayerBaseRow({
 	onCalm,
 	farmHealth,
 	gateHealth,
-	towerHealth
+	towerHealth,
+	fear
 }: PlayerBaseRowProps) {
 	return (
 		<div className='flex space-x-3 p-[2px]'>
@@ -124,7 +126,7 @@ export function PlayerBaseRow({
 			<Fearamid
 				canCalm={canCalm}
 				divRef={fearamidRef}
-				fear={0}
+				fear={fear}
 				onCalm={() => {
 					onCalm()
 				}}
