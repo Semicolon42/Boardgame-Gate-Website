@@ -245,20 +245,24 @@ export function GameBoard() {
 					<PlayerBaseRow
 						canCalm={!isProcessing && gameState.cCalm > 0}
 						canRepair={!isProcessing && gameState.cRepair > 0}
-						farmHealth={gameState.bFarmHealth}
-						farmRef={farmRef}
+						healthFarm={gameState.bFarmHealth}
+						healthMaxFarm={gameState.bFarmHealthMAX}
+						healthGate={gameState.bGateHealth}
+						healthGateMax={gameState.bGateHealthMAX}
+						healthTower={gameState.bTowerHealth}
+						healthTowerMax={gameState.bTowerHealthMAX}
 						fear={gameState.fFear}
-						fearamidRef={fearamidRef}
-						gateHealth={gameState.bGateHealth}
+					fearamid={gameState.fFearamid}
+						farmRef={farmRef}
 						gateRef={gateRef}
+						towerRef={towerRef}
+						fearamidRef={fearamidRef}
 						onCalm={() => {
 							gameCalmFear(1)
 						}}
 						onRepair={(building: BuildingType) => {
 							gameRepairBase(building, 1)
 						}}
-						towerHealth={gameState.bTowerHealth}
-						towerRef={towerRef}
 					/>
 					{/* Fourth Row Player Hand */}
 					<div className={statusBarClass}>

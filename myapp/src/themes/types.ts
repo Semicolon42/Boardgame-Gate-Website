@@ -22,6 +22,13 @@ export interface GateTheme {
 		textDamage: string
 		textHealing: string
 	}
+	fearamid: {
+		highlightColor: string
+	}
+	vp: {
+		strokeWidthPx: number
+		strokeColor: string
+	}
 	cardAnimation: {
 		drawDurationMs: number
 		drawEasing: string

@@ -24,6 +24,13 @@ const theme: GateTheme = {
 		textDamage: 'rgb(255, 46, 46)',
 		textHealing: 'rgb(106, 221, 106)'
 	},
+	fearamid: {
+		highlightColor: 'rgba(250, 204, 21, 0.7)'
+	},
+	vp: {
+		strokeColor: 'white',
+		strokeWidthPx: 3
+	},
 	cardAnimation: {
 		drawDurationMs: 80,
 		drawEasing: 'ease-out',

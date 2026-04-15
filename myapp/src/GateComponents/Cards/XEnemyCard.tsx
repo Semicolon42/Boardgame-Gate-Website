@@ -145,7 +145,7 @@ export function XEnemyCard({
 				<ScaledName text={enemyInfo.name} />
 				<div className='grid h-[22px] w-[22px] shrink-0 place-items-center'>
 					<WaIcon
-						className='[grid-area:1/1] text-l color'
+						className='[grid-area:1/1] text-lg color'
 						name='star'
 						variant='solid'
 					/>
