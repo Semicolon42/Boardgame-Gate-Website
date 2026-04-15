@@ -34,7 +34,7 @@ export function VillageRow({
 		<div className='flex space-x-3 p-[2px]'>
 			{slots.map((card, slotIndex) => {
 				if (card === null) {
-					// biome-ignore lint/suspicious/noArrayIndexKey: this is a generic element where he index key is fine to use
+					// biome-ignore lint/suspicious/noArrayIndexKey: this is a generic element where he index key is fine to
 					return <CardSlot key={`slot-${slotIndex}`} />
 				}
 				const cardInfo = getCitizenCard(card.cardId)

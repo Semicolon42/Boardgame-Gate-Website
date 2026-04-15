@@ -139,8 +139,8 @@ export function XEnemyCard({
 	].join(' ')
 
 	const inner = (
-		<div>
-			<div className='flex items-center gap-[4px] px-[5px] w-full'>
+		<div className='w-full'>
+			<div className='flex items-center gap-[4px] px-[5px]'>
 				<ScaledName text={enemyInfo.name} />
 				<div className='flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs text-black'>
 					{enemyInfo.stars}
