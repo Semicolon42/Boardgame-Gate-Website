@@ -136,8 +136,9 @@ export function XEnemyCard({
 			: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
 
 	const containerClass = [
-		'flex h-[140px] w-[100px] shrink-0 flex-col items-start justify-start rounded-xl p-[5px] text-white text-left XENEMYCARD outline-4',
-		'bg-(--color-enemy-card-face)',
+		'flex flex-col h-[140px] w-[100px]',
+		'shrink-0 items-start justify-start rounded-xl p-[5px] text-white text-left',
+		'bg-(--color-enemy-card-face) outline-4',
 		isDiscarded ? 'card-fade-out-animate' : '',
 		outlineClass,
 		className

@@ -169,13 +169,13 @@ export function EnemyRow({
 							if (enemySlotsRef) enemySlotsRef.current[slotIndex] = el
 						}}
 					>
-						<div style={{gridArea: '1/1'}}>
+						<div className='[grid-area:1/1]'>
 							<CardSlot />
 						</div>
 						{card !== null && (
 							<XEnemyCard
 								card={card}
-								className='[grid-area:1/1]'
+								className='z-[1] [grid-area:1/1]'
 								isDiscarded={isDiscarded}
 								key={card.instanceId}
 								{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}

@@ -228,7 +228,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				text: '+1',
 				color: 'var(--color-text-damage)',
 				target: {kind: 'FEARAMID'},
-				attackSource
+				attackSource: attackSource
 			}
 		]
 		const fearAction = state.fFearamid[newFear]
