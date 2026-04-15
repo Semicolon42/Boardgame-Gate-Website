@@ -4,6 +4,7 @@ import type {
 	AnimatingVillagerRowSpec
 } from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Cards/CardSlot'
+import type {XCardAnimSpec} from '@/GateComponents/Cards/XCard'
 import {XCard} from '@/GateComponents/Cards/XCard'
 import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 
@@ -44,11 +45,14 @@ export function VillageRow({
 					animatingCard.instanceId === card.instanceId
 						? animatingCard
 						: null
-				let moveToAnim = rowAnimSpec?.moveTo ?? undefined
-				if (moveToAnim === undefined) {
-					moveToAnim = cardAnimSpec?.moveTo
+				const moveToPos = rowAnimSpec?.moveTo ?? cardAnimSpec?.moveTo
+				const moveFromPos = cardAnimSpec?.moveFrom ?? undefined
+				let animSpec: XCardAnimSpec | undefined
+				if (moveFromPos) {
+					animSpec = {type: 'FROM', pos: moveFromPos}
+				} else if (moveToPos) {
+					animSpec = {type: 'TO', pos: moveToPos}
 				}
-				const moveFromAnim = cardAnimSpec?.moveFrom ?? undefined
 				// For the row-clear animation, only the first card fires onAnimationEnd
 				// to avoid signalling completion once per card (which drops draw actions).
 				const isSignalCard = !rowAnimSpec?.moveTo || slotIndex === 0
@@ -58,8 +62,7 @@ export function VillageRow({
 						disabled={!buyable}
 						key={card.instanceId}
 						{...(buyable && onBuyCard ? {onBuyCard} : {})}
-						{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
-						{...(moveToAnim ? {moveTo: moveToAnim} : {})}
+						{...(animSpec !== undefined ? {animSpec} : {})}
 						{...(isSignalCard && onAnimationEnd !== undefined
 							? {onAnimationEnd}
 							: {})}

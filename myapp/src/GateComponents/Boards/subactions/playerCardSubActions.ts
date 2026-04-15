@@ -266,6 +266,25 @@ export const atomicHandlers: Partial<
 			SubActionType,
 			{type: 'PLAYER_DISCARD_SINGLE_CARD'}
 		>
+		const wasPlayed = !!ctx.currentState.pPlayed[card.instanceId]
+		const cardInfo = getCitizenCard(card.cardId)
+		if (wasPlayed && cardInfo.type === 'HERO') {
+			// Played hero cards are removed from the game — fall-away animation, no discard pile.
+			ctx.pendingOnCompleteRef.current = () => {
+				ctx.dispatch({
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'HAND',
+					instanceIds: [card.instanceId]
+				})
+			}
+			ctx.setIsAnimating(true)
+			ctx.setAnimatingCard({
+				type: 'PLAYER',
+				instanceId: card.instanceId,
+				fallAway: true
+			})
+			return
+		}
 		ctx.pendingOnCompleteRef.current = () => {
 			ctx.dispatch({
 				type: 'MULTI_ACTION',
