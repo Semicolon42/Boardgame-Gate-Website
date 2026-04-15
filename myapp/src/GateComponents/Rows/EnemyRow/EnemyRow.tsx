@@ -34,12 +34,9 @@ export function HeroDeck(props: {
 		'rounded-xl bg-(--color-card-back) text-(--color-card-text)',
 		'outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) '
 	].join(' ')
-	
+
 	return (
-		<div
-			className={cn}
-			ref={hDeckRef}
-		>
+		<div className={cn} ref={hDeckRef}>
 			<div>Hero Deck</div>
 			<div>{cardsRemaining}</div>
 		</div>
@@ -76,7 +73,7 @@ export function EnemyRow({
 	return (
 		<div className='flex space-x-3 p-[2px]'>
 			{slots.map((card, slotIndex) => {
-				const isFadingOut =
+				const isDiscarded =
 					card !== null && animatingEnemyRemove === card.instanceId
 				const isEntering =
 					card !== null &&
@@ -87,7 +84,7 @@ export function EnemyRow({
 
 				// Only the fading-out or entering card fires onAnimationEnd — never shift cards.
 				const cardOnAnimEnd =
-					isFadingOut || isEntering ? onAnimationEnd : undefined
+					isDiscarded || isEntering ? onAnimationEnd : undefined
 
 				let moveFromAnim: {x: number; y: number} | undefined
 				if (isEntering) {
@@ -115,7 +112,7 @@ export function EnemyRow({
 							<XEnemyCard
 								card={card}
 								className='[grid-area:1/1]'
-								isFadingOut={isFadingOut}
+								isDiscarded={isDiscarded}
 								key={card.instanceId}
 								{...(moveFromAnim ? {moveFrom: moveFromAnim} : {})}
 								{...(cardOnAnimEnd !== undefined

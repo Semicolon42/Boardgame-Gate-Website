@@ -27,8 +27,15 @@ export interface GateTheme {
 		drawEasing: string
 		discardDurationMs: number
 		discardEasing: string
-		fadeOutDurationMs: number
-		fadeOutEasing: string
+	}
+	enemyDiscard: {
+		durationMs: number
+		speedPxPerMs: number
+		gravityPxPerMs2: number
+		minRotationDeg: number
+		maxRotationDeg: number
+		opacityFadeStartProgress: number
+		keyframeSteps: number
 	}
 	floatingText: {
 		fontSizeRem: number
