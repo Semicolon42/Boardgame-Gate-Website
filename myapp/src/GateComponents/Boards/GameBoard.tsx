@@ -73,6 +73,13 @@ export function GameBoard() {
 			enemyCards: temp
 		})
 	}
+	const onViewHeroDeck = () => {
+		setCardDialog({
+			title: 'Hero Deck',
+			playerCards: gameState.hDeck,
+			enemyCards: []
+		})
+	}
 
 	return (
 		<div className='flex bg-(--color-gameboard-background)'>
@@ -167,10 +174,11 @@ export function GameBoard() {
 						enemySlotsRef={enemySlotsRef}
 						hDeckRef={hDeckRef}
 						heroCardsRemaining={gameState.hDeckRemaining}
-						isAttackable={gameState.cAttack > 0}
+						isAttackable={!isProcessing && gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
 						onAttack={gameAttackEnemy}
 						onViewEnemyDeck={onViewEnemyDeck}
+						onViewHeroDeck={onViewHeroDeck}
 					/>
 					{/* Second Row Village cards to buy */}
 					<div className={statusBarClass}>
@@ -196,6 +204,7 @@ export function GameBoard() {
 						animatingClearVillagerRow={animatingClearVillagerRow}
 						currentCoins={gameState.cCoins + gameState.bFarmBonusRecruitCurrent}
 						onAnimationEnd={signalAnimationComplete}
+						isBuyable={!isProcessing}
 						onBuyCard={gameBuyCard}
 						villageCards={gameState.vRow}
 					/>
@@ -234,8 +243,8 @@ export function GameBoard() {
 						)}
 					</div>
 					<PlayerBaseRow
-						canCalm={gameState.cCalm > 0}
-						canRepair={gameState.cRepair > 0}
+						canCalm={!isProcessing && gameState.cCalm > 0}
+						canRepair={!isProcessing && gameState.cRepair > 0}
 						farmHealth={gameState.bFarmHealth}
 						farmRef={farmRef}
 						fear={gameState.fFear}

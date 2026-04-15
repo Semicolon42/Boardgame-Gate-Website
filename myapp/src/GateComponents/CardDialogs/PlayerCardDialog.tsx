@@ -14,9 +14,9 @@ export function PlayerEnemyCardDialog(props: {
 	return (
 		<WaDialog
 			label={title}
-			lightDismiss={true}
-			onWaAfterHide={onClose}
+			onWaAfterHide={e => { if (e.target === e.currentTarget) onClose() }}
 			open={isOpen}
+			lightDismiss
 		>
 			<div className='grid grid-cols-3 gap-1'>
 				{playerCards.map(card => (

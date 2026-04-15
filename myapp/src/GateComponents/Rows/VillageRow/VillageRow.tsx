@@ -11,6 +11,7 @@ import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
 interface VillageRowProps {
 	currentCoins: number
 	villageCards: CardInstance[]
+	isBuyable: boolean
 	onAnimationEnd?: () => void
 	animatingClearVillagerRow?: AnimatingVillagerRowSpec | null
 	animatingCard?: AnimatingCardSpec | null
@@ -20,10 +21,11 @@ interface VillageRowProps {
 export function VillageRow({
 	currentCoins,
 	villageCards,
+	isBuyable,
+	onBuyCard,
 	onAnimationEnd,
 	animatingClearVillagerRow,
 	animatingCard,
-	onBuyCard
 }: VillageRowProps) {
 	const SlotCount = 4
 	const slots = Array.from(
@@ -39,7 +41,7 @@ export function VillageRow({
 					return <CardSlot key={`slot-${slotIndex}`} />
 				}
 				const cardInfo = getCitizenCard(card.cardId)
-				const buyable: boolean = currentCoins >= cardInfo.cost
+				const buyable: boolean = currentCoins >= cardInfo.cost && isBuyable
 				const cardAnimSpec =
 					animatingCard?.type === 'VILLAGER' &&
 					animatingCard.instanceId === card.instanceId
