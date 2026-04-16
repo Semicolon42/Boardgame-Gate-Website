@@ -1,8 +1,15 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
-import {useEffect, useLayoutEffect, useRef} from 'react'
+import {useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
 import {getCitizenCard} from '../Data/PlayerCards'
+
+// Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
+import '@/GateComponents/Cards/XCard.css'
+import theme from '@/themes'
+import {FitText, ScaledName} from '../UIComponents/misc'
+import {useFallawayAnimation} from './useFallawayAnimation'
+import {useSlideAnimation} from './useSlideAnimation'
 
 function ActionButton({
 	cardClass,
@@ -46,11 +53,6 @@ function ActionButton({
 		</div>
 	)
 }
-
-// Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
-import '@/GateComponents/Cards/XCard.css'
-import theme from '@/themes'
-import {FitText, ScaledName} from '../UIComponents/misc'
 
 export type CardPlayType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
 
@@ -112,81 +114,15 @@ export function XCard({
 	const onAnimationEndRef = useRef(onAnimationEnd)
 	onAnimationEndRef.current = onAnimationEnd
 
-	// useLayoutEffect fires synchronously after the DOM is updated but BEFORE the
-	// browser paints. This is critical for animation setup: we need to measure the
-	// card's position (getBoundingClientRect) and set CSS custom properties before
-	// the frame is painted, so the animation starts from the correct position with
-	// no visible flash or jump.
-	//
-	// FROM (enter): card is at its destination — animate from external position to self.
-	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(delta) → translate(0,0)
-	//
-	// TO (exit): card is at its source — animate from self to external position.
-	//   --slide-x/y = external.pos - self.pos → keyframe goes translate(0,0) → translate(delta)
-	useLayoutEffect(() => {
-		const el = ref.current
-		if (!el) return
-
-		el.classList.remove('card-move-from-animate', 'card-move-to-animate')
-
-		if (animSpec?.type === 'FROM' || animSpec?.type === 'TO') {
-			const rect = el.getBoundingClientRect()
-			el.style.setProperty('--slide-x', `${animSpec.pos.x - rect.left}px`)
-			el.style.setProperty('--slide-y', `${animSpec.pos.y - rect.top}px`)
-			el.classList.add(
-				animSpec.type === 'FROM'
-					? 'card-move-from-animate'
-					: 'card-move-to-animate'
-			)
-		}
-	}, [animSpec])
-
-	useEffect(() => {
-		if (animSpec?.type !== 'FALL_AWAY') return
-		const el = ref.current
-		if (!el) return
-
-		const {
-			durationMs,
-			speedPxPerMs,
-			gravityPxPerMs2,
-			minRotationDeg,
-			maxRotationDeg,
-			opacityFadeStartProgress,
-			keyframeSteps
-		} = theme.enemyDiscard
-		const sign = Math.random() < 0.5 ? 1 : -1
-		const finalRotation =
-			sign *
-			(minRotationDeg + Math.random() * (maxRotationDeg - minRotationDeg))
-		const vy = -speedPxPerMs
-
-		const keyframes = Array.from({length: keyframeSteps + 1}, (_, i) => {
-			const progress = i / keyframeSteps
-			const t = progress * durationMs
-			const y = vy * t + 0.5 * gravityPxPerMs2 * t * t
-			const rotateDeg = progress * finalRotation
-			const opacity =
-				progress < opacityFadeStartProgress
-					? 1
-					: 1 -
-						(progress - opacityFadeStartProgress) /
-							(1 - opacityFadeStartProgress)
-			return {
-				transform: `translate(0px, ${y}px) rotate(${rotateDeg}deg)`,
-				opacity,
-				offset: progress
-			}
-		})
-
-		const anim = el.animate(keyframes, {duration: durationMs, fill: 'forwards'})
-		anim.onfinish = () => {
-			onAnimationEndRef.current?.()
-		}
-		return () => {
-			anim.cancel()
-		}
-	}, [animSpec])
+	const slideSpec =
+		animSpec?.type === 'FROM' || animSpec?.type === 'TO' ? animSpec : undefined
+	useSlideAnimation(ref, slideSpec)
+	useFallawayAnimation(
+		ref,
+		{...theme.enemyDiscard},
+		animSpec?.type === 'FALL_AWAY',
+		onAnimationEndRef
+	)
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {

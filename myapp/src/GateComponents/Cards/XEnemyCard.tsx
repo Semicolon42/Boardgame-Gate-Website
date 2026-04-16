@@ -1,5 +1,5 @@
 import type {ReactElement, RefObject} from 'react'
-import {useEffect, useLayoutEffect, useRef} from 'react'
+import {useRef} from 'react'
 import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
 // Reuse the same animation keyframes as XCard
@@ -9,6 +9,8 @@ import theme from '@/themes'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
 import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
+import {useFallawayAnimation} from './useFallawayAnimation'
+import {useSlideAnimation} from './useSlideAnimation'
 
 interface XEnemyCardProps {
 	card: EnemyCardInstance
@@ -63,71 +65,18 @@ export function XEnemyCard({
 	const onAnimationEndRef = useRef(onAnimationEnd)
 	onAnimationEndRef.current = onAnimationEnd
 
-	useLayoutEffect(() => {
-		const el = ref.current
-		if (!el) return
-
-		el.classList.remove('card-move-from-animate', 'card-move-to-animate')
-
-		const rect = el.getBoundingClientRect()
-
-		if (moveFrom) {
-			el.style.setProperty('--slide-x', `${moveFrom.x - rect.left}px`)
-			el.style.setProperty('--slide-y', `${moveFrom.y - rect.top}px`)
-			el.classList.add('card-move-from-animate')
-		} else if (moveTo) {
-			el.style.setProperty('--slide-x', `${moveTo.x - rect.left}px`)
-			el.style.setProperty('--slide-y', `${moveTo.y - rect.top}px`)
-			el.classList.add('card-move-to-animate')
-		}
-	}, [moveFrom, moveTo])
-
-	useEffect(() => {
-		if (!isDiscarded) return
-		const el = ref.current
-		if (!el) return
-
-		const {
-			durationMs,
-			speedPxPerMs,
-			gravityPxPerMs2,
-			minRotationDeg,
-			maxRotationDeg,
-			opacityFadeStartProgress,
-			keyframeSteps
-		} = theme.enemyDiscard
-		const sign = Math.random() < 0.5 ? 1 : -1
-		const finalRotation =
-			sign *
-			(minRotationDeg + Math.random() * (maxRotationDeg - minRotationDeg))
-		const vy = -speedPxPerMs
-
-		const keyframes = Array.from({length: keyframeSteps + 1}, (_, i) => {
-			const progress = i / keyframeSteps
-			const t = progress * durationMs
-			const y = vy * t + 0.5 * gravityPxPerMs2 * t * t
-			const rotateDeg = progress * finalRotation
-			const opacity =
-				progress < opacityFadeStartProgress
-					? 1
-					: 1 -
-						(progress - opacityFadeStartProgress) /
-							(1 - opacityFadeStartProgress)
-			return {
-				transform: `translate(0px, ${y}px) rotate(${rotateDeg}deg)`,
-				opacity,
-				offset: progress
-			}
-		})
-
-		const anim = el.animate(keyframes, {duration: durationMs, fill: 'forwards'})
-		anim.onfinish = () => {
-			onAnimationEndRef.current?.()
-		}
-		return () => {
-			anim.cancel()
-		}
-	}, [isDiscarded])
+	const slideSpec = moveFrom
+		? {type: 'FROM' as const, pos: moveFrom}
+		: moveTo
+			? {type: 'TO' as const, pos: moveTo}
+			: undefined
+	useSlideAnimation(ref, slideSpec)
+	useFallawayAnimation(
+		ref,
+		{...theme.enemyDiscard},
+		isDiscarded,
+		onAnimationEndRef
+	)
 
 	const outlineClass = isAttackable
 		? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover) cursor-pointer'
