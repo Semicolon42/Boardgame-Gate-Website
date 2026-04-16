@@ -128,9 +128,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		if (targetEnemey === undefined) {
 			return []
 		}
-		const delta = targetEnemey.health - damage
-		const bonusUsed = Math.max(state.bTowerBonusDamageCurrent, delta, 0)
-		const damageUsed = Math.max(damage, targetEnemey.health, 0)
+		const bonusUsed = Math.min(state.bTowerBonusDamageCurrent, targetEnemey.health)
+		const damageUsed = Math.min(damage, targetEnemey.health-bonusUsed)
 		const totalDamage = damageUsed + bonusUsed
 		const actionsDamageEnemy: SubActionType[] = [
 			{
@@ -157,7 +156,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			}
 		]
 
-		if (targetEnemey.health <= damage) {
+		if (targetEnemey.health <= totalDamage) {
 			return [
 				...actionsDamageEnemy,
 				{
