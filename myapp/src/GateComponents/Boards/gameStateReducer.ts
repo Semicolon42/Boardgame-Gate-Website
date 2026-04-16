@@ -58,6 +58,12 @@ export type FearAction =
 // State & action types
 // ---------------------------------------------------------------------------
 
+export interface ActiveEffects {
+	multipleNextPlayedResource?: Partial<{coins?: number, repair?: number, calm?: number, attack?: number}> | undefined
+	mayTrashCardsFromDiscard?: {genericAmount: number, specificCardIds: number[]}
+	mayDrawCards?: number
+}
+
 export interface GameState {
 	gameOutcome: GameOutcomeType | undefined
 	stateActionLogs: GameAction[]
@@ -108,6 +114,8 @@ export interface GameState {
 	bFarmBonusMinHealth: number
 	bFarmBonusRecruit: number
 	bFarmBonusRecruitCurrent: number
+
+	activeEffects: Partial<ActiveEffects>
 }
 
 export type StackType =
@@ -164,6 +172,8 @@ export type GameAction =
 	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
 	| {type: 'TURN_START_RESET'}
 	| {type: 'SET_GAME_STATE'; nextState: GameState}
+	| {type: 'UPDATE_ACTIVE_EFFECTS'; effects: Partial<ActiveEffects>}
+	| {type: 'ADD_ACTIVE_EFFECTS'; effects: Partial<ActiveEffects>}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -451,6 +461,62 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'UPDATE_ACTIVE_EFFECTS': {
+			return {
+				...state,
+				activeEffects: {...state.activeEffects, ...action.effects},
+				stateActionLogs: newActionLog
+			}
+		}
+
+		case 'ADD_ACTIVE_EFFECTS': {
+			const cur = state.activeEffects
+			const inc = action.effects
+			const mult = inc.multipleNextPlayedResource
+			return {
+				...state,
+				activeEffects: {
+					...cur,
+					...(inc.mayDrawCards !== undefined
+						? {mayDrawCards: (cur.mayDrawCards ?? 0) + inc.mayDrawCards}
+						: {}),
+					...(mult !== undefined
+						? {
+								multipleNextPlayedResource: {
+									...cur.multipleNextPlayedResource,
+									...(mult.coins !== undefined
+										? {coins: (cur.multipleNextPlayedResource?.coins ?? 1) * mult.coins}
+										: {}),
+									...(mult.repair !== undefined
+										? {repair: (cur.multipleNextPlayedResource?.repair ?? 1) * mult.repair}
+										: {}),
+									...(mult.calm !== undefined
+										? {calm: (cur.multipleNextPlayedResource?.calm ?? 1) * mult.calm}
+										: {}),
+									...(mult.attack !== undefined
+										? {attack: (cur.multipleNextPlayedResource?.attack ?? 1) * mult.attack}
+										: {})
+								}
+							}
+						: {}),
+					...(inc.mayTrashCardsFromDiscard !== undefined
+						? {
+								mayTrashCardsFromDiscard: {
+									genericAmount:
+										(cur.mayTrashCardsFromDiscard?.genericAmount ?? 0) +
+										inc.mayTrashCardsFromDiscard.genericAmount,
+									specificCardIds: [
+										...(cur.mayTrashCardsFromDiscard?.specificCardIds ?? []),
+										...inc.mayTrashCardsFromDiscard.specificCardIds
+									]
+								}
+							}
+						: {})
+				},
+				stateActionLogs: newActionLog
+			}
+		}
+
 		default:
 			return {
 				...state,
@@ -528,6 +594,8 @@ export const initialState: GameState = {
 	bFarmBonusMinHealth: 1,
 	bFarmBonusRecruit: 1,
 	bFarmBonusRecruitCurrent: 1,
+
+	activeBonuses: {}
 
 	stateActionLogs: []
 }

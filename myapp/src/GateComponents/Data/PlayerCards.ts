@@ -1,5 +1,6 @@
-export type CitizenCardType = 'VILLAGER' | 'HERO' | 'STARTER' | 'DEBUG'
+import type {SubActionType} from '@/GateComponents/Boards/subactions/types'
 
+export type CitizenCardType = 'VILLAGER' | 'HERO' | 'STARTER' | 'DEBUG'
 export const HERO_PLACEHOLDER_CARD_ID = 99
 
 export function GetRange(type: CitizenCardType) {
@@ -17,11 +18,15 @@ export interface IntCitizenCard {
 	actionRepair: number
 	actionCalm: number
 	actionAttack: number
-	actionBonusId?: string
-	actionBonusText?: string
+
 	actionRepairBonusFarm?: number | undefined
 	actionRepairBonusGate?: number | undefined
 	actionRepairBonusTower?: number | undefined
+
+	actionBonusAction?: SubActionType
+	actionBonusText?: string
+	
+	canTrashFromDiscard?: boolean
 }
 
 export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
@@ -29,13 +34,14 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		id: HERO_PLACEHOLDER_CARD_ID,
 		name: 'Hero',
 		image: 'hero_placeholder',
-		type: 'HERO',
+		type: 'VILLAGER',
 
-		cost: -1,
-		actionCoins: -1,
-		actionRepair: -1,
-		actionCalm: -1,
-		actionAttack: -1
+		cost: 0,
+		actionCoins: 0,
+		actionRepair: 0,
+		actionCalm: 0,
+		actionAttack: 0,
+		actionBonusText: 'Hero revealed when draw'
 	},
 	{
 		id: 0,
@@ -85,7 +91,6 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepairBonusFarm: 1,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusId: 'farmer',
 		actionBonusText: '+1 when repairing the FARM'
 	},
 	{
@@ -99,7 +104,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 0,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusId: 'tax_collector',
+		canTrashFromDiscard: true,
 		actionBonusText: 'May trash this card from discard'
 	},
 	{
@@ -139,7 +144,6 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepairBonusGate: 1,
 		actionCalm: 0,
 		actionAttack: 1,
-		actionBonusId: 'craftsman',
 		actionBonusText: '+1 when repairing FARM or GATE'
 	},
 	{
@@ -154,7 +158,6 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionCalm: 0,
 		actionAttack: 1,
 		actionRepairBonusTower: 1,
-		actionBonusId: 'mason',
 		actionBonusText: '+1 when repairing TOWER'
 	},
 	{
@@ -216,8 +219,8 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 2,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusId: 'blacksmith',
-		actionBonusText: 'Double attack of the next card'
+		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'UPDATE_ACTIVE_EFFECTS', effects: { multipleNextPlayedResource: {attack: 2}}}},
+		actionBonusText: 'Double attack of next play'
 	},
 	{
 		id: 20,
@@ -230,8 +233,8 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 1,
-		actionBonusId: 'swindler',
-		actionBonusText: 'Draw 1 card'
+		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'ADD_ACTIVE_EFFECTS', effects: { mayDrawCards: 1}}},
+		actionBonusText: 'May draw 1 card'
 	},
 	{
 		id: 21,
@@ -280,8 +283,8 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 2,
-		actionBonusId: 'alchemist',
-		actionBonusText: 'You may trash a card in the discard'
+		actionBonusAction:: 'alchemist',
+		actionBonusText: 'May trash a discarded card '
 	},
 	{
 		id: 23,
@@ -354,8 +357,8 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 1,
-		actionBonusId: 'traveler',
-		actionBonusText: 'Draw 2 cards'
+		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'ADD_ACTIVE_EFFECTS', effects: { mayDrawCards: 2}}},
+		actionBonusText: 'May draw 2 cards'
 	}
 ]
 
