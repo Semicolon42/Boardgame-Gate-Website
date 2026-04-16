@@ -89,12 +89,12 @@ export function Fearamid(props: {
 	return (
 		<>
 			<div
-				className={cn}
+				className={cn + ' pb-3'}
 				id={id}
 				ref={divRef}
 				{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})}
 			>
-				<div className='text-xs'>Fearamid</div>
+				<div className='top-1 text-2xl'>Fearamid</div>
 				{FEARAMID_ROWS.map((rowIndices, rowIdx) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: stable positional row
 					<div className='flex gap-[2px]' key={rowIdx}>
