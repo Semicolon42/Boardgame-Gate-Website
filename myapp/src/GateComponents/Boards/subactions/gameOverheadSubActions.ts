@@ -156,6 +156,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			bFarmBonusRecruit: 1,
 			bFarmBonusRecruitCurrent: 1,
 
+			activeEffects: {},
+
 			stateActionLogs: []
 		}
 		return [

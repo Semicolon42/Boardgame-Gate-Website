@@ -60,7 +60,6 @@ export type CardPlayHandler = (
 	card: CardInstance,
 	type: CardPlayType,
 	amount: number,
-	actionBonusId?: string,
 	disabled?: boolean
 ) => void
 
@@ -170,9 +169,7 @@ export function XCard({
 						isDisabled={info.actionCoins === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'COINS'}
-						onAction={() =>
-							onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)
-						}
+						onAction={() => onPlayCard?.(card, 'COINS', info.actionCoins)}
 						value={info.actionCoins}
 					/>
 					<ActionButton
@@ -181,14 +178,7 @@ export function XCard({
 						isDisabled={info.actionRepair === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'REPAIR'}
-						onAction={() =>
-							onPlayCard?.(
-								card,
-								'REPAIR',
-								info.actionRepair,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'REPAIR', info.actionRepair)}
 						value={info.actionRepair}
 					/>
 					<ActionButton
@@ -197,9 +187,7 @@ export function XCard({
 						isDisabled={info.actionCalm === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'CALM'}
-						onAction={() =>
-							onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)
-						}
+						onAction={() => onPlayCard?.(card, 'CALM', info.actionCalm)}
 						value={info.actionCalm}
 					/>
 					<ActionButton
@@ -208,14 +196,7 @@ export function XCard({
 						isDisabled={info.actionAttack === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'ATTACK'}
-						onAction={() =>
-							onPlayCard?.(
-								card,
-								'ATTACK',
-								info.actionAttack,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'ATTACK', info.actionAttack)}
 						value={info.actionAttack}
 					/>
 				</div>

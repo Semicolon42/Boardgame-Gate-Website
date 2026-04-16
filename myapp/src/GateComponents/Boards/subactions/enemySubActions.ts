@@ -128,8 +128,11 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		if (targetEnemey === undefined) {
 			return []
 		}
-		const bonusUsed = Math.min(state.bTowerBonusDamageCurrent, targetEnemey.health)
-		const damageUsed = Math.min(damage, targetEnemey.health-bonusUsed)
+		const bonusUsed = Math.min(
+			state.bTowerBonusDamageCurrent,
+			targetEnemey.health
+		)
+		const damageUsed = Math.min(damage, targetEnemey.health - bonusUsed)
 		const totalDamage = damageUsed + bonusUsed
 		const actionsDamageEnemy: SubActionType[] = [
 			{

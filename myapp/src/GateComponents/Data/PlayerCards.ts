@@ -25,7 +25,7 @@ export interface IntCitizenCard {
 
 	actionBonusAction?: SubActionType
 	actionBonusText?: string
-	
+
 	canTrashFromDiscard?: boolean
 }
 
@@ -219,7 +219,13 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 2,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'UPDATE_ACTIVE_EFFECTS', effects: { multipleNextPlayedResource: {attack: 2}}}},
+		actionBonusAction: {
+			type: 'EXECUTE_GAME_STATE_UPDATE',
+			gameStateAction: {
+				type: 'UPDATE_ACTIVE_EFFECTS',
+				effects: {multipleNextPlayedResource: {attack: 2}}
+			}
+		},
 		actionBonusText: 'Double attack of next play'
 	},
 	{
@@ -233,7 +239,10 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 1,
-		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'ADD_ACTIVE_EFFECTS', effects: { mayDrawCards: 1}}},
+		actionBonusAction: {
+			type: 'EXECUTE_GAME_STATE_UPDATE',
+			gameStateAction: {type: 'ADD_ACTIVE_EFFECTS', effects: {mayDrawCards: 1}}
+		},
 		actionBonusText: 'May draw 1 card'
 	},
 	{
@@ -283,7 +292,13 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 2,
-		actionBonusAction:: 'alchemist',
+		actionBonusAction: {
+			type: 'EXECUTE_GAME_STATE_UPDATE',
+			gameStateAction: {
+				type: 'ADD_ACTIVE_EFFECTS',
+				effects: {mayTrashCardsFromDiscard: {genericAmount: 1}}
+			}
+		},
 		actionBonusText: 'May trash a discarded card '
 	},
 	{
@@ -357,7 +372,10 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 1,
 		actionCalm: 1,
 		actionAttack: 1,
-		actionBonusAction: {type: 'EXECUTE_GAME_STATE_UPDATE', gameStateAction: {type:'ADD_ACTIVE_EFFECTS', effects: { mayDrawCards: 2}}},
+		actionBonusAction: {
+			type: 'EXECUTE_GAME_STATE_UPDATE',
+			gameStateAction: {type: 'ADD_ACTIVE_EFFECTS', effects: {mayDrawCards: 2}}
+		},
 		actionBonusText: 'May draw 2 cards'
 	}
 ]

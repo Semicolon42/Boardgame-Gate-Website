@@ -17,7 +17,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			{type: 'ENQ_PLAYER_PLAY_CARD'}
 		>
 		const cardInfo = getCitizenCard(card.cardId)
-		return [
+		const actions: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
@@ -51,6 +51,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				}
 			}
 		]
+		if (cardInfo.actionBonusAction) {
+			actions.push(cardInfo.actionBonusAction)
+		}
+		return actions
 	},
 
 	ENQ_DISCARD_HAND: (_action, state: GameState): SubActionType[] =>
