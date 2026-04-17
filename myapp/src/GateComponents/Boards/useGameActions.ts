@@ -15,10 +15,14 @@ import {makeEnemyActions} from './actions/enemyActions'
 import {makePlayerActions} from './actions/playerActions'
 import {makeVillagerActions} from './actions/villagerActions'
 import {gameStateReducer, initialState} from './gameStateReducer'
+import type {GameState} from './gameStateReducer'
 import {useSubActionQueue} from './useSubActionQueue'
 
-export function useGameActions() {
-	const [state, dispatch] = useReducer(gameStateReducer, initialState)
+export function useGameActions(overrideInitialState?: GameState) {
+	const [state, dispatch] = useReducer(
+		gameStateReducer,
+		overrideInitialState ?? initialState
+	)
 
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
@@ -61,6 +65,7 @@ export function useGameActions() {
 
 	return {
 		state,
+		dispatch,
 		deckRef,
 		discardRef,
 		villageDeckRef,
