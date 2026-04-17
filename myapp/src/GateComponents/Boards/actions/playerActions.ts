@@ -114,11 +114,8 @@ export function makePlayerActions(
 		])
 	}
 
-	const gameTrashCardFromDiscard = (card: CardInstance) => {
-		alert('doing the things')
-		enqueue([
-			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD', card}
-		])
+	const gameTrashCardFromDiscard = (card: CardInstance, consumesGenericAmount: boolean): void => {
+		enqueue([{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD', card, consumesGenericAmount}])
 	}
 
 	return {

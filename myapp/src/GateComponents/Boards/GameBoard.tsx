@@ -64,9 +64,12 @@ export function GameBoard() {
 
 	const [cardDialog, setCardDialog] = useState<
 		| {
+				isOpen: boolean
 				title: string
 				playerCards: CardInstance[]
 				enemyCards: EnemyCardInstance[]
+				onTrashCard?: (card: CardInstance, consumesGenericAmount: boolean) => void
+				genericTrashesAvailable?: number
 		  }
 		| undefined
 	>(undefined)
@@ -76,14 +79,16 @@ export function GameBoard() {
 		setCardDialog({
 			title: 'Enemy Deck',
 			playerCards: [],
-			enemyCards: temp
+			enemyCards: temp,
+			isOpen: true,
 		})
 	}
 	const onViewHeroDeck = () => {
 		setCardDialog({
 			title: 'Hero Deck',
 			playerCards: gameState.hDeck,
-			enemyCards: []
+			enemyCards: [],
+			isOpen: true,
 		})
 	}
 
@@ -120,7 +125,11 @@ export function GameBoard() {
 						setCardDialog({
 							title: 'Player Discard',
 							playerCards: discard,
-							enemyCards: []
+							enemyCards: [],
+							onTrashCard: (card, consumesGenericAmount) => {
+								gameTrashCardFromDiscard(card, consumesGenericAmount)
+							},
+							genericTrashesAvailable: gameState.activeEffects.mayTrashCardsFromDiscard?.genericAmount ?? 0
 						})
 					}}
 					ref={discardRef}
@@ -460,14 +469,14 @@ export function GameBoard() {
 			)}
 			<PlayerEnemyCardDialog
 				enemyCards={cardDialog?.enemyCards ?? []}
-				isOpen={cardDialog !== undefined}
+				genericTrashesAvailable={cardDialog?.genericTrashesAvailable}
+				isOpen={cardDialog?.isOpen ?? false}
 				onClose={() => {
-					setCardDialog(undefined)
+					setCardDialog((prev) => prev ? {...prev, isOpen: false} : prev)
 				}}
+				onTrashCard={cardDialog?.onTrashCard}
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
-				mayTrashFromDiscard={gameState.activeEffects.mayTrashCardsFromDiscard?.genericAmount ?? 0}
-				onTrashCardFromDiscard={gameTrashCardFromDiscard}
 			/>
 		</div>
 	)

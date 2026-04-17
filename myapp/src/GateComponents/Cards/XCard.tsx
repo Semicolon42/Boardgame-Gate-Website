@@ -78,22 +78,22 @@ export type XCardAnimSpec =
 
 interface XcardProps {
 	card: CardInstance
-	onAnimationEnd?: () => void
-	animSpec?: XCardAnimSpec
+	onAnimationEnd?: (() => void) | undefined
+	animSpec?: XCardAnimSpec | undefined
 	// Hand mode: individual action buttons are clickable.
 	onPlayCard?: CardPlayHandler | undefined
 	// Village mode: the whole card is one button to buy it.
 	// When provided, inner action buttons are suppressed.
-	onBuyCard?: (card: CardInstance) => void
+	onBuyCard?: ((card: CardInstance) => void) | undefined
 	// Disable all functions
-	disabled?: boolean
+	disabled?: boolean | undefined
 	isPlayed?: CardPlayType | undefined
 	// Renders the card shape with the card-back colour and no content.
 	// Used for animations where a face-down card travels between positions.
-	cardback?: boolean
-	isPlayable?: boolean
-	isTrashable?: boolean
-	onTrash?: (card: CardInstance)=>void
+	cardback?: boolean | undefined
+	isPlayable?: boolean | undefined
+	isTrashable?: boolean | undefined
+	onTrash?: ((card: CardInstance)=>void) | undefined
 }
 
 export function XCard({

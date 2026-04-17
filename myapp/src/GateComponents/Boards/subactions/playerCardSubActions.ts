@@ -117,6 +117,33 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		]
 	},
 
+	ENQ_PLAYER_TRASH_FROM_DISCARD: (action, _state): SubActionType[] => {
+		const {card, consumesGenericAmount} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'}
+		>
+		const actions: SubActionType[] = [
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'DISCARD',
+					instanceIds: [card.instanceId]
+				}
+			}
+		]
+		if (consumesGenericAmount) {
+			actions.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'ADD_ACTIVE_EFFECTS',
+					effects: {mayTrashCardsFromDiscard: {genericAmount: -1}}
+				}
+			})
+		}
+		return actions
+	},
+
 	ENQ_PLAYER_REPAIR_BUILDING: (action, state: GameState): SubActionType[] => {
 		const {building, amount} = action as Extract<
 			SubActionType,
@@ -168,25 +195,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				text: `${repairAmout}`
 			}
 		]
-	},
-	ENQ_PLAYER_TRASH_FROM_DISCARD: (action, state: GameState): SubActionType[] => {
-		const {card} = action as Extract<
-			SubActionType,
-			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'}
-		>
-		return [
-			{
-				type: 'EXECUTE_GAME_STATE_UPDATE',
-				gameStateAction: {
-					type: 'STACK_REMOVE_CARDS',
-					stack: 'DISCARD',
-					instanceIds: [card.instanceId]
-				}
-			}
-		]
-	}
-
-	
+	},	
 }
 
 export const atomicHandlers: Partial<
