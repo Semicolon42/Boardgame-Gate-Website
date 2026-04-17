@@ -114,6 +114,13 @@ export function makePlayerActions(
 		])
 	}
 
+	const gameTrashCardFromDiscard = (card: CardInstance) => {
+		alert('doing the things')
+		enqueue([
+			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD', card}
+		])
+	}
+
 	return {
 		gameDrawCards,
 		gameEndTurn,
@@ -122,6 +129,7 @@ export function makePlayerActions(
 		gameGainGenericResource,
 		gameRepairBase,
 		gameCalmFear,
+		gameTrashCardFromDiscard,
 		clearActionLogs
 	}
 }

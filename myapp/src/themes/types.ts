@@ -13,6 +13,8 @@ export interface GateTheme {
 		outlineNormalHover: string
 		outlineActive: string
 		outlineActiveHover: string
+		outlineTrashable: string
+		outlineTrashableHover: string
 		outlineAttackable: string
 		outlineAttackableHover: string
 		outlineInactive: string

@@ -92,6 +92,8 @@ interface XcardProps {
 	// Used for animations where a face-down card travels between positions.
 	cardback?: boolean
 	isPlayable?: boolean
+	isTrashable?: boolean
+	onTrash?: (card: CardInstance)=>void
 }
 
 export function XCard({
@@ -103,7 +105,9 @@ export function XCard({
 	isPlayed,
 	disabled = false,
 	cardback = false,
-	isPlayable = false
+	isPlayable = false,
+	isTrashable = false,
+	onTrash,
 }: XcardProps) {
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -131,6 +135,9 @@ export function XCard({
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
 		containerClass +=
 			' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+	} else if (isTrashable) {
+		containerClass +=
+			' outline-(--color-outline-trashable) hover:outline-(--color-outline-trashable-hover)'
 	} else {
 		containerClass +=
 			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
@@ -208,6 +215,19 @@ export function XCard({
 		</div>
 	)
 
+	if (isTrashable && onTrash) {
+		return (
+			<button
+				className={containerClass}
+				onAnimationEnd={onAnimationEnd}
+				onClick={() => onTrash(card)}
+				ref={ref as RefObject<HTMLButtonElement>}
+				type='button'
+			>
+				{cardInner}
+			</button>
+		)
+	}
 	if (onBuyCard !== undefined) {
 		return (
 			<button

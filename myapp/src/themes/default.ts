@@ -17,6 +17,8 @@ const theme: GateTheme = {
 		outlineActiveHover: 'rgb(200, 200, 200)',
 		outlineAttackable: 'rgb(200, 0, 0)',
 		outlineAttackableHover: 'rgb(240, 0, 0)',
+		outlineTrashable: 'rgb(200, 0, 0)',
+		outlineTrashableHover: 'rgb(240, 0, 0)',
 		outlineInactive: 'rgb(40, 40, 40)',
 		outlineInactiveHover: 'rgb(80, 80, 80)',
 		textPrimary: 'rgb(225, 225, 225)',

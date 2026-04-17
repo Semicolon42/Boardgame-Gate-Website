@@ -168,7 +168,25 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				text: `${repairAmout}`
 			}
 		]
+	},
+	ENQ_PLAYER_TRASH_FROM_DISCARD: (action, state: GameState): SubActionType[] => {
+		const {card} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'}
+		>
+		return [
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'DISCARD',
+					instanceIds: [card.instanceId]
+				}
+			}
+		]
 	}
+
+	
 }
 
 export const atomicHandlers: Partial<

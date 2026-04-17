@@ -46,6 +46,7 @@ export function GameBoard() {
 		gameAttackEnemy,
 		gameRepairBase,
 		gameCalmFear,
+		gameTrashCardFromDiscard,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -465,6 +466,8 @@ export function GameBoard() {
 				}}
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
+				mayTrashFromDiscard={gameState.activeEffects.mayTrashCardsFromDiscard?.genericAmount ?? 0}
+				onTrashCardFromDiscard={gameTrashCardFromDiscard}
 			/>
 		</div>
 	)
