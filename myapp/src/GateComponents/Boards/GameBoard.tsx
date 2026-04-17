@@ -1,5 +1,5 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {PlayerEnemyCardDialog} from '../CardDialogs/PlayerCardDialog'
 import {CardSlot} from '../Cards/CardSlot'
 import {FloatingText} from '../Cards/FloatingText'
@@ -14,13 +14,15 @@ import {
 	type BuildingType,
 	type CardInstance,
 	type EnemyCardInstance,
+	type GameState,
 	makeEnemyCardInstances
 } from './gameStateReducer'
 import {useGameActions} from './useGameActions'
 
-export function GameBoard() {
+export function GameBoard({initialState}: {initialState?: GameState} = {}) {
 	const {
 		state: gameState,
+		dispatch,
 		queue,
 		deckRef,
 		discardRef,
@@ -52,7 +54,20 @@ export function GameBoard() {
 		gameGainGenericResource,
 		clearActionLogs,
 		gameOver
-	} = useGameActions()
+	} = useGameActions(initialState)
+
+	const gameStateRef = useRef(gameState)
+	gameStateRef.current = gameState
+
+	useEffect(() => {
+		if (!import.meta.env.DEV) return
+		const w = window as Window & {__setGameState?: (s: Partial<GameState>) => void}
+		w.__setGameState = partialState =>
+			dispatch({type: 'SET_GAME_STATE', nextState: {...gameStateRef.current, ...partialState}})
+		return () => {
+			w.__setGameState
+		}
+	}, [dispatch])
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
 	const buttonClass =
