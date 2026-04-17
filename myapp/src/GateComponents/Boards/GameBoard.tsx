@@ -1,5 +1,5 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
-import {useState} from 'react'
+import {useState, type RefObject} from 'react'
 import {PlayerEnemyCardDialog} from '../CardDialogs/PlayerCardDialog'
 import {CardSlot} from '../Cards/CardSlot'
 import {FloatingText} from '../Cards/FloatingText'
@@ -42,6 +42,7 @@ export function GameBoard() {
 		signalExileComplete,
 		hDeckRef,
 		gameBuyCard,
+		gameDrawCards,
 		gameAttackEnemy,
 		gameRepairBase,
 		gameCalmFear,
@@ -85,64 +86,111 @@ export function GameBoard() {
 		})
 	}
 
+	const classNameStackTitle = 'absolute top-1 text-lg text-(--color-card-text)'
+
+	function VillagerDeck(props: {vDeck: CardInstance[], vDiscard: CardInstance[], villageDeckRef: RefObject<HTMLDivElement | null>}) {
+		const {vDeck, vDiscard, villageDeckRef} = props
+		return (
+			<div
+				className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+				onClick={() => {
+					setCardDialog({
+						title: 'Villager Deck',
+						playerCards: [...vDeck, ...vDiscard],
+						enemyCards: []
+					})
+				}}
+				ref={villageDeckRef}
+				role='button'
+			>
+				<div className={classNameStackTitle}>Village</div>
+				<WaIcon className='text-6xl' name='dungeon' variant='classic' />
+			</div>
+		)
+	}
+
+	function PlayerDiscard(props: {discard: CardInstance[], discardRef: RefObject<HTMLDivElement | null>}) {
+		const {discard, discardRef} = props
+		if (discard.length > 0) { 
+			return (
+				<div
+					className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+					onClick={() => {
+						setCardDialog({
+							title: 'Player Discard',
+							playerCards: discard,
+							enemyCards: []
+						})
+					}}
+					ref={discardRef}
+					role='button'
+				>
+					<div className={classNameStackTitle}>Discard</div>
+				</div>
+			)
+		}
+		return ( 
+			<CardSlot ref={discardRef} title='Discard' />
+		)
+	}
+
+	function PlayerDeck(props: {deck: CardInstance[], deckRef: RefObject<HTMLDivElement | null>, mayDrawCards: number, onDrawBonusCard: () => void}) {
+		const {deck, deckRef, mayDrawCards, onDrawBonusCard} = props
+
+		if (!deck?.length) return <CardSlot ref={deckRef} title='Deck' />
+
+		const containerClass = 'relative flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
+
+		if (mayDrawCards > 0) {
+			return (
+				<div className={containerClass} ref={deckRef}>
+					{/* Top half — open deck dialog */}
+					<div
+						className='absolute top-0 left-0 right-0 h-1/2 z-10'
+						onClick={() => setCardDialog({title: 'Player Deck', playerCards: deck, enemyCards: []})}
+						role='button'
+					/>
+					{/* Bottom half — draw bonus card; named peer drives text highlight */}
+					<div
+						className='peer/bottom absolute bottom-0 left-0 right-0 h-1/2 z-10'
+						onClick={onDrawBonusCard}
+						role='button'
+					/>
+					<div className={classNameStackTitle}>Deck</div>
+					<WaIcon className='text-6xl' name='dungeon' variant='classic' />
+					<div className='absolute bottom-1 w-full text-center text-xs peer-hover/bottom:font-bold pointer-events-none'>
+						May Draw {mayDrawCards}
+					</div>
+				</div>
+			)
+		}
+
+		return (
+			<div
+				className={containerClass}
+				onClick={() => setCardDialog({title: 'Player Deck', playerCards: deck, enemyCards: []})}
+				ref={deckRef}
+				role='button'
+			>
+				<div className={classNameStackTitle}>Deck</div>
+				<WaIcon className='text-6xl' name='dungeon' variant='classic' />
+			</div>
+		)
+	}
+
 	return (
 		<div className='flex bg-(--color-gameboard-background)'>
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
-					<div
-						className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-						onClick={() => {
-							setCardDialog({
-								title: 'Villager Deck',
-								playerCards: [...gameState.vDeck, ...gameState.vDiscard],
-								enemyCards: []
-							})
-						}}
-						ref={villageDeckRef}
-						role='button'
-					>
-						<div className='absolute top-1 text-lg'>Village</div>
-						<WaIcon className='text-6xl' name='dungeon' variant='classic' />
-					</div>
-					{gameState?.pDiscard?.length > 0 ? (
-						<div
-							className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-							onClick={() => {
-								setCardDialog({
-									title: 'Player Discard',
-									playerCards: gameState.pDiscard,
-									enemyCards: []
-								})
-							}}
-							ref={discardRef}
-							role='button'
-						>
-							Discard:
-							{gameState?.pDiscard?.length ?? 'XXX'}
-						</div>
-					) : (
-						<CardSlot ref={discardRef} title='Discard' />
-					)}
-					{gameState?.pDeck?.length > 0 ? (
-						<div
-							className='relative flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-							onClick={() => {
-								setCardDialog({
-									title: 'Player Deck',
-									playerCards: gameState.pDeck,
-									enemyCards: []
-								})
-							}}
-							ref={deckRef}
-							role='button'
-						>
-							<div className='absolute top-1 text-lg'>Deck</div>
-							<WaIcon className='text-6xl' name='dungeon' variant='classic' />
-						</div>
-					) : (
-						<CardSlot ref={deckRef} title='Deck' />
-					)}
+					<VillagerDeck vDeck={gameState.vDeck} vDiscard={gameState.vDiscard} villageDeckRef={villageDeckRef}/>
+					<PlayerDiscard discard={gameState?.pDiscard} discardRef={discardRef}/>
+					<PlayerDeck 
+						deck={gameState?.pDeck} 
+						deckRef={deckRef} 
+						mayDrawCards={gameState.activeEffects.mayDrawCards ?? 0} 
+						onDrawBonusCard={()=>{gameDrawCards(1, true)}}
+					/>
 					<WaButton
 						disabled={isProcessing}
 						onClick={() => {

@@ -54,7 +54,7 @@ export function AttackLine({
 				width: '100vw',
 				height: '100vh',
 				pointerEvents: 'none',
-				zIndex: 9990
+				zIndex: 9991
 			}}
 		>
 			<line

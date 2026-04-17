@@ -41,7 +41,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 0,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusText: 'Hero revealed when draw'
+		actionBonusText: 'Shown when draw'
 	},
 	{
 		id: 0,
