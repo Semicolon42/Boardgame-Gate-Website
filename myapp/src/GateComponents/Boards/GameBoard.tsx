@@ -101,6 +101,7 @@ export function GameBoard() {
 				className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
 				onClick={() => {
 					setCardDialog({
+						isOpen: true,
 						title: 'Villager Deck',
 						playerCards: [...vDeck, ...vDiscard],
 						enemyCards: []
@@ -123,6 +124,7 @@ export function GameBoard() {
 					className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
 					onClick={() => {
 						setCardDialog({
+							isOpen: true,
 							title: 'Player Discard',
 							playerCards: discard,
 							enemyCards: [],
@@ -157,7 +159,7 @@ export function GameBoard() {
 					{/* Top half — open deck dialog */}
 					<div
 						className='absolute top-0 left-0 right-0 h-1/2 z-10'
-						onClick={() => setCardDialog({title: 'Player Deck', playerCards: deck, enemyCards: []})}
+						onClick={() => setCardDialog({isOpen: true, title: 'Player Deck', playerCards: deck, enemyCards: []})}
 						role='button'
 					/>
 					{/* Bottom half — draw bonus card; named peer drives text highlight */}
@@ -178,7 +180,7 @@ export function GameBoard() {
 		return (
 			<div
 				className={containerClass}
-				onClick={() => setCardDialog({title: 'Player Deck', playerCards: deck, enemyCards: []})}
+				onClick={() => setCardDialog({isOpen: true, title: 'Player Deck', playerCards: deck, enemyCards: []})}
 				ref={deckRef}
 				role='button'
 			>

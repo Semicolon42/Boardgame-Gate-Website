@@ -76,6 +76,10 @@ export function applyTheme(theme: GateTheme): void {
 		'--easing-card-discard',
 		theme.cardAnimation.discardEasing
 	)
+	r.style.setProperty(
+		'--duration-card-pulse',
+		`${theme.cardAnimation.pulseDurationMs}ms`
+	)
 	// Floating text appearance
 	r.style.setProperty(
 		'--text-floating-size',

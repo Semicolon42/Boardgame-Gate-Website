@@ -54,6 +54,14 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		if (cardInfo.actionBonusAction) {
 			actions.push(cardInfo.actionBonusAction)
 		}
+		actions.push({
+			type: 'PLAYER_CARD_PULSE',
+			card: card
+		})
+		actions.push({
+			type: 'PLAYER_DISCARD_SINGLE_CARD',
+			card: card
+		})
 		return actions
 	},
 
@@ -351,5 +359,18 @@ export const atomicHandlers: Partial<
 	PLAYER_SHUFFLE_SHUFFLE_DECK: (_action, ctx) => {
 		ctx.dispatch({type: 'STACK_SHUFFLE', stack: 'DECK'})
 		ctx.setQueue(q => q.slice(1))
-	}
+	},
+
+	PLAYER_CARD_PULSE: (action, ctx) => {
+		const {card} = action as Extract<
+			SubActionType,
+			{type: 'PLAYER_CARD_PULSE'}
+		>
+		ctx.setIsAnimating(true)
+		ctx.setAnimatingCard({
+			type: 'PLAYER',
+			instanceId: card.instanceId,
+			pulse: true
+		})
+	},
 }

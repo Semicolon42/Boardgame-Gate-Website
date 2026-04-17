@@ -22,6 +22,7 @@ function toXCardAnimSpec(spec: AnimatingCardSpec): XCardAnimSpec | undefined {
 	if (spec.moveFrom) return {type: 'FROM', pos: spec.moveFrom}
 	if (spec.moveTo) return {type: 'TO', pos: spec.moveTo}
 	if (spec.fallAway) return {type: 'FALL_AWAY'}
+	if (spec.pulse) return {type: 'PULSE'}
 	return undefined
 }
 

@@ -35,7 +35,8 @@ const theme: GateTheme = {
 		drawDurationMs: 80,
 		drawEasing: 'ease-out',
 		discardDurationMs: 80,
-		discardEasing: 'ease-in'
+		discardEasing: 'ease-in',
+		pulseDurationMs: 80
 	},
 	enemyDiscard: {
 		durationMs: 200,

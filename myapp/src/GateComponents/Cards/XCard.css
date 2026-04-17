@@ -26,6 +26,16 @@
 		var(--easing-card-discard) forwards;
 }
 
+@keyframes card-pulse {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.05); }
+	100% { transform: scale(1); }
+}
+
+.card-pulse-animate {
+	animation: card-pulse var(--duration-card-pulse) ease-in-out forwards;
+}
+
 .card-action-btn {
 	display: flex;
 	align-items: center;

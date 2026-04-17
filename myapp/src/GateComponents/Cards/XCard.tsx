@@ -1,6 +1,6 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
-import {useRef} from 'react'
+import {useLayoutEffect, useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
 import {getCitizenCard} from '../Data/PlayerCards'
 
@@ -75,6 +75,7 @@ export type XCardAnimSpec =
 	| {type: 'FROM'; pos: {x: number; y: number}}
 	| {type: 'TO'; pos: {x: number; y: number}}
 	| {type: 'FALL_AWAY'}
+	| {type: 'PULSE'}
 
 interface XcardProps {
 	card: CardInstance
@@ -126,6 +127,14 @@ export function XCard({
 		animSpec?.type === 'FALL_AWAY',
 		onAnimationEndRef
 	)
+	useLayoutEffect(() => {
+		const el = ref.current
+		if (!el) return
+		el.classList.remove('card-pulse-animate')
+		if (animSpec?.type === 'PULSE') {
+			el.classList.add('card-pulse-animate')
+		}
+	}, [animSpec, ref])
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {

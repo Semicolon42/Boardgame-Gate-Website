@@ -36,6 +36,7 @@ export interface GateTheme {
 		drawEasing: string
 		discardDurationMs: number
 		discardEasing: string
+		pulseDurationMs: number
 	}
 	enemyDiscard: {
 		durationMs: number

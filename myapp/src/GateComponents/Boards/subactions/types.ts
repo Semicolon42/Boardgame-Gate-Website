@@ -96,6 +96,7 @@ export type SubActionType =
 			enemyCard: EnemyCardInstance
 			gateDamage: number
 	  }
+	| {type: 'PLAYER_CARD_PULSE', card: CardInstance}
 	| {
 			type: 'SHOW_FLOATING_TEXT'
 			text: string
@@ -117,7 +118,9 @@ export interface AnimatingCardSpec {
 	/** Exit animation: card slides FROM its DOM slot TO this screen position. */
 	moveTo?: {x: number; y: number} | undefined
 	/** Exit animation: card falls away in place (used for played hero cards). */
-	fallAway?: boolean
+	fallAway?: boolean | undefined
+	/** card ulse */
+	pulse?: boolean | undefined
 }
 
 export interface AnimatingVillagerRowSpec {
