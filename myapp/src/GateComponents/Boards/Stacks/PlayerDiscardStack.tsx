@@ -5,14 +5,12 @@ import type {CardInstance} from '../gameStateReducer'
 
 import {cnStackTitle} from './stackStyles'
 
-export function PlayerDiscard(
-	props: {
-		discard: CardInstance[]
-		ref: RefObject<HTMLDivElement | null>
-		onViewDiscard: () => void,
-		mayTrashFromDiscard: boolean
-	},
-): ReactElement {
+export function PlayerDiscard(props: {
+	discard: CardInstance[]
+	ref: RefObject<HTMLDivElement | null>
+	onViewDiscard: () => void
+	mayTrashFromDiscard: boolean
+}): ReactElement {
 	const {discard, ref, onViewDiscard, mayTrashFromDiscard} = props
 	if (discard.length > 0) {
 		return (

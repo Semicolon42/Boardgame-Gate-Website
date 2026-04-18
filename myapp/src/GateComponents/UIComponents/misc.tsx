@@ -48,10 +48,7 @@ export function FitText({text}: {text: string}) {
 
 	return (
 		<div className='h-[50px] w-[50px] overflow-hidden' ref={outerRef}>
-			<div
-				className='w-full whitespace-normal break-words'
-				ref={innerRef}
-			>
+			<div className='w-full whitespace-normal break-words' ref={innerRef}>
 				{text}
 			</div>
 		</div>

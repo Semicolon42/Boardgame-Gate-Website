@@ -1,12 +1,10 @@
-import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {RefObject} from 'react'
 import type {EnemyCardInstance} from '@/GateComponents/Boards/gameStateReducer'
-import type {AnimatingCardSpec} from '@/GateComponents/Boards/useSubActionQueue'
 import {CardSlot} from '@/GateComponents/Boards/Stacks/CardSlot'
+import {EnemyDeck} from '@/GateComponents/Boards/Stacks/EnemyDeck'
+import {HeroDeck} from '@/GateComponents/Boards/Stacks/HeroDeck'
+import type {AnimatingCardSpec} from '@/GateComponents/Boards/useSubActionQueue'
 import {XEnemyCard} from '@/GateComponents/Cards/XEnemyCard'
-import {getEnemyCard} from '@/GateComponents/Data/EnemyCardsData'
-import { EnemyDeck } from '@/GateComponents/Boards/Stacks/EnemyDeck'
-import { HeroDeck } from '@/GateComponents/Boards/Stacks/HeroDeck'
 
 interface EnemyRowProps {
 	enemyCards: EnemyCardInstance[]
@@ -27,7 +25,6 @@ interface EnemyRowProps {
 	onViewEnemyDeck?: (() => void) | undefined
 	onViewHeroDeck?: (() => void) | undefined
 }
-
 
 export function EnemyRow({
 	enemyCards,

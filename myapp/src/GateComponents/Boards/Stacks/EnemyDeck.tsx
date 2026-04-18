@@ -1,8 +1,8 @@
-import type { RefObject } from "react"
-import type { EnemyCardInstance } from "../gameStateReducer"
-import { CardSlot } from "./CardSlot"
-import { getEnemyCard } from "@/GateComponents/Data/EnemyCardsData"
-import { WaIcon } from "@awesome.me/webawesome/dist/react"
+import {WaIcon} from '@awesome.me/webawesome/dist/react'
+import type {RefObject} from 'react'
+import {getEnemyCard} from '@/GateComponents/Data/EnemyCardsData'
+import type {EnemyCardInstance} from '../gameStateReducer'
+import {CardSlot} from './CardSlot'
 import {cnStackTitle} from './stackStyles'
 
 export function EnemyDeck(props: {

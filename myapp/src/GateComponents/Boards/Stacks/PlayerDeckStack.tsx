@@ -16,12 +16,14 @@ export function PlayerDeck(props: {
 
 	if (deck?.length === 0) {
 		if (mayDrawCards > 0) {
-			return <CardSlot 
-				ref={deckRef} 
-				title='Deck' 
-				bottomText={`May Draw ${mayDrawCards}`} 
-				onClick={onDrawBonusCard}
-			/>
+			return (
+				<CardSlot
+					bottomText={`May Draw ${mayDrawCards}`}
+					onClick={onDrawBonusCard}
+					ref={deckRef}
+					title='Deck'
+				/>
+			)
 		}
 		return <CardSlot ref={deckRef} title='Deck' />
 	}

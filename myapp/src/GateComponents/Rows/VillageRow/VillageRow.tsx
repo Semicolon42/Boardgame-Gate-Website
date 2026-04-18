@@ -1,9 +1,9 @@
 import type {CardInstance} from '@/GateComponents/Boards/gameStateReducer'
+import {CardSlot} from '@/GateComponents/Boards/Stacks/CardSlot'
 import type {
 	AnimatingCardSpec,
 	AnimatingVillagerRowSpec
 } from '@/GateComponents/Boards/useSubActionQueue'
-import {CardSlot} from '@/GateComponents/Boards/Stacks/CardSlot'
 import type {XCardAnimSpec} from '@/GateComponents/Cards/XCard'
 import {XCard} from '@/GateComponents/Cards/XCard'
 import {getCitizenCard} from '@/GateComponents/Data/PlayerCardsData'

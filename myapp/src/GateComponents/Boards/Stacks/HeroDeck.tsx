@@ -1,7 +1,6 @@
-
-import type { RefObject } from 'react'
-import { WaIcon } from '@awesome.me/webawesome/dist/react'
-import { CardSlot } from '@/GateComponents/Boards/Stacks/CardSlot'
+import {WaIcon} from '@awesome.me/webawesome/dist/react'
+import type {RefObject} from 'react'
+import {CardSlot} from '@/GateComponents/Boards/Stacks/CardSlot'
 import {cnStackTitle} from './stackStyles'
 
 export function HeroDeck(props: {

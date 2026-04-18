@@ -174,7 +174,7 @@ export type GameAction =
 			instanceId: string
 			cardPlayType: CardPlayType | undefined
 	  }
-	| { type: 'MARK_CARD_PLAYED_REMOVE'; instanceId: string}
+	| {type: 'MARK_CARD_PLAYED_REMOVE'; instanceId: string}
 	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
@@ -392,7 +392,8 @@ export function gameStateReducer(
 		}
 
 		case 'MARK_CARD_PLAYED_REMOVE': {
-			if (!(action.instanceId in state.pPlayed)) return {...state, stateActionLogs: newActionLog}
+			if (!(action.instanceId in state.pPlayed))
+				return {...state, stateActionLogs: newActionLog}
 			const {[action.instanceId]: _, ...newPPlayed} = state.pPlayed
 			return {
 				...state,

@@ -7,12 +7,12 @@ export function CardSlot(props: {
 	onClick?: (() => void) | undefined
 }) {
 	const {title, ref, bottomText = undefined, onClick = undefined} = props
-	let cn = [
+	const cn = [
 		'group/cardSlot relative justify-center flex',
-		'h-[140px] w-[100px]', 
+		'h-[140px] w-[100px]',
 		'shrink-0 rounded-xl',
 		'border-2 border-gray-600 border-dashed bg-gray-800/40',
-		(onClick ? 'cursor-pointer' : '')
+		onClick ? 'cursor-pointer' : ''
 	].join(' ')
 	return (
 		<div

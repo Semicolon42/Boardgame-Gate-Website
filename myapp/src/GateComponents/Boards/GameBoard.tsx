@@ -6,6 +6,7 @@ import {
 } from '../CardDialogs/PlayerEnemyCardDialog'
 import {FloatingText} from '../Cards/FloatingText'
 import {HeroCardToDiscard} from '../Cards/HeroCardToDiscard'
+import {getCitizenCard} from '../Data/PlayerCardsData'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
@@ -17,7 +18,6 @@ import {CitizenDeck} from './Stacks/CitizenDeckStack'
 import {PlayerDeck} from './Stacks/PlayerDeckStack'
 import {PlayerDiscard} from './Stacks/PlayerDiscardStack'
 import {useGameActions} from './useGameActions'
-import { getCitizenCard } from '../Data/PlayerCardsData'
 
 export function GameBoard() {
 	const {
@@ -116,15 +116,18 @@ export function GameBoard() {
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
 					<CitizenDeck onViewDeck={onViewCitizenDeck} ref={villageDeckRef} />
-					<PlayerDiscard 
-						discard={gameState.pDiscard} 
-						ref={discardRef} 
+					<PlayerDiscard
+						discard={gameState.pDiscard}
 						mayTrashFromDiscard={
-							gameState.pDiscard.some((c)=>getCitizenCard(c.cardId).canTrashFromDiscard)
-							|| (gameState.activeEffects.mayTrashCardsFromDiscard?.genericAmount ?? 0) > 0
+							gameState.pDiscard.some(
+								c => getCitizenCard(c.cardId).canTrashFromDiscard
+							) ||
+							(gameState.activeEffects.mayTrashCardsFromDiscard
+								?.genericAmount ?? 0) > 0
 						}
 						onViewDiscard={onViewDiscard}
-						/>
+						ref={discardRef}
+					/>
 					<PlayerDeck
 						deck={gameState?.pDeck}
 						deckRef={deckRef}
