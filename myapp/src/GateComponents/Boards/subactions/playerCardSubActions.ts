@@ -17,6 +17,17 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			{type: 'ENQ_PLAYER_PLAY_CARD'}
 		>
 		const cardInfo = getCitizenCard(card.cardId)
+		const mult = _state.activeEffects.multNextPlayedResource
+		const multKeyMap: Record<
+			typeof cardPlayType,
+			keyof NonNullable<typeof mult>
+		> = {
+			COINS: 'coins',
+			REPAIR: 'repair',
+			CALM: 'calm',
+			ATTACK: 'attack'
+		}
+		const multKey = multKeyMap[cardPlayType]
 		const actions: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
@@ -25,9 +36,18 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 					actions: [
 						{
 							type: 'UPADTE_RESOURCES',
-							coins: cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
-							attack: cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
-							repair: cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+							coins:
+								cardPlayType === 'COINS'
+									? cardInfo.actionCoins * (mult?.coins ?? 1)
+									: 0,
+							attack:
+								cardPlayType === 'ATTACK'
+									? cardInfo.actionAttack * (mult?.attack ?? 1)
+									: 0,
+							repair:
+								cardPlayType === 'REPAIR'
+									? cardInfo.actionRepair * (mult?.repair ?? 1)
+									: 0,
 							bonusRepairFarm:
 								cardPlayType === 'REPAIR'
 									? (cardInfo.actionRepairBonusFarm ?? 0)
@@ -40,13 +60,29 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 								cardPlayType === 'REPAIR'
 									? (cardInfo.actionRepairBonusTower ?? 0)
 									: 0,
-							calm: cardPlayType === 'CALM' ? cardInfo.actionCalm : 0
+							calm:
+								cardPlayType === 'CALM'
+									? cardInfo.actionCalm * (mult?.calm ?? 1)
+									: 0
 						},
 						{
 							type: 'MARK_CARD_PLAYED',
 							instanceId: card.instanceId,
 							cardPlayType
-						}
+						},
+						...(mult?.[multKey] !== undefined
+							? [
+									{
+										type: 'UPDATE_ACTIVE_EFFECTS' as const,
+										effects: {
+											multNextPlayedResource: {
+												...mult,
+												[multKey]: undefined
+											}
+										}
+									}
+								]
+							: [])
 					]
 				}
 			}
@@ -145,7 +181,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
 					type: 'ADD_ACTIVE_EFFECTS',
-					effects: {mayTrashCardsFromDiscard: {genericAmount: -1}}
+					effects: {mayTrashCardsFromDiscard: -1}
 				}
 			})
 		}

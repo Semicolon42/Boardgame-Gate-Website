@@ -22,7 +22,6 @@ import {useGameActions} from './useGameActions'
 export function GameBoard() {
 	const {
 		state: gameState,
-		queue,
 		deckRef,
 		discardRef,
 		villageDeckRef,
@@ -106,7 +105,7 @@ export function GameBoard() {
 				gameTrashCardFromDiscard(card, consumesGenericAmount)
 			},
 			genericTrashesAvailable:
-				gameState.activeEffects.mayTrashCardsFromDiscard?.genericAmount ?? 0
+				gameState.activeEffects.mayTrashCardsFromDiscard ?? 0
 		})
 	}
 
@@ -121,9 +120,7 @@ export function GameBoard() {
 						mayTrashFromDiscard={
 							gameState.pDiscard.some(
 								c => getCitizenCard(c.cardId).canTrashFromDiscard
-							) ||
-							(gameState.activeEffects.mayTrashCardsFromDiscard
-								?.genericAmount ?? 0) > 0
+							) || (gameState.activeEffects.mayTrashCardsFromDiscard ?? 0) > 0
 						}
 						onViewDiscard={onViewDiscard}
 						ref={discardRef}

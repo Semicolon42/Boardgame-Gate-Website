@@ -228,7 +228,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 			type: 'EXECUTE_GAME_STATE_UPDATE',
 			gameStateAction: {
 				type: 'UPDATE_ACTIVE_EFFECTS',
-				effects: {multipleNextPlayedResource: {attack: 2}}
+				effects: {multNextPlayedResource: {attack: 2}}
 			}
 		},
 		actionBonusText: 'Double attack of next play'
@@ -301,7 +301,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 			type: 'EXECUTE_GAME_STATE_UPDATE',
 			gameStateAction: {
 				type: 'ADD_ACTIVE_EFFECTS',
-				effects: {mayTrashCardsFromDiscard: {genericAmount: 1}}
+				effects: {mayTrashCardsFromDiscard: 1}
 			}
 		},
 		actionBonusText: 'May trash 1 from discard'

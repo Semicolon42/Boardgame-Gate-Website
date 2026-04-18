@@ -55,7 +55,7 @@ export function PlayerEnemyCardDialog({
 			label={title}
 			lightDismiss={trashingCard === null}
 			onWaAfterHide={e => {
-				if (e.target === e.currentTarget) onClose()
+				if (e.target === e.currentTarget && onClose) onClose()
 			}}
 			open={isOpen}
 		>

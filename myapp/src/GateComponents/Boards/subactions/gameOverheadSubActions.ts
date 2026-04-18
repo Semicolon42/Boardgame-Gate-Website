@@ -89,7 +89,7 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	ENQ_GAME_SETUP_NORMAL: (_action, _state: GameState): SubActionType[] => {
-		const starterPlayerDeck = makeCardInstances([1, 2, 3])
+		const starterPlayerDeck = makeCardInstances([1, 2, 3, 19, 104])
 		const startingVillagerDeck = makeCardInstances(
 			GetPlayerCardRange('VILLAGER').sort(() => 0.5 - Math.random())
 		)
@@ -155,6 +155,13 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			bFarmBonusMinHealth: 1,
 			bFarmBonusRecruit: 1,
 			bFarmBonusRecruitCurrent: 1,
+
+			commandUsed: {
+				attack: 0,
+				calm: 0,
+				refreshCitizens: 0,
+				repair: 0
+			},
 
 			activeEffects: {},
 

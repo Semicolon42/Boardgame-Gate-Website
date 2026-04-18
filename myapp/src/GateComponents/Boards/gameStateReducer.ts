@@ -59,12 +59,10 @@ export type FearAction =
 // ---------------------------------------------------------------------------
 
 export interface ActiveEffects {
-	multipleNextPlayedResource?:
+	multNextPlayedResource?:
 		| Partial<{coins?: number; repair?: number; calm?: number; attack?: number}>
 		| undefined
-	mayTrashCardsFromDiscard?: Partial<{
-		genericAmount: number
-	}>
+	mayTrashCardsFromDiscard?: number | undefined
 	mayDrawCards?: number
 }
 
@@ -495,8 +493,8 @@ export function gameStateReducer(
 				activeEffects: {
 					...state.activeEffects,
 					mayDrawCards: 0,
-					mayTrashCardsFromDiscard: {genericAmount: 0},
-					multipleNextPlayedResource: {coins: 0, repair: 0, calm: 0, attack: 0}
+					mayTrashCardsFromDiscard: 0,
+					multNextPlayedResource: {}
 				},
 				commandUsed: {
 					attack: 0,
@@ -527,7 +525,7 @@ export function gameStateReducer(
 		case 'ADD_ACTIVE_EFFECTS': {
 			const cur = state.activeEffects
 			const inc = action.effects
-			const mult = inc.multipleNextPlayedResource
+			const mult = inc.multNextPlayedResource
 			return {
 				...state,
 				activeEffects: {
@@ -537,33 +535,31 @@ export function gameStateReducer(
 						: {}),
 					...(mult !== undefined
 						? {
-								multipleNextPlayedResource: {
-									...cur.multipleNextPlayedResource,
+								multNextPlayedResource: {
+									...cur.multNextPlayedResource,
 									...(mult.coins !== undefined
 										? {
 												coins:
-													(cur.multipleNextPlayedResource?.coins ?? 1) *
-													mult.coins
+													(cur.multNextPlayedResource?.coins ?? 1) * mult.coins
 											}
 										: {}),
 									...(mult.repair !== undefined
 										? {
 												repair:
-													(cur.multipleNextPlayedResource?.repair ?? 1) *
+													(cur.multNextPlayedResource?.repair ?? 1) *
 													mult.repair
 											}
 										: {}),
 									...(mult.calm !== undefined
 										? {
 												calm:
-													(cur.multipleNextPlayedResource?.calm ?? 1) *
-													mult.calm
+													(cur.multNextPlayedResource?.calm ?? 1) * mult.calm
 											}
 										: {}),
 									...(mult.attack !== undefined
 										? {
 												attack:
-													(cur.multipleNextPlayedResource?.attack ?? 1) *
+													(cur.multNextPlayedResource?.attack ?? 1) *
 													mult.attack
 											}
 										: {})
@@ -572,11 +568,9 @@ export function gameStateReducer(
 						: {}),
 					...(inc.mayTrashCardsFromDiscard !== undefined
 						? {
-								mayTrashCardsFromDiscard: {
-									genericAmount:
-										(cur?.mayTrashCardsFromDiscard?.genericAmount ?? 0) +
-										(inc?.mayTrashCardsFromDiscard?.genericAmount ?? 0)
-								}
+								mayTrashCardsFromDiscard:
+									(cur?.mayTrashCardsFromDiscard ?? 0) +
+									(inc?.mayTrashCardsFromDiscard ?? 0)
 							}
 						: {})
 				},
