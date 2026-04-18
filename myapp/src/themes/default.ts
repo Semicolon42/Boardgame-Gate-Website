@@ -50,15 +50,15 @@ const theme: GateTheme = {
 		keyframeSteps: 20
 	},
 	floatingText: {
-		fontSizeRem: 3,
-		strokeWidthPx: 3,
+		fontSizeRem: 4.5,
+		strokeWidthPx: 1,
 		strokeColor: 'white',
-		durationMs: 1100,
-		speedPxPerMs: 0.18,
-		gravityPxPerMs2: 0.000_35,
-		angleRangeDeg: 30,
+		durationMs: 650,
+		speedPxPerMs: 0.32,
+		gravityPxPerMs2: 0.000_99,
+		angleRangeDeg: 45,
 		opacityFadeStartProgress: 0.65,
-		keyframeSteps: 24
+		keyframeSteps: 9
 	}
 }
 

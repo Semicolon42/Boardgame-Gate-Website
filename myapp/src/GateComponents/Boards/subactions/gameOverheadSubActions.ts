@@ -1,5 +1,5 @@
 import {GetEnemyCardRange} from '@/GateComponents/Data/EnemyCardsData'
-import {GetRange as GetPlayerCardRange} from '@/GateComponents/Data/PlayerCards'
+import {GetRange as GetPlayerCardRange} from '@/GateComponents/Data/PlayerCardsData'
 import {
 	type FearAction,
 	type GameState,

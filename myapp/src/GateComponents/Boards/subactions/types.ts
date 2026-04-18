@@ -65,7 +65,11 @@ export type SubActionType =
 	| {type: 'ENQ_GAME_END_TURN'}
 	| {type: 'ENQ_GAME_START'}
 	| {type: 'ENQ_GAME_SETUP_NORMAL'}
-	| {type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'; card: CardInstance; consumesGenericAmount: boolean}
+	| {
+			type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'
+			card: CardInstance
+			consumesGenericAmount: boolean
+	  }
 	| {type: 'ENQ_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
@@ -96,7 +100,7 @@ export type SubActionType =
 			enemyCard: EnemyCardInstance
 			gateDamage: number
 	  }
-	| {type: 'PLAYER_CARD_PULSE', card: CardInstance}
+	| {type: 'PLAYER_CARD_PULSE'; card: CardInstance}
 	| {
 			type: 'SHOW_FLOATING_TEXT'
 			text: string

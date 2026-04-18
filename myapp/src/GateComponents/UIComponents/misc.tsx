@@ -19,7 +19,7 @@ export function ScaledName({text}: {text: string}) {
 	}, [])
 
 	return (
-		<div className='min-w-0 flex-1 overflow-hidden' ref={outerRef}>
+		<div className='min-w-0 flex-1 overflow-hidden text-left' ref={outerRef}>
 			<span className='whitespace-nowrap' ref={innerRef}>
 				{text}
 			</span>
@@ -37,6 +37,7 @@ export function FitText({text}: {text: string}) {
 		const inner = innerRef.current
 		if (!(outer && inner)) return
 		inner.style.fontSize = '12px'
+		inner.style.lineHeight = '1'
 		while (
 			inner.scrollHeight > outer.clientHeight &&
 			Number.parseFloat(inner.style.fontSize) > 6
@@ -47,7 +48,10 @@ export function FitText({text}: {text: string}) {
 
 	return (
 		<div className='h-[50px] w-[50px] overflow-hidden' ref={outerRef}>
-			<div className='w-full whitespace-normal break-words' ref={innerRef}>
+			<div
+				className='w-full whitespace-normal break-words'
+				ref={innerRef}
+			>
 				{text}
 			</div>
 		</div>

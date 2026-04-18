@@ -1,4 +1,4 @@
-import {getCitizenCard} from '@/GateComponents/Data/PlayerCards'
+import {getCitizenCard} from '@/GateComponents/Data/PlayerCardsData'
 import type {GameState} from '../gameStateReducer'
 import type {AtomicHandler, Expander, SubActionType} from './types'
 

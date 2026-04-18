@@ -3,34 +3,38 @@ import {useState} from 'react'
 import type {CardInstance, EnemyCardInstance} from '../Boards/gameStateReducer'
 import {XCard} from '../Cards/XCard'
 import {XEnemyCard} from '../Cards/XEnemyCard'
-import {getCitizenCard} from '../Data/PlayerCards'
+import {getCitizenCard} from '../Data/PlayerCardsData'
 
-export function PlayerEnemyCardDialog(props: {
+export interface CardDialogProps {
 	title: string
 	playerCards?: CardInstance[]
 	enemyCards?: EnemyCardInstance[]
 	isOpen: boolean
-	onClose: () => void
-	onTrashCard?: ((card: CardInstance, consumesGenericAmount: boolean) => void) | undefined
+	onClose: (() => void) | undefined
+	onTrashCard?:
+		| ((card: CardInstance, consumesGenericAmount: boolean) => void)
+		| undefined
 	genericTrashesAvailable?: number | undefined
-}) {
-	const {
-		title,
-		playerCards = [],
-		enemyCards = [],
-		isOpen,
-		onClose,
-		onTrashCard,
-		genericTrashesAvailable
-	} = props
+}
 
+export function PlayerEnemyCardDialog({
+	title,
+	playerCards = [],
+	enemyCards = [],
+	isOpen,
+	onClose,
+	onTrashCard,
+	genericTrashesAvailable
+}: CardDialogProps) {
 	const [selectedCard, setSelectedCard] = useState<CardInstance | null>(null)
 	const [trashingCard, setTrashingCard] = useState<CardInstance | null>(null)
 
 	const isTrashable = (card: CardInstance): boolean => {
 		if (!onTrashCard) return false
 		const info = getCitizenCard(card.cardId)
-		return info.canTrashFromDiscard === true || (genericTrashesAvailable ?? 0) > 0
+		return (
+			info.canTrashFromDiscard === true || (genericTrashesAvailable ?? 0) > 0
+		)
 	}
 
 	const handleConfirmTrash = () => {
@@ -61,13 +65,15 @@ export function PlayerEnemyCardDialog(props: {
 					const isAnimatingAway = trashingCard?.instanceId === card.instanceId
 					const isSelected = selectedCard?.instanceId === card.instanceId
 					return (
-						<div key={card.instanceId} className='relative'>
+						<div className='relative' key={card.instanceId}>
 							<XCard
 								animSpec={isAnimatingAway ? {type: 'FALL_AWAY'} : undefined}
 								card={card}
 								isPlayable={false}
 								isTrashable={trashable}
-								onAnimationEnd={isAnimatingAway ? handleTrashAnimEnd : undefined}
+								onAnimationEnd={
+									isAnimatingAway ? handleTrashAnimEnd : undefined
+								}
 								onTrash={trashable ? setSelectedCard : undefined}
 							/>
 							{isSelected && (
@@ -85,18 +91,18 @@ export function PlayerEnemyCardDialog(props: {
 					)
 				})}
 				{enemyCards.map(card => (
-					<XEnemyCard key={card.instanceId} card={card} isAttackable={false} />
+					<XEnemyCard card={card} isAttackable={false} key={card.instanceId} />
 				))}
 			</div>
-				<WaButton
-					appearance='filled'
-					data-dialog='close'
-					slot='footer'
-					variant='brand'
-					disabled={trashingCard !== null}
-				>
-					Close
-				</WaButton>
+			<WaButton
+				appearance='filled'
+				data-dialog='close'
+				disabled={trashingCard !== null}
+				slot='footer'
+				variant='brand'
+			>
+				Close
+			</WaButton>
 		</WaDialog>
 	)
 }

@@ -4,7 +4,9 @@ export type CitizenCardType = 'VILLAGER' | 'HERO' | 'STARTER' | 'DEBUG'
 export const HERO_PLACEHOLDER_CARD_ID = 99
 
 export function GetRange(type: CitizenCardType) {
-	return CITIZEN_CARD_LIST.filter(c => c.type === type).map(c => c.id)
+	return CITIZEN_CARD_LIST.filter(c => c.type === type && !c.notSetupCard).map(
+		c => c.id
+	)
 }
 
 export interface IntCitizenCard {
@@ -27,6 +29,7 @@ export interface IntCitizenCard {
 	actionBonusText?: string
 
 	canTrashFromDiscard?: boolean
+	notSetupCard?: boolean
 }
 
 export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
@@ -41,7 +44,9 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 		actionRepair: 0,
 		actionCalm: 0,
 		actionAttack: 0,
-		actionBonusText: 'Shown when draw'
+		actionBonusText: 'Shown when draw',
+
+		notSetupCard: true
 	},
 	{
 		id: 0,
@@ -299,7 +304,7 @@ export const CITIZEN_CARD_LIST: IntCitizenCard[] = [
 				effects: {mayTrashCardsFromDiscard: {genericAmount: 1}}
 			}
 		},
-		actionBonusText: 'May trash a discarded card '
+		actionBonusText: 'May trash 1 from discard'
 	},
 	{
 		id: 23,

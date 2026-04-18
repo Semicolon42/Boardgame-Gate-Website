@@ -1,6 +1,6 @@
 import type {CardInstance} from '../../Boards/gameStateReducer'
 import type {AnimatingCardSpec} from '../../Boards/useSubActionQueue'
-import {CardSlot} from '../../Cards/CardSlot'
+import {CardSlot} from '../../Boards/Stacks/CardSlot'
 import type {
 	CardPlayHandler,
 	CardPlayType,

@@ -1,7 +1,7 @@
 import {
 	getCitizenCard,
 	HERO_PLACEHOLDER_CARD_ID
-} from '@/GateComponents/Data/PlayerCards'
+} from '@/GateComponents/Data/PlayerCardsData'
 import type {GameAction, GameState} from '../gameStateReducer'
 import type {
 	AtomicHandler,
@@ -56,11 +56,11 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		}
 		actions.push({
 			type: 'PLAYER_CARD_PULSE',
-			card: card
+			card
 		})
 		actions.push({
 			type: 'PLAYER_DISCARD_SINGLE_CARD',
-			card: card
+			card
 		})
 		return actions
 	},
@@ -203,7 +203,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				text: `${repairAmout}`
 			}
 		]
-	},	
+	}
 }
 
 export const atomicHandlers: Partial<
@@ -333,7 +333,8 @@ export const atomicHandlers: Partial<
 						stack: 'HAND',
 						instanceIds: [card.instanceId]
 					},
-					{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]}
+					{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]},
+					{type: 'MARK_CARD_PLAYED_REMOVE', instanceId: card.instanceId}
 				]
 			})
 		}
@@ -362,15 +363,12 @@ export const atomicHandlers: Partial<
 	},
 
 	PLAYER_CARD_PULSE: (action, ctx) => {
-		const {card} = action as Extract<
-			SubActionType,
-			{type: 'PLAYER_CARD_PULSE'}
-		>
+		const {card} = action as Extract<SubActionType, {type: 'PLAYER_CARD_PULSE'}>
 		ctx.setIsAnimating(true)
 		ctx.setAnimatingCard({
 			type: 'PLAYER',
 			instanceId: card.instanceId,
 			pulse: true
 		})
-	},
+	}
 }

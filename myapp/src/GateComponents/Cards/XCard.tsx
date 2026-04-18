@@ -2,7 +2,7 @@ import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
 import {useLayoutEffect, useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
-import {getCitizenCard} from '../Data/PlayerCards'
+import {getCitizenCard} from '../Data/PlayerCardsData'
 
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
@@ -94,7 +94,7 @@ interface XcardProps {
 	cardback?: boolean | undefined
 	isPlayable?: boolean | undefined
 	isTrashable?: boolean | undefined
-	onTrash?: ((card: CardInstance)=>void) | undefined
+	onTrash?: ((card: CardInstance) => void) | undefined
 }
 
 export function XCard({
@@ -108,7 +108,7 @@ export function XCard({
 	cardback = false,
 	isPlayable = false,
 	isTrashable = false,
-	onTrash,
+	onTrash
 }: XcardProps) {
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -134,7 +134,7 @@ export function XCard({
 		if (animSpec?.type === 'PULSE') {
 			el.classList.add('card-pulse-animate')
 		}
-	}, [animSpec, ref])
+	}, [animSpec])
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {
@@ -221,6 +221,11 @@ export function XCard({
 					{info.actionBonusText && <FitText text={info.actionBonusText} />}
 				</div>
 			</div>
+			{info.type === 'HERO' && (
+				<div className='absolute bottom-0 text-(--color-card-text) text-xs ml-[10px]'>
+					One Time Use
+				</div>
+			)}
 		</div>
 	)
 
