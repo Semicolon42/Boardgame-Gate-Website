@@ -1,7 +1,7 @@
 import {
 	getCitizenCard,
 	HERO_PLACEHOLDER_CARD_ID
-} from '@/GateComponents/Data/PlayerCards'
+} from '@/GateComponents/Data/PlayerCardsData'
 import type {GameAction, GameState} from '../gameStateReducer'
 import type {
 	AtomicHandler,
@@ -17,7 +17,18 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			{type: 'ENQ_PLAYER_PLAY_CARD'}
 		>
 		const cardInfo = getCitizenCard(card.cardId)
-		return [
+		const mult = _state.activeEffects.multNextPlayedResource
+		const multKeyMap: Record<
+			typeof cardPlayType,
+			keyof NonNullable<typeof mult>
+		> = {
+			COINS: 'coins',
+			REPAIR: 'repair',
+			CALM: 'calm',
+			ATTACK: 'attack'
+		}
+		const multKey = multKeyMap[cardPlayType]
+		const actions: SubActionType[] = [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {
@@ -25,9 +36,18 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 					actions: [
 						{
 							type: 'UPADTE_RESOURCES',
-							coins: cardPlayType === 'COINS' ? cardInfo.actionCoins : 0,
-							attack: cardPlayType === 'ATTACK' ? cardInfo.actionAttack : 0,
-							repair: cardPlayType === 'REPAIR' ? cardInfo.actionRepair : 0,
+							coins:
+								cardPlayType === 'COINS'
+									? cardInfo.actionCoins * (mult?.coins ?? 1)
+									: 0,
+							attack:
+								cardPlayType === 'ATTACK'
+									? cardInfo.actionAttack * (mult?.attack ?? 1)
+									: 0,
+							repair:
+								cardPlayType === 'REPAIR'
+									? cardInfo.actionRepair * (mult?.repair ?? 1)
+									: 0,
 							bonusRepairFarm:
 								cardPlayType === 'REPAIR'
 									? (cardInfo.actionRepairBonusFarm ?? 0)
@@ -40,17 +60,45 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 								cardPlayType === 'REPAIR'
 									? (cardInfo.actionRepairBonusTower ?? 0)
 									: 0,
-							calm: cardPlayType === 'CALM' ? cardInfo.actionCalm : 0
+							calm:
+								cardPlayType === 'CALM'
+									? cardInfo.actionCalm * (mult?.calm ?? 1)
+									: 0
 						},
 						{
 							type: 'MARK_CARD_PLAYED',
 							instanceId: card.instanceId,
 							cardPlayType
-						}
+						},
+						...(mult?.[multKey] !== undefined
+							? [
+									{
+										type: 'UPDATE_ACTIVE_EFFECTS' as const,
+										effects: {
+											multNextPlayedResource: {
+												...mult,
+												[multKey]: undefined
+											}
+										}
+									}
+								]
+							: [])
 					]
 				}
 			}
 		]
+		if (cardInfo.actionBonusAction) {
+			actions.push(cardInfo.actionBonusAction)
+		}
+		actions.push({
+			type: 'PLAYER_CARD_PULSE',
+			card
+		})
+		actions.push({
+			type: 'PLAYER_DISCARD_SINGLE_CARD',
+			card
+		})
+		return actions
 	},
 
 	ENQ_DISCARD_HAND: (_action, state: GameState): SubActionType[] =>
@@ -111,6 +159,33 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				text: `${amount}`
 			}
 		]
+	},
+
+	ENQ_PLAYER_TRASH_FROM_DISCARD: (action, _state): SubActionType[] => {
+		const {card, consumesGenericAmount} = action as Extract<
+			SubActionType,
+			{type: 'ENQ_PLAYER_TRASH_FROM_DISCARD'}
+		>
+		const actions: SubActionType[] = [
+			{
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'STACK_REMOVE_CARDS',
+					stack: 'DISCARD',
+					instanceIds: [card.instanceId]
+				}
+			}
+		]
+		if (consumesGenericAmount) {
+			actions.push({
+				type: 'EXECUTE_GAME_STATE_UPDATE',
+				gameStateAction: {
+					type: 'ADD_ACTIVE_EFFECTS',
+					effects: {mayTrashCardsFromDiscard: -1}
+				}
+			})
+		}
+		return actions
 	},
 
 	ENQ_PLAYER_REPAIR_BUILDING: (action, state: GameState): SubActionType[] => {
@@ -294,7 +369,8 @@ export const atomicHandlers: Partial<
 						stack: 'HAND',
 						instanceIds: [card.instanceId]
 					},
-					{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]}
+					{type: 'STACK_ADD_CARDS', stack: 'DISCARD', cards: [card]},
+					{type: 'MARK_CARD_PLAYED_REMOVE', instanceId: card.instanceId}
 				]
 			})
 		}
@@ -320,5 +396,15 @@ export const atomicHandlers: Partial<
 	PLAYER_SHUFFLE_SHUFFLE_DECK: (_action, ctx) => {
 		ctx.dispatch({type: 'STACK_SHUFFLE', stack: 'DECK'})
 		ctx.setQueue(q => q.slice(1))
+	},
+
+	PLAYER_CARD_PULSE: (action, ctx) => {
+		const {card} = action as Extract<SubActionType, {type: 'PLAYER_CARD_PULSE'}>
+		ctx.setIsAnimating(true)
+		ctx.setAnimatingCard({
+			type: 'PLAYER',
+			instanceId: card.instanceId,
+			pulse: true
+		})
 	}
 }

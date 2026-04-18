@@ -7,7 +7,7 @@
 
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
-import {GetRange} from '../Data/PlayerCards'
+import {GetRange} from '../Data/PlayerCardsData'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -58,6 +58,21 @@ export type FearAction =
 // State & action types
 // ---------------------------------------------------------------------------
 
+export interface ActiveEffects {
+	multNextPlayedResource?:
+		| Partial<{coins?: number; repair?: number; calm?: number; attack?: number}>
+		| undefined
+	mayTrashCardsFromDiscard?: number | undefined
+	mayDrawCards?: number
+}
+
+export interface CommandUsedType {
+	attack: number
+	refreshCitizens: number
+	repair: number
+	calm: number
+}
+
 export interface GameState {
 	gameOutcome: GameOutcomeType | undefined
 	stateActionLogs: GameAction[]
@@ -72,6 +87,8 @@ export interface GameState {
 	fFear: number
 	fFearMax: number
 	fFearamid: FearAction[]
+
+	commandUsed: CommandUsedType
 
 	// Player card state
 	pDeck: CardInstance[]
@@ -108,6 +125,8 @@ export interface GameState {
 	bFarmBonusMinHealth: number
 	bFarmBonusRecruit: number
 	bFarmBonusRecruitCurrent: number
+
+	activeEffects: Partial<ActiveEffects>
 }
 
 export type StackType =
@@ -153,6 +172,7 @@ export type GameAction =
 			instanceId: string
 			cardPlayType: CardPlayType | undefined
 	  }
+	| {type: 'MARK_CARD_PLAYED_REMOVE'; instanceId: string}
 	| {type: 'CLEAR_PLAYED_CARDS'}
 	| {type: 'MULTI_ACTION'; actions: GameAction[]}
 	| {type: 'ACTION_LOGS_CLEAR'}
@@ -164,6 +184,9 @@ export type GameAction =
 	| {type: 'ENEMY_DAMAGE'; damage: number; targetInstanceId: string}
 	| {type: 'TURN_START_RESET'}
 	| {type: 'SET_GAME_STATE'; nextState: GameState}
+	| {type: 'UPDATE_ACTIVE_EFFECTS'; effects: Partial<ActiveEffects>}
+	| {type: 'ADD_ACTIVE_EFFECTS'; effects: Partial<ActiveEffects>}
+	| {type: 'COMMANG_USED'; commandType: Partial<CommandUsedType>}
 
 // ---------------------------------------------------------------------------
 // Reducer helpers
@@ -249,6 +272,23 @@ export function gameStateReducer(
 				...(action.stack === 'HERO_DECK'
 					? {hDeckRemaining: state.hDeckRemaining - action.instanceIds.length}
 					: {}),
+				stateActionLogs: newActionLog
+			}
+		}
+
+		case 'COMMANG_USED': {
+			const newCommandUsed = {
+				attack: state.commandUsed.attack + (action.commandType.attack ?? 0),
+				repair: state.commandUsed.repair + (action.commandType.repair ?? 0),
+				calm: state.commandUsed.calm + (action.commandType.calm ?? 0),
+				refreshCitizens:
+					state.commandUsed.refreshCitizens +
+					(action.commandType.refreshCitizens ?? 0)
+			}
+
+			return {
+				...state,
+				commandUsed: newCommandUsed,
 				stateActionLogs: newActionLog
 			}
 		}
@@ -349,6 +389,17 @@ export function gameStateReducer(
 			}
 		}
 
+		case 'MARK_CARD_PLAYED_REMOVE': {
+			if (!(action.instanceId in state.pPlayed))
+				return {...state, stateActionLogs: newActionLog}
+			const {[action.instanceId]: _, ...newPPlayed} = state.pPlayed
+			return {
+				...state,
+				pPlayed: newPPlayed,
+				stateActionLogs: newActionLog
+			}
+		}
+
 		case 'CLEAR_PLAYED_CARDS': {
 			return {
 				...state,
@@ -439,6 +490,18 @@ export function gameStateReducer(
 					state.bTowerHealth > state.bTowerBonusMinHealth
 						? state.bTowerBonusDamage
 						: 0,
+				activeEffects: {
+					...state.activeEffects,
+					mayDrawCards: 0,
+					mayTrashCardsFromDiscard: 0,
+					multNextPlayedResource: {}
+				},
+				commandUsed: {
+					attack: 0,
+					calm: 0,
+					refreshCitizens: 0,
+					repair: 0
+				},
 				stateActionLogs: newActionLog
 			}
 		}
@@ -447,6 +510,70 @@ export function gameStateReducer(
 			return {
 				...state,
 				...action.nextState,
+				stateActionLogs: newActionLog
+			}
+		}
+
+		case 'UPDATE_ACTIVE_EFFECTS': {
+			return {
+				...state,
+				activeEffects: {...state.activeEffects, ...action.effects},
+				stateActionLogs: newActionLog
+			}
+		}
+
+		case 'ADD_ACTIVE_EFFECTS': {
+			const cur = state.activeEffects
+			const inc = action.effects
+			const mult = inc.multNextPlayedResource
+			return {
+				...state,
+				activeEffects: {
+					...cur,
+					...(inc.mayDrawCards !== undefined
+						? {mayDrawCards: (cur.mayDrawCards ?? 0) + inc.mayDrawCards}
+						: {}),
+					...(mult !== undefined
+						? {
+								multNextPlayedResource: {
+									...cur.multNextPlayedResource,
+									...(mult.coins !== undefined
+										? {
+												coins:
+													(cur.multNextPlayedResource?.coins ?? 1) * mult.coins
+											}
+										: {}),
+									...(mult.repair !== undefined
+										? {
+												repair:
+													(cur.multNextPlayedResource?.repair ?? 1) *
+													mult.repair
+											}
+										: {}),
+									...(mult.calm !== undefined
+										? {
+												calm:
+													(cur.multNextPlayedResource?.calm ?? 1) * mult.calm
+											}
+										: {}),
+									...(mult.attack !== undefined
+										? {
+												attack:
+													(cur.multNextPlayedResource?.attack ?? 1) *
+													mult.attack
+											}
+										: {})
+								}
+							}
+						: {}),
+					...(inc.mayTrashCardsFromDiscard !== undefined
+						? {
+								mayTrashCardsFromDiscard:
+									(cur?.mayTrashCardsFromDiscard ?? 0) +
+									(inc?.mayTrashCardsFromDiscard ?? 0)
+							}
+						: {})
+				},
 				stateActionLogs: newActionLog
 			}
 		}
@@ -489,6 +616,12 @@ export const initialState: GameState = {
 		'DAMAGE_GATE',
 		'GAMEOVER'
 	],
+	commandUsed: {
+		attack: 0,
+		calm: 0,
+		refreshCitizens: 0,
+		repair: 0
+	},
 
 	gameOutcome: undefined,
 
@@ -528,6 +661,8 @@ export const initialState: GameState = {
 	bFarmBonusMinHealth: 1,
 	bFarmBonusRecruit: 1,
 	bFarmBonusRecruitCurrent: 1,
+
+	activeEffects: {},
 
 	stateActionLogs: []
 }

@@ -37,6 +37,14 @@ export function applyTheme(theme: GateTheme): void {
 		'--color-outline-attackable-hover',
 		theme.colors.outlineAttackableHover
 	)
+	r.style.setProperty(
+		'--color-outline-trashable',
+		theme.colors.outlineTrashable
+	)
+	r.style.setProperty(
+		'--color-outline-trashable-hover',
+		theme.colors.outlineTrashableHover
+	)
 	r.style.setProperty('--color-outline-inactive', theme.colors.outlineInactive)
 	r.style.setProperty(
 		'--color-outline-inactive-hover',
@@ -67,6 +75,10 @@ export function applyTheme(theme: GateTheme): void {
 	r.style.setProperty(
 		'--easing-card-discard',
 		theme.cardAnimation.discardEasing
+	)
+	r.style.setProperty(
+		'--duration-card-pulse',
+		`${theme.cardAnimation.pulseDurationMs}ms`
 	)
 	// Floating text appearance
 	r.style.setProperty(

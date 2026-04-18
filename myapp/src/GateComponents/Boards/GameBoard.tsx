@@ -1,27 +1,27 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
 import {useState} from 'react'
-import {PlayerEnemyCardDialog} from '../CardDialogs/PlayerCardDialog'
-import {CardSlot} from '../Cards/CardSlot'
+import {
+	type CardDialogProps,
+	PlayerEnemyCardDialog
+} from '../CardDialogs/PlayerEnemyCardDialog'
 import {FloatingText} from '../Cards/FloatingText'
 import {HeroCardToDiscard} from '../Cards/HeroCardToDiscard'
+import {getCitizenCard} from '../Data/PlayerCardsData'
 import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
 import {ValueBadge} from '../UIComponents/ValueBadge'
 import {AttackLine} from './AttackLine'
-import {
-	type BuildingType,
-	type CardInstance,
-	type EnemyCardInstance,
-	makeEnemyCardInstances
-} from './gameStateReducer'
+import {type BuildingType, makeEnemyCardInstances} from './gameStateReducer'
+import {CitizenDeck} from './Stacks/CitizenDeckStack'
+import {PlayerDeck} from './Stacks/PlayerDeckStack'
+import {PlayerDiscard} from './Stacks/PlayerDiscardStack'
 import {useGameActions} from './useGameActions'
 
 export function GameBoard() {
 	const {
 		state: gameState,
-		queue,
 		deckRef,
 		discardRef,
 		villageDeckRef,
@@ -42,9 +42,11 @@ export function GameBoard() {
 		signalExileComplete,
 		hDeckRef,
 		gameBuyCard,
+		gameDrawCards,
 		gameAttackEnemy,
 		gameRepairBase,
 		gameCalmFear,
+		gameTrashCardFromDiscard,
 		playCard,
 		signalAnimationComplete,
 		gameEndTurn,
@@ -60,28 +62,50 @@ export function GameBoard() {
 	const costCircleClass =
 		'flex h-[22px] w-[22px] items-center justify-center rounded-full border border-gray-700 bg-white font-bold text-xs'
 
-	const [cardDialog, setCardDialog] = useState<
-		| {
-				title: string
-				playerCards: CardInstance[]
-				enemyCards: EnemyCardInstance[]
-		  }
-		| undefined
-	>(undefined)
+	const [cardDialog, setCardDialog] = useState<CardDialogProps | undefined>(
+		undefined
+	)
 
 	const onViewEnemyDeck = () => {
 		const temp = makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9])
 		setCardDialog({
 			title: 'Enemy Deck',
 			playerCards: [],
-			enemyCards: temp
+			enemyCards: temp,
+			isOpen: true,
+			onClose: undefined
 		})
 	}
 	const onViewHeroDeck = () => {
 		setCardDialog({
 			title: 'Hero Deck',
 			playerCards: gameState.hDeck,
-			enemyCards: []
+			enemyCards: [],
+			isOpen: true,
+			onClose: undefined
+		})
+	}
+	const onViewCitizenDeck = () => {
+		setCardDialog({
+			isOpen: true,
+			title: 'Villager Deck',
+			playerCards: [...gameState.vDeck, ...gameState.vDiscard],
+			enemyCards: [],
+			onClose: undefined
+		})
+	}
+	const onViewDiscard = () => {
+		setCardDialog({
+			isOpen: true,
+			onClose: undefined,
+			title: 'Player Discard',
+			playerCards: gameState.pDiscard,
+			enemyCards: [],
+			onTrashCard: (card, consumesGenericAmount) => {
+				gameTrashCardFromDiscard(card, consumesGenericAmount)
+			},
+			genericTrashesAvailable:
+				gameState.activeEffects.mayTrashCardsFromDiscard ?? 0
 		})
 	}
 
@@ -90,59 +114,26 @@ export function GameBoard() {
 			<div className='flex h-max'>
 				{/* Left column: player deck, spans full board height, anchored to bottom to align with player hand */}
 				<div className='flex flex-col justify-end p-[2px]'>
-					<div
-						className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-						onClick={() => {
-							setCardDialog({
-								title: 'Villager Deck',
-								playerCards: [...gameState.vDeck, ...gameState.vDiscard],
-								enemyCards: []
-							})
+					<CitizenDeck onViewDeck={onViewCitizenDeck} ref={villageDeckRef} />
+					<PlayerDiscard
+						discard={gameState.pDiscard}
+						mayTrashFromDiscard={
+							gameState.pDiscard.some(
+								c => getCitizenCard(c.cardId).canTrashFromDiscard
+							) || (gameState.activeEffects.mayTrashCardsFromDiscard ?? 0) > 0
+						}
+						onViewDiscard={onViewDiscard}
+						ref={discardRef}
+					/>
+					<PlayerDeck
+						deck={gameState?.pDeck}
+						deckRef={deckRef}
+						mayDrawCards={gameState.activeEffects.mayDrawCards ?? 0}
+						onDrawBonusCard={() => {
+							gameDrawCards(1, true)
 						}}
-						ref={villageDeckRef}
-						role='button'
-					>
-						<div className='absolute top-1 text-lg'>Village</div>
-						<WaIcon className='text-6xl' name='dungeon' variant='classic' />
-					</div>
-					{gameState?.pDiscard?.length > 0 ? (
-						<div
-							className='flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-							onClick={() => {
-								setCardDialog({
-									title: 'Player Discard',
-									playerCards: gameState.pDiscard,
-									enemyCards: []
-								})
-							}}
-							ref={discardRef}
-							role='button'
-						>
-							Discard:
-							{gameState?.pDiscard?.length ?? 'XXX'}
-						</div>
-					) : (
-						<CardSlot ref={discardRef} title='Discard' />
-					)}
-					{gameState?.pDeck?.length > 0 ? (
-						<div
-							className='relative flex flex-col h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-back) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
-							onClick={() => {
-								setCardDialog({
-									title: 'Player Deck',
-									playerCards: gameState.pDeck,
-									enemyCards: []
-								})
-							}}
-							ref={deckRef}
-							role='button'
-						>
-							<div className='absolute top-1 text-lg'>Deck</div>
-							<WaIcon className='text-6xl' name='dungeon' variant='classic' />
-						</div>
-					) : (
-						<CardSlot ref={deckRef} title='Deck' />
-					)}
+						onVideDeck={onViewHeroDeck}
+					/>
 					<WaButton
 						disabled={isProcessing}
 						onClick={() => {
@@ -332,7 +323,10 @@ export function GameBoard() {
 						</button>
 						<button
 							className={buttonClass}
-							disabled={gameState.cCoins < 2}
+							disabled={
+								gameState.cCoins < 2 ||
+								gameState.commandUsed.refreshCitizens > 0
+							}
 							onClick={() => {
 								gameGainGenericResource('CALM', 1, 2)
 							}}
@@ -343,7 +337,10 @@ export function GameBoard() {
 						</button>
 						<button
 							className={buttonClass}
-							disabled={gameState.cCoins < 1}
+							disabled={
+								gameState.cCoins < 1 ||
+								gameState.commandUsed.refreshCitizens > 0
+							}
 							onClick={() => {
 								gameVillagerRowClear(1)
 							}}
@@ -360,17 +357,6 @@ export function GameBoard() {
 						onPlayCard={playCard}
 						playedInstanceIds={gameState.pPlayed}
 					/>
-				</div>
-			</div>
-			<div className='flex-1'>
-				<div className='flex-1'>
-					{queue.map(it => {
-						return (
-							<div className='bg-cyan-400' key={crypto.randomUUID()}>
-								{JSON.stringify(it)}
-							</div>
-						)
-					})}
 				</div>
 			</div>
 			<WaDialog open={gameState.gameOutcome !== undefined}>
@@ -411,10 +397,12 @@ export function GameBoard() {
 			)}
 			<PlayerEnemyCardDialog
 				enemyCards={cardDialog?.enemyCards ?? []}
-				isOpen={cardDialog !== undefined}
+				genericTrashesAvailable={cardDialog?.genericTrashesAvailable}
+				isOpen={cardDialog?.isOpen ?? false}
 				onClose={() => {
-					setCardDialog(undefined)
+					setCardDialog(prev => (prev ? {...prev, isOpen: false} : prev))
 				}}
+				onTrashCard={cardDialog?.onTrashCard}
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
 			/>

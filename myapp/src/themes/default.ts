@@ -17,6 +17,8 @@ const theme: GateTheme = {
 		outlineActiveHover: 'rgb(200, 200, 200)',
 		outlineAttackable: 'rgb(200, 0, 0)',
 		outlineAttackableHover: 'rgb(240, 0, 0)',
+		outlineTrashable: 'rgb(200, 0, 0)',
+		outlineTrashableHover: 'rgb(240, 0, 0)',
 		outlineInactive: 'rgb(40, 40, 40)',
 		outlineInactiveHover: 'rgb(80, 80, 80)',
 		textPrimary: 'rgb(225, 225, 225)',
@@ -35,7 +37,8 @@ const theme: GateTheme = {
 		drawDurationMs: 400,
 		drawEasing: 'ease-out',
 		discardDurationMs: 400,
-		discardEasing: 'ease-in'
+		discardEasing: 'ease-in',
+		pulseDurationMs: 500
 	},
 	enemyDiscard: {
 		durationMs: 700,
@@ -47,15 +50,15 @@ const theme: GateTheme = {
 		keyframeSteps: 20
 	},
 	floatingText: {
-		fontSizeRem: 3,
-		strokeWidthPx: 3,
+		fontSizeRem: 4.5,
+		strokeWidthPx: 1,
 		strokeColor: 'white',
-		durationMs: 1100,
-		speedPxPerMs: 0.18,
-		gravityPxPerMs2: 0.000_35,
-		angleRangeDeg: 30,
+		durationMs: 650,
+		speedPxPerMs: 0.32,
+		gravityPxPerMs2: 0.000_99,
+		angleRangeDeg: 45,
 		opacityFadeStartProgress: 0.65,
-		keyframeSteps: 24
+		keyframeSteps: 9
 	}
 }
 

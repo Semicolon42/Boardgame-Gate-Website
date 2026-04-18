@@ -1,8 +1,8 @@
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import type {ReactElement, RefObject} from 'react'
-import {useRef} from 'react'
+import {useLayoutEffect, useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
-import {getCitizenCard} from '../Data/PlayerCards'
+import {getCitizenCard} from '../Data/PlayerCardsData'
 
 // Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
 import '@/GateComponents/Cards/XCard.css'
@@ -60,7 +60,6 @@ export type CardPlayHandler = (
 	card: CardInstance,
 	type: CardPlayType,
 	amount: number,
-	actionBonusId?: string,
 	disabled?: boolean
 ) => void
 
@@ -76,23 +75,26 @@ export type XCardAnimSpec =
 	| {type: 'FROM'; pos: {x: number; y: number}}
 	| {type: 'TO'; pos: {x: number; y: number}}
 	| {type: 'FALL_AWAY'}
+	| {type: 'PULSE'}
 
 interface XcardProps {
 	card: CardInstance
-	onAnimationEnd?: () => void
-	animSpec?: XCardAnimSpec
+	onAnimationEnd?: (() => void) | undefined
+	animSpec?: XCardAnimSpec | undefined
 	// Hand mode: individual action buttons are clickable.
 	onPlayCard?: CardPlayHandler | undefined
 	// Village mode: the whole card is one button to buy it.
 	// When provided, inner action buttons are suppressed.
-	onBuyCard?: (card: CardInstance) => void
+	onBuyCard?: ((card: CardInstance) => void) | undefined
 	// Disable all functions
-	disabled?: boolean
+	disabled?: boolean | undefined
 	isPlayed?: CardPlayType | undefined
 	// Renders the card shape with the card-back colour and no content.
 	// Used for animations where a face-down card travels between positions.
-	cardback?: boolean
-	isPlayable?: boolean
+	cardback?: boolean | undefined
+	isPlayable?: boolean | undefined
+	isTrashable?: boolean | undefined
+	onTrash?: ((card: CardInstance) => void) | undefined
 }
 
 export function XCard({
@@ -104,7 +106,9 @@ export function XCard({
 	isPlayed,
 	disabled = false,
 	cardback = false,
-	isPlayable = false
+	isPlayable = false,
+	isTrashable = false,
+	onTrash
 }: XcardProps) {
 	// ref gives us direct access to the DOM node so we can read its position
 	// and imperatively add/remove the animation class without triggering a re-render.
@@ -123,6 +127,14 @@ export function XCard({
 		animSpec?.type === 'FALL_AWAY',
 		onAnimationEndRef
 	)
+	useLayoutEffect(() => {
+		const el = ref.current
+		if (!el) return
+		el.classList.remove('card-pulse-animate')
+		if (animSpec?.type === 'PULSE') {
+			el.classList.add('card-pulse-animate')
+		}
+	}, [animSpec])
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {
@@ -132,6 +144,9 @@ export function XCard({
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
 		containerClass +=
 			' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+	} else if (isTrashable) {
+		containerClass +=
+			' outline-(--color-outline-trashable) hover:outline-(--color-outline-trashable-hover)'
 	} else {
 		containerClass +=
 			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
@@ -170,9 +185,7 @@ export function XCard({
 						isDisabled={info.actionCoins === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'COINS'}
-						onAction={() =>
-							onPlayCard?.(card, 'COINS', info.actionCoins, info.actionBonusId)
-						}
+						onAction={() => onPlayCard?.(card, 'COINS', info.actionCoins)}
 						value={info.actionCoins}
 					/>
 					<ActionButton
@@ -181,14 +194,7 @@ export function XCard({
 						isDisabled={info.actionRepair === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'REPAIR'}
-						onAction={() =>
-							onPlayCard?.(
-								card,
-								'REPAIR',
-								info.actionRepair,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'REPAIR', info.actionRepair)}
 						value={info.actionRepair}
 					/>
 					<ActionButton
@@ -197,9 +203,7 @@ export function XCard({
 						isDisabled={info.actionCalm === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'CALM'}
-						onAction={() =>
-							onPlayCard?.(card, 'CALM', info.actionCalm, info.actionBonusId)
-						}
+						onAction={() => onPlayCard?.(card, 'CALM', info.actionCalm)}
 						value={info.actionCalm}
 					/>
 					<ActionButton
@@ -208,14 +212,7 @@ export function XCard({
 						isDisabled={info.actionAttack === 0}
 						isPlayable={isPlayable}
 						isPlayed={isPlayed === 'ATTACK'}
-						onAction={() =>
-							onPlayCard?.(
-								card,
-								'ATTACK',
-								info.actionAttack,
-								info.actionBonusId
-							)
-						}
+						onAction={() => onPlayCard?.(card, 'ATTACK', info.actionAttack)}
 						value={info.actionAttack}
 					/>
 				</div>
@@ -224,9 +221,27 @@ export function XCard({
 					{info.actionBonusText && <FitText text={info.actionBonusText} />}
 				</div>
 			</div>
+			{info.type === 'HERO' && (
+				<div className='absolute bottom-0 text-(--color-card-text) text-xs ml-[10px]'>
+					One Time Use
+				</div>
+			)}
 		</div>
 	)
 
+	if (isTrashable && onTrash) {
+		return (
+			<button
+				className={containerClass}
+				onAnimationEnd={onAnimationEnd}
+				onClick={() => onTrash(card)}
+				ref={ref as RefObject<HTMLButtonElement>}
+				type='button'
+			>
+				{cardInner}
+			</button>
+		)
+	}
 	if (onBuyCard !== undefined) {
 		return (
 			<button

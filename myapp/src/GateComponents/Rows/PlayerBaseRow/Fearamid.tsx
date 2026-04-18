@@ -89,7 +89,7 @@ export function Fearamid(props: {
 	return (
 		<>
 			<div
-				className={cn + ' pb-3'}
+				className={`${cn} pb-3`}
 				id={id}
 				ref={divRef}
 				{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})}
