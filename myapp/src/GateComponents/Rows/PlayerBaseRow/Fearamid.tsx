@@ -1,6 +1,7 @@
 import {WaIcon, WaTooltip} from '@awesome.me/webawesome/dist/react'
 import {type RefObject, useId} from 'react'
 import type {FearAction} from '@/GateComponents/Boards/gameStateReducer'
+import {OUTLINE_CLASSES} from '@/GateComponents/outlineClasses'
 
 function fearIcon(action: FearAction): {
 	name: string
@@ -77,14 +78,11 @@ export function Fearamid(props: {
 		'outline-4'
 	].join(' ')
 	if (canCalm) {
-		cn +=
-			' cursor-pointer outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+		cn += ` cursor-pointer ${OUTLINE_CLASSES.active}`
 	} else if (isUnderAttack) {
-		cn +=
-			' outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
+		cn += ` ${OUTLINE_CLASSES.attackable}`
 	} else {
-		cn +=
-			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		cn += ` ${OUTLINE_CLASSES.normal}`
 	}
 	return (
 		<>
