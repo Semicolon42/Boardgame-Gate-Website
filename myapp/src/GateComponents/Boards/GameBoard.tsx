@@ -76,6 +76,15 @@ export function GameBoard() {
 			onClose: undefined
 		})
 	}
+	const onViewPlayerDeck = () => {
+		setCardDialog({
+			title: 'Player Deck',
+			playerCards: gameState?.pDeck,
+			enemyCards: [],
+			isOpen: true,
+			onClose: undefined
+		})
+	}
 	const onViewHeroDeck = () => {
 		setCardDialog({
 			title: 'Hero Deck',
@@ -132,7 +141,7 @@ export function GameBoard() {
 						onDrawBonusCard={() => {
 							gameDrawCards(1, true)
 						}}
-						onVideDeck={onViewHeroDeck}
+						onViewDeck={onViewPlayerDeck}
 					/>
 					<WaButton
 						disabled={isProcessing}
