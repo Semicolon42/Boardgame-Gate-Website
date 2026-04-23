@@ -10,6 +10,7 @@
 // function (not a hook) that closes over enqueue/dispatch.
 
 import {useReducer, useRef} from 'react'
+import {gameRecordReducer, initialGameRecord} from '../Stats/gameRecordReducer'
 import {makeBuildingActions} from './actions/buildingActions'
 import {makeEnemyActions} from './actions/enemyActions'
 import {makePlayerActions} from './actions/playerActions'
@@ -19,6 +20,10 @@ import {useSubActionQueue} from './useSubActionQueue'
 
 export function useGameActions() {
 	const [state, dispatch] = useReducer(gameStateReducer, initialState)
+	const [gameRecord, recordDispatch] = useReducer(
+		gameRecordReducer,
+		initialGameRecord
+	)
 
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
@@ -47,6 +52,7 @@ export function useGameActions() {
 	} = useSubActionQueue(
 		state,
 		dispatch,
+		recordDispatch,
 		deckRef,
 		discardRef,
 		hDeckRef,
@@ -61,6 +67,7 @@ export function useGameActions() {
 
 	return {
 		state,
+		gameRecord,
 		deckRef,
 		discardRef,
 		villageDeckRef,
@@ -82,7 +89,7 @@ export function useGameActions() {
 		hDeckRef,
 		signalAnimationComplete,
 		queue,
-		...makePlayerActions(enqueue, dispatch),
+		...makePlayerActions(enqueue, dispatch, recordDispatch),
 		...makeVillagerActions(enqueue),
 		...makeEnemyActions(enqueue),
 		...makeBuildingActions(enqueue)

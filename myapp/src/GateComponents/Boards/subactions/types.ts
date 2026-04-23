@@ -1,5 +1,6 @@
 import type {Dispatch, MutableRefObject, RefObject, SetStateAction} from 'react'
 import type {CardPlayType} from '@/GateComponents/Cards/XCard'
+import type {GameRecordAction} from '../../Stats/gameRecordReducer'
 import type {
 	BuildingType,
 	CardInstance,
@@ -135,6 +136,7 @@ export interface AnimatingVillagerRowSpec {
 /** Everything an atomic handler needs to do its work. */
 export interface SubActionContext {
 	dispatch: Dispatch<GameAction>
+	recordDispatch: Dispatch<GameRecordAction>
 	currentState: GameState
 	setQueue: Dispatch<SetStateAction<SubActionType[]>>
 	setIsAnimating: (v: boolean) => void

@@ -11,6 +11,7 @@
 import type {Dispatch, RefObject} from 'react'
 import {useCallback, useEffect, useRef, useState} from 'react'
 import type {GameAction, GameState} from './gameStateReducer'
+import type {GameRecordAction} from '../Stats/gameRecordReducer'
 import * as enemy from './subactions/enemySubActions'
 import * as gameOverhead from './subactions/gameOverheadSubActions'
 import * as playerCard from './subactions/playerCardSubActions'
@@ -64,6 +65,7 @@ const allAtomicActionHandlers: Partial<Record<SubActionType['type'], AtomicHandl
 export function useSubActionQueue(
 	state: GameState,
 	dispatch: Dispatch<GameAction>,
+	recordDispatch: Dispatch<GameRecordAction>,
 	deckRef: RefObject<HTMLDivElement | null>,
 	discardRef: RefObject<HTMLDivElement | null>,
 	hDeckRef: RefObject<HTMLDivElement | null>,
@@ -146,6 +148,7 @@ export function useSubActionQueue(
 		// Snapshot DOM positions before any dispatch — positions are from the pre-update DOM.
 		const ctx: SubActionContext = {
 			dispatch,
+			recordDispatch,
 			currentState,
 			setQueue,
 			setIsAnimating,
@@ -176,7 +179,7 @@ export function useSubActionQueue(
 		} else {
 			setQueue(q => q.slice(1))
 		}
-	}, [queue, isAnimating, dispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
+	}, [queue, isAnimating, dispatch, recordDispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
 
 	const enqueue = useCallback((actions: SubActionType[]) => {
 		setQueue(q => [...q, ...actions])

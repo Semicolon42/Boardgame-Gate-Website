@@ -97,6 +97,7 @@ export const atomicHandlers: Partial<
 			ctx.setQueue(q => q.slice(1))
 			return
 		}
+		ctx.recordDispatch({type: 'RECORD_CARD_PURCHASED', cardId: card.cardId})
 		ctx.pendingOnCompleteRef.current = () => {
 			ctx.dispatch({
 				type: 'MULTI_ACTION',

@@ -1,5 +1,5 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {
 	type CardDialogProps,
 	PlayerEnemyCardDialog
@@ -11,6 +11,8 @@ import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
+import {GameStatsPanel} from '../Stats/GameStatsPanel'
+import {saveGameRecord} from '../Stats/gameStats'
 import {ValueBadge} from '../UIComponents/ValueBadge'
 import {AttackLine} from './AttackLine'
 import {type BuildingType, makeEnemyCardInstances} from './gameStateReducer'
@@ -22,6 +24,7 @@ import {useGameActions} from './useGameActions'
 export function GameBoard() {
 	const {
 		state: gameState,
+		gameRecord,
 		deckRef,
 		discardRef,
 		villageDeckRef,
@@ -65,6 +68,20 @@ export function GameBoard() {
 	const [cardDialog, setCardDialog] = useState<CardDialogProps | undefined>(
 		undefined
 	)
+	const [showStats, setShowStats] = useState(false)
+
+	const prevOutcomeRef = useRef(gameState.gameOutcome)
+	const gameRecordRef = useRef(gameRecord)
+	gameRecordRef.current = gameRecord
+	useEffect(() => {
+		if (
+			gameState.gameOutcome !== undefined &&
+			prevOutcomeRef.current !== gameState.gameOutcome
+		) {
+			saveGameRecord(gameRecordRef.current)
+		}
+		prevOutcomeRef.current = gameState.gameOutcome
+	}, [gameState.gameOutcome])
 
 	const onViewEnemyDeck = () => {
 		const temp = makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -142,6 +159,9 @@ export function GameBoard() {
 						variant='brand'
 					>
 						End Turn
+					</WaButton>
+					<WaButton onClick={() => setShowStats(true)} variant='neutral'>
+						Stats
 					</WaButton>
 				</div>
 
@@ -406,6 +426,7 @@ export function GameBoard() {
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
 			/>
+			<GameStatsPanel isOpen={showStats} onClose={() => setShowStats(false)} />
 		</div>
 	)
 }

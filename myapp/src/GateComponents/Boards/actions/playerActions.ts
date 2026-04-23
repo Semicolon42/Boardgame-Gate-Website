@@ -1,5 +1,6 @@
 import type {Dispatch} from 'react'
 import type {CardPlayHandler} from '../../Cards/XCard'
+import type {GameRecordAction} from '../../Stats/gameRecordReducer'
 import type {BuildingType, CardInstance, GameAction} from '../gameStateReducer'
 import type {EnqueueFn, SubActionType} from '../useSubActionQueue'
 
@@ -7,11 +8,13 @@ type ResourceType = 'COINS' | 'REPAIR' | 'CALM' | 'ATTACK'
 
 export function makePlayerActions(
 	enqueue: EnqueueFn,
-	dispatch: Dispatch<GameAction>
+	dispatch: Dispatch<GameAction>,
+	recordDispatch: Dispatch<GameRecordAction>
 ) {
 	const gameDrawCards = (n: number, isBonus?: boolean | undefined): void => {
 		const actions: SubActionType[] = [{type: 'ENQ_PLAYER_DRAW_N', count: n}]
 		if (isBonus) {
+			recordDispatch({type: 'RECORD_BONUS_DRAW'})
 			actions.push({
 				type: 'EXECUTE_GAME_STATE_UPDATE',
 				gameStateAction: {

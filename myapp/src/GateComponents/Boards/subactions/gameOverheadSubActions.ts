@@ -2,6 +2,7 @@ import {GetEnemyCardRange} from '@/GateComponents/Data/EnemyCardsData'
 import {GetRange as GetPlayerCardRange} from '@/GateComponents/Data/PlayerCardsData'
 import {
 	type FearAction,
+	type GameAction,
 	type GameState,
 	makeCardInstances,
 	makeEnemyCardInstances
@@ -10,8 +11,60 @@ import type {
 	AtomicHandler,
 	AttackSource,
 	Expander,
+	SubActionContext,
 	SubActionType
 } from './types'
+
+function dispatchRecordAction(action: GameAction, ctx: SubActionContext): void {
+	switch (action.type) {
+		case 'CHANGE_FEAR':
+			ctx.recordDispatch({type: 'RECORD_FEAR_CHANGE', amount: action.amount})
+			break
+		case 'BUILDING_CHANGE_HEALTH':
+			ctx.recordDispatch({
+				type: 'RECORD_BUILDING_HEALTH_CHANGE',
+				building: action.building,
+				amount: action.healthChange
+			})
+			break
+		case 'ENEMY_DAMAGE':
+			ctx.recordDispatch({type: 'RECORD_ENEMY_DAMAGE', amount: action.damage})
+			break
+		case 'MARK_CARD_PLAYED': {
+			const allCards = [
+				...ctx.currentState.pHand,
+				...ctx.currentState.pDeck,
+				...ctx.currentState.pDiscard,
+				...ctx.currentState.hDeck
+			]
+			const card = allCards.find(c => c.instanceId === action.instanceId)
+			if (card !== undefined) {
+				ctx.recordDispatch({type: 'RECORD_CARD_PLAYED', cardId: card.cardId})
+			}
+			break
+		}
+		case 'TURN_START_RESET':
+			ctx.recordDispatch({type: 'RECORD_TURN_END'})
+			break
+		case 'UPDATE_GAME_OUTCOME':
+			ctx.recordDispatch({
+				type: 'RECORD_GAME_END',
+				outcome: action.outcome,
+				finalFear: ctx.currentState.fFear
+			})
+			break
+		case 'SET_GAME_STATE':
+			ctx.recordDispatch({type: 'RECORD_RESET'})
+			break
+		case 'MULTI_ACTION':
+			for (const subAction of action.actions) {
+				dispatchRecordAction(subAction, ctx)
+			}
+			break
+		default:
+			break
+	}
+}
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
@@ -270,6 +323,7 @@ export const atomicHandlers: Partial<
 			{type: 'EXECUTE_GAME_STATE_UPDATE'}
 		>
 		ctx.dispatch(gameStateAction)
+		dispatchRecordAction(gameStateAction, ctx)
 		ctx.setQueue(q => q.slice(1))
 	},
 	SHOW_FLOATING_TEXT: (action, ctx) => {
