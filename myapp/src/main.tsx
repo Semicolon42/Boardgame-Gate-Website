@@ -18,6 +18,7 @@ posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
 	api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
 	defaults: '2026-01-30'
 })
+posthog.register({environment: import.meta.env.PROD ? 'PROD' : 'DEV'})
 
 const queryClient = new QueryClient()
 
@@ -31,22 +32,31 @@ async function enableMocking() {
 }
 
 const container = document.querySelector('#root')
+const mainContent = (
+	<QueryClientProvider client={queryClient}>
+		<ReactQueryDevtools initialIsOpen={false} />
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>
+	</QueryClientProvider>
+)
 enableMocking()
 	.then(() => {
 		if (container) {
 			const root = createRoot(container)
 			root.render(
 				<StrictMode>
-					<PostHogProvider client={posthog}>
-						<PostHogErrorBoundary>
-							<QueryClientProvider client={queryClient}>
-								<ReactQueryDevtools initialIsOpen={false} />
-								<BrowserRouter>
-									<App />
-								</BrowserRouter>
-							</QueryClientProvider>
-						</PostHogErrorBoundary>
-					</PostHogProvider>
+					{true || import.meta.env.PROD ? (
+						<PostHogProvider client={posthog}>
+							<PostHogErrorBoundary>
+								{mainContent}
+							</PostHogErrorBoundary>
+						</PostHogProvider>
+					) : (
+						<div>
+							{mainContent}
+						</div>
+					)}
 				</StrictMode>
 			)
 		}

@@ -89,7 +89,7 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 	ENQ_GAME_SETUP_NORMAL: (_action, _state: GameState): SubActionType[] => {
-		const starterPlayerDeck = makeCardInstances([1, 2, 3, 19, 104])
+		const starterPlayerDeck = makeCardInstances([1, 2, 3])
 		const startingVillagerDeck = makeCardInstances(
 			GetPlayerCardRange('VILLAGER').sort(() => 0.5 - Math.random())
 		)
