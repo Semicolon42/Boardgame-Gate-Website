@@ -71,6 +71,7 @@ export type SubActionType =
 			consumesGenericAmount: boolean
 	  }
 	| {type: 'ENQ_GAME_OVER'}
+	| {type: 'ENQ_CHECK_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 	| {type: 'ENQ_VILLAGER_ROW_CLEAR'; cost?: number}
