@@ -1,3 +1,9 @@
+// ---------------------------------------------------------------------------
+// Game record reducer — accumulates per-game stats in parallel with the game
+// state reducer. Kept entirely separate from GameState so the simulation layer
+// stays clean.
+// ---------------------------------------------------------------------------
+
 export interface GameRecord {
 	date: string
 	seed: number
@@ -9,6 +15,7 @@ export interface GameRecord {
 	damageTakenByBuilding: {farm: number; gate: number; tower: number}
 	repairByBuilding: {farm: number; gate: number; tower: number}
 	damageDealtToEnemies: number
+	/** cardId → number of times played this game */
 	cardPlayCounts: Record<number, number>
 	purchasedCardIds: number[]
 	bonusCardsDrawn: number
@@ -50,6 +57,9 @@ export function gameRecordReducer(
 	action: GameRecordAction
 ): GameRecord {
 	switch (action.type) {
+		case 'RECORD_RESET':
+			return {...initialGameRecord}
+
 		case 'RECORD_TURN_END':
 			return {...state, turnCount: state.turnCount + 1}
 
@@ -60,13 +70,13 @@ export function gameRecordReducer(
 			return {...state, fearHealed: state.fearHealed + Math.abs(action.amount)}
 
 		case 'RECORD_BUILDING_HEALTH_CHANGE': {
+			const b = action.building
 			if (action.amount > 0) {
 				return {
 					...state,
 					repairByBuilding: {
 						...state.repairByBuilding,
-						[action.building]:
-							state.repairByBuilding[action.building] + action.amount
+						[b]: state.repairByBuilding[b] + action.amount
 					}
 				}
 			}
@@ -74,9 +84,7 @@ export function gameRecordReducer(
 				...state,
 				damageTakenByBuilding: {
 					...state.damageTakenByBuilding,
-					[action.building]:
-						state.damageTakenByBuilding[action.building] +
-						Math.abs(action.amount)
+					[b]: state.damageTakenByBuilding[b] + Math.abs(action.amount)
 				}
 			}
 		}
@@ -87,13 +95,14 @@ export function gameRecordReducer(
 				damageDealtToEnemies: state.damageDealtToEnemies + action.amount
 			}
 
-		case 'RECORD_CARD_PLAYED': {
-			const prev = state.cardPlayCounts[action.cardId] ?? 0
+		case 'RECORD_CARD_PLAYED':
 			return {
 				...state,
-				cardPlayCounts: {...state.cardPlayCounts, [action.cardId]: prev + 1}
+				cardPlayCounts: {
+					...state.cardPlayCounts,
+					[action.cardId]: (state.cardPlayCounts[action.cardId] ?? 0) + 1
+				}
 			}
-		}
 
 		case 'RECORD_CARD_PURCHASED':
 			return {
@@ -112,12 +121,11 @@ export function gameRecordReducer(
 				date: new Date().toISOString()
 			}
 
-		case 'RECORD_RESET':
-			return initialGameRecord
-
 		default: {
 			const _exhaustive: never = action
-			return _exhaustive
+			throw new Error(
+				`Unknown GameRecordAction: ${JSON.stringify(_exhaustive)}`
+			)
 		}
 	}
 }

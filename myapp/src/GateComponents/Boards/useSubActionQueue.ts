@@ -187,7 +187,7 @@ export function useSubActionQueue(
 		} else {
 			setQueue(q => q.slice(1))
 		}
-	}, [queue, isAnimating, dispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
+	}, [queue, isAnimating, dispatch, recordDispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
 
 	const enqueue = useCallback((actions: SubActionType[]) => {
 		setQueue(q => [...q, ...actions])
