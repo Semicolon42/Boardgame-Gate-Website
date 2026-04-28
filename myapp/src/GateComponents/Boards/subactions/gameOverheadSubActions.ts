@@ -15,7 +15,10 @@ import type {
 	SubActionType
 } from './types'
 
-function dispatchRecordAction(action: GameAction, ctx: SubActionContext): void {
+function _dispatchRecordAction(
+	action: GameAction,
+	ctx: SubActionContext
+): void {
 	switch (action.type) {
 		case 'CHANGE_FEAR':
 			ctx.recordDispatch({type: 'RECORD_FEAR_CHANGE', amount: action.amount})
@@ -58,13 +61,17 @@ function dispatchRecordAction(action: GameAction, ctx: SubActionContext): void {
 			break
 		case 'MULTI_ACTION':
 			for (const subAction of action.actions) {
-				dispatchRecordAction(subAction, ctx)
+				_dispatchRecordAction(subAction, ctx)
 			}
 			break
 		default:
 			break
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Fear pyramid helpers
+// ---------------------------------------------------------------------------
 
 function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	switch (fearAction) {
@@ -140,19 +147,78 @@ function fearActionToSubActions(fearAction: FearAction): SubActionType[] {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// Record dispatch — maps GameActions to GameRecordActions (no-op for most)
+// ---------------------------------------------------------------------------
+
+function dispatchRecordAction(action: GameAction, ctx: SubActionContext): void {
+	switch (action.type) {
+		case 'CHANGE_FEAR':
+			ctx.recordDispatch({type: 'RECORD_FEAR_CHANGE', amount: action.amount})
+			break
+		case 'BUILDING_CHANGE_HEALTH':
+			ctx.recordDispatch({
+				type: 'RECORD_BUILDING_HEALTH_CHANGE',
+				building: action.building,
+				amount: action.healthChange
+			})
+			break
+		case 'ENEMY_DAMAGE':
+			ctx.recordDispatch({type: 'RECORD_ENEMY_DAMAGE', amount: action.damage})
+			break
+		case 'MARK_CARD_PLAYED': {
+			const allCards = [
+				...ctx.currentState.pHand,
+				...ctx.currentState.pDeck,
+				...ctx.currentState.pDiscard,
+				...ctx.currentState.hDeck
+			]
+			const card = allCards.find(c => c.instanceId === action.instanceId)
+			if (card !== undefined) {
+				ctx.recordDispatch({type: 'RECORD_CARD_PLAYED', cardId: card.cardId})
+			}
+			break
+		}
+		case 'TURN_START_RESET':
+			ctx.recordDispatch({type: 'RECORD_TURN_END'})
+			break
+		case 'UPDATE_GAME_OUTCOME':
+			ctx.recordDispatch({
+				type: 'RECORD_GAME_END',
+				outcome: action.outcome,
+				finalFear: ctx.currentState.fFear
+			})
+			break
+		case 'SET_GAME_STATE':
+			ctx.recordDispatch({type: 'RECORD_RESET'})
+			break
+		case 'MULTI_ACTION':
+			for (const subAction of action.actions) {
+				dispatchRecordAction(subAction, ctx)
+			}
+			break
+		default:
+			break
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Expanders
+// ---------------------------------------------------------------------------
+
 export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
-	ENQ_GAME_SETUP_NORMAL: (_action, _state: GameState): SubActionType[] => {
-		const starterPlayerDeck = makeCardInstances([1, 2, 3, 19, 104])
+	ENQ_GAME_SETUP_NORMAL: (_action, _state, rng): SubActionType[] => {
+		const starterPlayerDeck = makeCardInstances([1, 2, 3])
 		const startingVillagerDeck = makeCardInstances(
-			GetPlayerCardRange('VILLAGER').sort(() => 0.5 - Math.random())
+			rng.shuffle(GetPlayerCardRange('VILLAGER'))
 		)
 		const startingHeroDeck = makeCardInstances(
-			GetPlayerCardRange('HERO').sort(() => 0.5 - Math.random())
+			rng.shuffle(GetPlayerCardRange('HERO'))
 		)
-		const startingEnemeyDeck = makeEnemyCardInstances([
-			...GetEnemyCardRange('L1').sort(() => 0.5 - Math.random()),
-			...GetEnemyCardRange('L2').sort(() => 0.5 - Math.random()),
-			...GetEnemyCardRange('L3').sort(() => 0.5 - Math.random())
+		const startingEnemyDeck = makeEnemyCardInstances([
+			...rng.shuffle(GetEnemyCardRange('L1')),
+			...rng.shuffle(GetEnemyCardRange('L2')),
+			...rng.shuffle(GetEnemyCardRange('L3'))
 		])
 		const newState: GameState = {
 			bFarmHealth: 6,
@@ -186,7 +252,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			hDeckRemaining: startingHeroDeck.length,
 			vDeck: startingVillagerDeck,
 
-			eEnemyDeck: startingEnemeyDeck,
+			eEnemyDeck: startingEnemyDeck,
 			eEnemyRow: [],
 			eEnemyDiscard: [],
 			eEnemyRowMax: 2,
@@ -230,15 +296,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			}
 		]
 	},
-	ENQ_GAME_START: (_action, _state: GameState): SubActionType[] => {
+	ENQ_GAME_START: (_action, _state): SubActionType[] => {
 		return [
-			// Prepare the player starter deck
-			// Prepare the village deck
-			// Prepare the enemy deck
-			// Draw the enemy card
 			{type: 'ENQ_ENEMY_DRAW_SINGLE_CARD'},
 			{type: 'ENQ_VILLAGER_ROW_FILL'},
-			// Draw the player's first cards
 			{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 		]
 	},
@@ -266,9 +327,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		},
 		{
 			type: 'EXECUTE_GAME_STATE_UPDATE',
-			gameStateAction: {
-				type: 'TURN_START_RESET'
-			}
+			gameStateAction: {type: 'TURN_START_RESET'}
 		},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
@@ -304,7 +363,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		}
 		return result
 	},
-	ENQ_GAME_OVER: (_action, _state: GameState): SubActionType[] => {
+	ENQ_GAME_OVER: (_action, _state): SubActionType[] => {
 		return [
 			{
 				type: 'EXECUTE_GAME_STATE_UPDATE',
@@ -313,6 +372,10 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 		]
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Atomic handlers
+// ---------------------------------------------------------------------------
 
 export const atomicHandlers: Partial<
 	Record<SubActionType['type'], AtomicHandler>

@@ -25,6 +25,7 @@ export function GameBoard() {
 	const {
 		state: gameState,
 		gameRecord,
+		gameSeed,
 		deckRef,
 		discardRef,
 		villageDeckRef,
@@ -78,10 +79,10 @@ export function GameBoard() {
 			gameState.gameOutcome !== undefined &&
 			prevOutcomeRef.current !== gameState.gameOutcome
 		) {
-			saveGameRecord(gameRecordRef.current)
+			saveGameRecord({...gameRecordRef.current, seed: gameSeed})
 		}
 		prevOutcomeRef.current = gameState.gameOutcome
-	}, [gameState.gameOutcome])
+	}, [gameState.gameOutcome, gameSeed])
 
 	const onViewEnemyDeck = () => {
 		const temp = makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -89,6 +90,15 @@ export function GameBoard() {
 			title: 'Enemy Deck',
 			playerCards: [],
 			enemyCards: temp,
+			isOpen: true,
+			onClose: undefined
+		})
+	}
+	const onViewPlayerDeck = () => {
+		setCardDialog({
+			title: 'Player Deck',
+			playerCards: gameState?.pDeck,
+			enemyCards: [],
 			isOpen: true,
 			onClose: undefined
 		})
@@ -149,7 +159,7 @@ export function GameBoard() {
 						onDrawBonusCard={() => {
 							gameDrawCards(1, true)
 						}}
-						onVideDeck={onViewHeroDeck}
+						onViewDeck={onViewPlayerDeck}
 					/>
 					<WaButton
 						disabled={isProcessing}
@@ -415,6 +425,12 @@ export function GameBoard() {
 					spec={animatingHeroToDiscard}
 				/>
 			)}
+			<GameStatsPanel
+				isOpen={showStats}
+				onClose={() => {
+					setShowStats(false)
+				}}
+			/>
 			<PlayerEnemyCardDialog
 				enemyCards={cardDialog?.enemyCards ?? []}
 				genericTrashesAvailable={cardDialog?.genericTrashesAvailable}

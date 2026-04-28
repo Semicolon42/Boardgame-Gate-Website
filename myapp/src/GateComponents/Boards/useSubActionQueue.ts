@@ -10,8 +10,9 @@
 
 import type {Dispatch, RefObject} from 'react'
 import {useCallback, useEffect, useRef, useState} from 'react'
-import type {GameAction, GameState} from './gameStateReducer'
 import type {GameRecordAction} from '../Stats/gameRecordReducer'
+import type {GameRng} from './gameRng'
+import type {GameAction, GameState} from './gameStateReducer'
 import * as enemy from './subactions/enemySubActions'
 import * as gameOverhead from './subactions/gameOverheadSubActions'
 import * as playerCard from './subactions/playerCardSubActions'
@@ -66,6 +67,7 @@ export function useSubActionQueue(
 	state: GameState,
 	dispatch: Dispatch<GameAction>,
 	recordDispatch: Dispatch<GameRecordAction>,
+	rng: GameRng,
 	deckRef: RefObject<HTMLDivElement | null>,
 	discardRef: RefObject<HTMLDivElement | null>,
 	hDeckRef: RefObject<HTMLDivElement | null>,
@@ -91,11 +93,13 @@ export function useSubActionQueue(
 	const [animatingAttackVisualization, setAnimatingAttackVisualization] =
 		useState<AttackVisualizationSpec | null>(null)
 
-	// Track latest state in a ref to avoid stale closures inside the effect
-	// without making `state` a dependency (which would re-run the effect on
-	// every state change, not just queue/animation changes).
+	// Track latest values in refs to avoid stale closures in the effect.
 	const stateRef = useRef(state)
 	stateRef.current = state
+	const rngRef = useRef(rng)
+	rngRef.current = rng
+	const recordDispatchRef = useRef(recordDispatch)
+	recordDispatchRef.current = recordDispatch
 
 	// For exit animations: the state mutation is deferred until after the
 	// animation so the card stays rendered during the slide/fade.
@@ -141,14 +145,18 @@ export function useSubActionQueue(
 		// Expand high-level (ENQ_*) sub-actions into atomic sequences.
 		const expander = allExpanderActionHandlers[head.type]
 		if (expander) {
-			setQueue(q => [...(expander as Expander)(head, currentState), ...q.slice(1)])
+			setQueue(q => [
+				...(expander as Expander)(head, currentState, rngRef.current),
+				...q.slice(1)
+			])
 			return
 		}
 
 		// Snapshot DOM positions before any dispatch — positions are from the pre-update DOM.
 		const ctx: SubActionContext = {
 			dispatch,
-			recordDispatch,
+			recordDispatch: recordDispatchRef.current,
+			rng: rngRef.current,
 			currentState,
 			setQueue,
 			setIsAnimating,

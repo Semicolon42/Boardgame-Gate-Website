@@ -9,31 +9,35 @@ interface Props {
 	onClose: () => void
 }
 
+function topPlayedCards(
+	cardPlayCounts: Record<number, number>,
+	limit = 3
+): string {
+	const entries = Object.entries(cardPlayCounts)
+		.map(([id, count]) => ({id: Number(id), count}))
+		.sort((a, b) => b.count - a.count)
+		.slice(0, limit)
+	if (entries.length === 0) return '—'
+	return entries
+		.map(e => {
+			try {
+				return `${getCitizenCard(e.id).name} ×${e.count}`
+			} catch {
+				return `#${e.id} ×${e.count}`
+			}
+		})
+		.join(', ')
+}
+
 function formatDate(iso: string): string {
 	if (!iso) return '—'
-	return new Date(iso).toLocaleDateString(undefined, {
+	const d = new Date(iso)
+	return d.toLocaleDateString(undefined, {
 		month: 'short',
 		day: 'numeric',
 		hour: '2-digit',
 		minute: '2-digit'
 	})
-}
-
-function topPlayedCards(counts: Record<number, number>, limit = 3): string {
-	const entries = Object.entries(counts) as [string, number][]
-	if (entries.length === 0) return '—'
-	return entries
-		.sort(([, a], [, b]) => b - a)
-		.slice(0, limit)
-		.map(([id, count]) => {
-			try {
-				const name = getCitizenCard(Number(id)).name
-				return `${name} ×${count}`
-			} catch {
-				return `#${id} ×${count}`
-			}
-		})
-		.join(', ')
 }
 
 export function GameStatsPanel({isOpen, onClose}: Props) {
@@ -44,83 +48,113 @@ export function GameStatsPanel({isOpen, onClose}: Props) {
 		setRecords([])
 	}
 
-	const thClass =
-		'px-2 py-1 text-left text-xs font-semibold whitespace-nowrap border-b border-gray-300'
-	const tdClass = 'px-2 py-1 text-xs whitespace-nowrap'
+	const handleOpen = () => {
+		setRecords(loadGameRecords())
+	}
 
 	return (
 		<WaDialog
 			label='Game History'
-			onWaAfterHide={onClose}
+			onWaHide={onClose}
+			onWaShow={handleOpen}
 			open={isOpen}
 			style={{['--width' as string]: 'min(95vw, 900px)'}}
 		>
-			<div className='overflow-x-auto max-h-[70vh] overflow-y-auto'>
+			<div className='flex flex-col gap-2'>
 				{records.length === 0 ? (
-					<p className='p-4 text-sm text-gray-500'>No games played yet.</p>
+					<p className='text-center text-gray-500 py-4'>No games yet.</p>
 				) : (
-					<table className='w-full border-collapse text-left'>
-						<thead className='sticky top-0 bg-white'>
-							<tr>
-								<th className={thClass}>Date</th>
-								<th className={thClass}>Result</th>
-								<th className={thClass}>Turns</th>
-								<th className={thClass}>Final Fear</th>
-								<th className={thClass}>Fear +/-</th>
-								<th className={thClass}>Farm Dmg</th>
-								<th className={thClass}>Gate Dmg</th>
-								<th className={thClass}>Tower Dmg</th>
-								<th className={thClass}>Farm Repair</th>
-								<th className={thClass}>Gate Repair</th>
-								<th className={thClass}>Tower Repair</th>
-								<th className={thClass}>Dmg Dealt</th>
-								<th className={thClass}>Purchased</th>
-								<th className={thClass}>Bonus Draws</th>
-								<th className={thClass}>Top Played</th>
-							</tr>
-						</thead>
-						<tbody>
-							{records.map((r, i) => (
-								<tr
-									className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-									key={r.date || i}
-								>
-									<td className={tdClass}>{formatDate(r.date)}</td>
-									<td
-										className={`${tdClass} font-bold ${r.outcome === 'WIN' ? 'text-green-600' : 'text-red-600'}`}
-									>
-										{r.outcome}
-									</td>
-									<td className={tdClass}>{r.turnCount}</td>
-									<td className={tdClass}>{r.finalFear}</td>
-									<td className={tdClass}>
-										+{r.fearGained} / -{r.fearHealed}
-									</td>
-									<td className={tdClass}>{r.damageTakenByBuilding.farm}</td>
-									<td className={tdClass}>{r.damageTakenByBuilding.gate}</td>
-									<td className={tdClass}>{r.damageTakenByBuilding.tower}</td>
-									<td className={tdClass}>{r.repairByBuilding.farm}</td>
-									<td className={tdClass}>{r.repairByBuilding.gate}</td>
-									<td className={tdClass}>{r.repairByBuilding.tower}</td>
-									<td className={tdClass}>{r.damageDealtToEnemies}</td>
-									<td className={tdClass}>{r.purchasedCardIds.length}</td>
-									<td className={tdClass}>{r.bonusCardsDrawn}</td>
-									<td className={tdClass}>
-										{topPlayedCards(r.cardPlayCounts)}
-									</td>
+					<div className='overflow-x-auto'>
+						<table className='w-full text-xs border-collapse'>
+							<thead>
+								<tr className='bg-gray-100 text-left'>
+									<th className='p-1 border'>Date</th>
+									<th className='p-1 border'>Result</th>
+									<th className='p-1 border'>Turns</th>
+									<th className='p-1 border'>Fear</th>
+									<th className='p-1 border'>+Fear</th>
+									<th className='p-1 border'>-Fear</th>
+									<th className='p-1 border'>Farm Dmg</th>
+									<th className='p-1 border'>Gate Dmg</th>
+									<th className='p-1 border'>Tower Dmg</th>
+									<th className='p-1 border'>Farm Rep</th>
+									<th className='p-1 border'>Gate Rep</th>
+									<th className='p-1 border'>Tower Rep</th>
+									<th className='p-1 border'>Dealt</th>
+									<th className='p-1 border'>Bought</th>
+									<th className='p-1 border'>Bonus</th>
+									<th className='p-1 border'>Top Played</th>
+									<th className='p-1 border'>Seed</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{records.map((r, i) => (
+									<tr
+										className={
+											r.outcome === 'WIN' ? 'bg-green-50' : 'bg-red-50'
+										}
+										key={i}
+									>
+										<td className='p-1 border whitespace-nowrap'>
+											{formatDate(r.date)}
+										</td>
+										<td className='p-1 border font-bold'>
+											{r.outcome === 'WIN' ? '✓ Win' : '✗ Loss'}
+										</td>
+										<td className='p-1 border text-center'>{r.turnCount}</td>
+										<td className='p-1 border text-center'>{r.finalFear}</td>
+										<td className='p-1 border text-center'>{r.fearGained}</td>
+										<td className='p-1 border text-center'>{r.fearHealed}</td>
+										<td className='p-1 border text-center'>
+											{r.damageTakenByBuilding.farm}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.damageTakenByBuilding.gate}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.damageTakenByBuilding.tower}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.repairByBuilding.farm}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.repairByBuilding.gate}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.repairByBuilding.tower}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.damageDealtToEnemies}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.purchasedCardIds.length}
+										</td>
+										<td className='p-1 border text-center'>
+											{r.bonusCardsDrawn}
+										</td>
+										<td className='p-1 border'>
+											{topPlayedCards(r.cardPlayCounts)}
+										</td>
+										<td className='p-1 border font-mono text-gray-400'>
+											{r.seed}
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				)}
 			</div>
 			<div className='flex gap-2' slot='footer'>
-				{records.length > 0 && (
-					<WaButton onClick={handleClear} variant='danger'>
-						Clear History
-					</WaButton>
-				)}
-				<WaButton appearance='filled' data-dialog='close' variant='brand'>
+				<WaButton
+					appearance='outlined'
+					disabled={records.length === 0}
+					onClick={handleClear}
+					variant='danger'
+				>
+					Clear History
+				</WaButton>
+				<WaButton appearance='filled' onClick={onClose} variant='brand'>
 					Close
 				</WaButton>
 			</div>

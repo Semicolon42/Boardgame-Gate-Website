@@ -149,9 +149,7 @@ export const atomicHandlers: Partial<
 	},
 
 	VILLAGER_SHUFFLE_DISCARD_INTO_DECK: (_action, ctx) => {
-		const shuffled = [...ctx.currentState.vDiscard].sort(
-			() => Math.random() - 0.5
-		)
+		const shuffled = ctx.rng.shuffle(ctx.currentState.vDiscard)
 		ctx.dispatch({
 			type: 'STACK_ADD_CARDS',
 			stack: 'VILLAGER_DECK',
@@ -162,7 +160,14 @@ export const atomicHandlers: Partial<
 	},
 
 	VILLAGER_SHUFFLE_DECK: (_action, ctx) => {
-		ctx.dispatch({type: 'STACK_SHUFFLE', stack: 'VILLAGER_DECK'})
+		const shuffled = ctx.rng.shuffle(ctx.currentState.vDeck)
+		ctx.dispatch({
+			type: 'MULTI_ACTION',
+			actions: [
+				{type: 'STACK_CLEAR_ALL_CARDS', stack: 'VILLAGER_DECK'},
+				{type: 'STACK_ADD_CARDS', stack: 'VILLAGER_DECK', cards: shuffled}
+			]
+		})
 		ctx.setQueue(q => q.slice(1))
 	}
 }

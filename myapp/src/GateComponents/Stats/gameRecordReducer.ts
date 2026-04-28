@@ -6,6 +6,7 @@
 
 export interface GameRecord {
 	date: string
+	seed: number
 	outcome: 'WIN' | 'LOSS'
 	turnCount: number
 	finalFear: number
@@ -37,6 +38,7 @@ export type GameRecordAction =
 
 export const initialGameRecord: GameRecord = {
 	date: '',
+	seed: 0,
 	outcome: 'LOSS',
 	turnCount: 0,
 	finalFear: 0,

@@ -15,6 +15,7 @@ import {makeBuildingActions} from './actions/buildingActions'
 import {makeEnemyActions} from './actions/enemyActions'
 import {makePlayerActions} from './actions/playerActions'
 import {makeVillagerActions} from './actions/villagerActions'
+import {createGameRng} from './gameRng'
 import {gameStateReducer, initialState} from './gameStateReducer'
 import {useSubActionQueue} from './useSubActionQueue'
 
@@ -24,6 +25,7 @@ export function useGameActions() {
 		gameRecordReducer,
 		initialGameRecord
 	)
+	const rngRef = useRef(createGameRng(Date.now()))
 
 	const deckRef = useRef<HTMLDivElement>(null)
 	const discardRef = useRef<HTMLDivElement>(null)
@@ -53,6 +55,7 @@ export function useGameActions() {
 		state,
 		dispatch,
 		recordDispatch,
+		rngRef.current,
 		deckRef,
 		discardRef,
 		hDeckRef,
@@ -68,6 +71,7 @@ export function useGameActions() {
 	return {
 		state,
 		gameRecord,
+		gameSeed: rngRef.current.seed,
 		deckRef,
 		discardRef,
 		villageDeckRef,
