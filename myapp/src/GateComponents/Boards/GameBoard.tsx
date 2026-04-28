@@ -425,12 +425,6 @@ export function GameBoard() {
 					spec={animatingHeroToDiscard}
 				/>
 			)}
-			<GameStatsPanel
-				isOpen={showStats}
-				onClose={() => {
-					setShowStats(false)
-				}}
-			/>
 			<PlayerEnemyCardDialog
 				enemyCards={cardDialog?.enemyCards ?? []}
 				genericTrashesAvailable={cardDialog?.genericTrashesAvailable}
