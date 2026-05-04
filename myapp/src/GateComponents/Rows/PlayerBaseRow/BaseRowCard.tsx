@@ -1,6 +1,7 @@
 import {WaIcon, WaTooltip} from '@awesome.me/webawesome/dist/react'
 import {type RefObject, useId} from 'react'
 import type {BuildingType} from '@/GateComponents/Boards/gameStateReducer'
+import {OUTLINE_CLASSES} from '@/GateComponents/outlineClasses'
 
 function HealthDice({health, maxHealth}: {health: number; maxHealth: number}) {
 	const dice: {name: string; variant: string; color: string}[] = []
@@ -97,20 +98,11 @@ export function PlayerBaseCard(props: {
 		'outline-4 outline-color:var(--color-red)'
 	].join(' ')
 	if (canRepair) {
-		cn += [
-			' cursor-pointer',
-			' outline-(--color-outline-active)',
-			' hover:outline-(--color-outline-active-hover)'
-		].join(' ')
+		cn += ` cursor-pointer ${OUTLINE_CLASSES.active}`
 	} else if (isUnderAttack) {
-		cn +=
-			' outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
+		cn += ` ${OUTLINE_CLASSES.attackable}`
 	} else {
-		cn += [
-			' cursor-pointer',
-			' outline-(--color-outline-normal)',
-			' hover:outline-(--color-outline-normal-hover)'
-		].join(' ')
+		cn += ` cursor-pointer ${OUTLINE_CLASSES.normal}`
 	}
 	return (
 		<>

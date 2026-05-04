@@ -4,9 +4,10 @@ import {useLayoutEffect, useRef} from 'react'
 import type {CardInstance} from '../Boards/gameStateReducer'
 import {getCitizenCard} from '../Data/PlayerCardsData'
 
-// Import CSS — defines card-move-from-animate / card-move-to-animate classes and keyframes
+import '@/GateComponents/Cards/cardAnimations.css'
 import '@/GateComponents/Cards/XCard.css'
 import theme from '@/themes'
+import {OUTLINE_CLASSES} from '../outlineClasses'
 import {FitText, ScaledName} from '../UIComponents/misc'
 import {useFallawayAnimation} from './useFallawayAnimation'
 import {useSlideAnimation} from './useSlideAnimation'
@@ -138,18 +139,13 @@ export function XCard({
 
 	let containerClass = `flex h-[140px] w-[100px] items-start rounded-xl ${cardback ? 'bg-(--color-card-back)' : 'bg-(--color-card-face) text-(--color-card-text)'} XCARD outline-4`
 	if (disabled) {
-		containerClass += ' pointer-events-none'
-		containerClass +=
-			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		containerClass += ` pointer-events-none ${OUTLINE_CLASSES.normal}`
 	} else if (onBuyCard !== undefined || onPlayCard !== undefined) {
-		containerClass +=
-			' outline-(--color-outline-active) hover:outline-(--color-outline-active-hover)'
+		containerClass += ` ${OUTLINE_CLASSES.active}`
 	} else if (isTrashable) {
-		containerClass +=
-			' outline-(--color-outline-trashable) hover:outline-(--color-outline-trashable-hover)'
+		containerClass += ` ${OUTLINE_CLASSES.trashable}`
 	} else {
-		containerClass +=
-			' outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+		containerClass += ` ${OUTLINE_CLASSES.normal}`
 	}
 
 	if (cardback) {

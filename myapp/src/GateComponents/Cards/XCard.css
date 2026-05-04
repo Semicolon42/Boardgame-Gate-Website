@@ -1,31 +1,3 @@
-@keyframes card-move-from {
-	from {
-		transform: translate(var(--slide-x, 0px), var(--slide-y, 0px));
-	}
-	to {
-		transform: translate(0, 0);
-	}
-}
-
-@keyframes card-move-to {
-	from {
-		transform: translate(0, 0);
-	}
-	to {
-		transform: translate(var(--slide-x, 0px), var(--slide-y, 0px));
-	}
-}
-
-.card-move-from-animate {
-	animation: card-move-from var(--duration-card-draw) var(--easing-card-draw)
-		forwards;
-}
-
-.card-move-to-animate {
-	animation: card-move-to var(--duration-card-discard)
-		var(--easing-card-discard) forwards;
-}
-
 @keyframes card-pulse {
 	0% {
 		transform: scale(1);
@@ -40,17 +12,4 @@
 
 .card-pulse-animate {
 	animation: card-pulse var(--duration-card-pulse) ease-in-out forwards;
-}
-
-.card-action-btn {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	padding: 0;
-	margin: 0;
-	font: inherit;
-	color: inherit;
-	text-align: left;
-	appearance: none;
-	cursor: pointer;
 }
