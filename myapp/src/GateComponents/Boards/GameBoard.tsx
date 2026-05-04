@@ -55,9 +55,7 @@ export function GameBoard() {
 		signalAnimationComplete,
 		gameEndTurn,
 		gameVillagerRowClear,
-		gameGainGenericResource,
-		clearActionLogs,
-		gameOver
+		gameGainGenericResource
 	} = useGameActions()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'

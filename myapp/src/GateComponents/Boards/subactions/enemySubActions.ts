@@ -165,7 +165,8 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				{
 					type: 'ENEMY_ROW_REMOVE_INSTANCE',
 					enemyCard: targetEnemey
-				}
+				},
+				{type: 'ENQ_CHECK_GAME_OVER'}
 			]
 		}
 		return actionsDamageEnemy

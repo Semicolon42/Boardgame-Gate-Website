@@ -2,11 +2,11 @@ import type {ReactElement, RefObject} from 'react'
 import {useRef} from 'react'
 import type {EnemyCardInstance} from '../Boards/gameStateReducer'
 
-// Reuse the same animation keyframes as XCard
-import '@/GateComponents/Cards/XEnemyCard.css'
+import '@/GateComponents/Cards/cardAnimations.css'
 import {WaIcon} from '@awesome.me/webawesome/dist/react'
 import theme from '@/themes'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
+import {OUTLINE_CLASSES} from '../outlineClasses'
 import {EnemyValueBadge} from '../UIComponents/EnemyValueBadge'
 import {ScaledName} from '../UIComponents/misc'
 import {useFallawayAnimation} from './useFallawayAnimation'
@@ -79,10 +79,10 @@ export function XEnemyCard({
 	)
 
 	const outlineClass = isAttackable
-		? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover) cursor-pointer'
+		? `${OUTLINE_CLASSES.attackable} cursor-pointer`
 		: isAttacking
-			? 'outline-(--color-outline-attackable) hover:outline-(--color-outline-attackable-hover)'
-			: 'outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)'
+			? OUTLINE_CLASSES.attackable
+			: OUTLINE_CLASSES.normal
 
 	const containerClass = [
 		'flex flex-col h-[140px] w-[100px]',

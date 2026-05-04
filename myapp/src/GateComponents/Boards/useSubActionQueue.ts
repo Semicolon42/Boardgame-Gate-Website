@@ -138,6 +138,12 @@ export function useSubActionQueue(
 	useEffect(() => {
 		if (queue.length === 0 || isAnimating) return
 
+		// Once the game is over, drain the remaining queue without processing.
+		if (stateRef.current.gameOutcome !== undefined) {
+			setQueue([])
+			return
+		}
+
 		const head = queue[0]
 		if (head === undefined) return
 		const currentState = stateRef.current
@@ -190,6 +196,7 @@ export function useSubActionQueue(
 	}, [queue, isAnimating, dispatch, recordDispatch, deckRef, discardRef, hDeckRef, villagerDeckRef, eDeckRef, enemySlotsRef])
 
 	const enqueue = useCallback((actions: SubActionType[]) => {
+		if (stateRef.current.gameOutcome !== undefined) return
 		setQueue(q => [...q, ...actions])
 	}, [])
 
