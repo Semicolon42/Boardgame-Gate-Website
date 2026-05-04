@@ -14,11 +14,11 @@ export function PlayerDiscard(props: {
 	const {discard, ref, onViewDiscard, mayTrashFromDiscard} = props
 	if (discard.length > 0) {
 		return (
-			<div
+			<button
 				className='relative flex h-[140px] w-[100px] items-center justify-center rounded-xl bg-(--color-card-face) text-(--color-card-text) outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover) cursor-pointer'
 				onClick={onViewDiscard}
 				ref={ref}
-				role='button'
+				type='button'
 			>
 				<div className={cnStackTitle}>Discard</div>
 
@@ -28,7 +28,7 @@ export function PlayerDiscard(props: {
 						<WaIcon name='trash' variant='classic' />
 					</div>
 				)}
-			</div>
+			</button>
 		)
 	}
 	return <CardSlot ref={ref} title='Discard' />
