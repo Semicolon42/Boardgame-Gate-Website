@@ -304,7 +304,7 @@ export const atomicHandlers: Partial<
 			ctx.setQueue(q => [{type: 'ENQ_PLAYER_DRAW_SINGLE_CARD'}, ...q.slice(1)])
 			return
 		}
-		const randomIdx = Math.floor(Math.random() * hDeck.length)
+		const randomIdx = ctx.rng.pickIndex(hDeck.length)
 		const heroCard = hDeck[randomIdx]
 		if (heroCard === undefined) {
 			ctx.setQueue(q => q.slice(1))
@@ -385,16 +385,21 @@ export const atomicHandlers: Partial<
 	},
 
 	PLAYER_SHUFFLE_DISCARD_INTO_DECK: (_action, ctx) => {
-		const shuffled = [...ctx.currentState.pDiscard].sort(
-			() => Math.random() - 0.5
-		)
+		const shuffled = ctx.rng.shuffle(ctx.currentState.pDiscard)
 		ctx.dispatch({type: 'STACK_ADD_CARDS', stack: 'DECK', cards: shuffled})
 		ctx.dispatch({type: 'STACK_CLEAR_ALL_CARDS', stack: 'DISCARD'})
 		ctx.setQueue(q => q.slice(1))
 	},
 
 	PLAYER_SHUFFLE_SHUFFLE_DECK: (_action, ctx) => {
-		ctx.dispatch({type: 'STACK_SHUFFLE', stack: 'DECK'})
+		const shuffled = ctx.rng.shuffle(ctx.currentState.pDeck)
+		ctx.dispatch({
+			type: 'MULTI_ACTION',
+			actions: [
+				{type: 'STACK_CLEAR_ALL_CARDS', stack: 'DECK'},
+				{type: 'STACK_ADD_CARDS', stack: 'DECK', cards: shuffled}
+			]
+		})
 		ctx.setQueue(q => q.slice(1))
 	},
 

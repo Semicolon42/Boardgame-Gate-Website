@@ -7,7 +7,6 @@
 
 import type {CardPlayType} from '../Cards/XCard'
 import {getEnemyCard, type IEnemyCard} from '../Data/EnemyCardsData'
-import {GetRange} from '../Data/PlayerCardsData'
 
 // ---------------------------------------------------------------------------
 // Card instance — separates physical card identity from card type info
@@ -143,7 +142,6 @@ export type GameOutcomeType = 'WIN' | 'LOSS'
 
 export type GameAction =
 	| {type: 'STACK_CLEAR_ALL_CARDS'; stack: StackType}
-	| {type: 'STACK_SHUFFLE'; stack: StackType}
 	| {type: 'STACK_ADD_CARDS'; stack: StackType; cards: CardInstance[]}
 	| {type: 'STACK_REMOVE_CARDS'; stack: StackType; instanceIds: string[]}
 	| {
@@ -289,15 +287,6 @@ export function gameStateReducer(
 			return {
 				...state,
 				commandUsed: newCommandUsed,
-				stateActionLogs: newActionLog
-			}
-		}
-
-		case 'STACK_SHUFFLE': {
-			const key = stackKey(action.stack)
-			return {
-				...state,
-				[key]: [...state[key]].sort(() => Math.random() - 0.5),
 				stateActionLogs: newActionLog
 			}
 		}
@@ -592,9 +581,8 @@ export function gameStateReducer(
 
 export const HAND_SIZE = 3
 
-const heroDeck = makeCardInstances(
-	GetRange('HERO').sort(() => 0.5 - Math.random())
-)
+// Placeholder state — immediately replaced by ENQ_GAME_SETUP_NORMAL on first render.
+// No Math.random() here; all game randomness is seeded through GameRng.
 export const initialState: GameState = {
 	bFarmHealth: 6,
 	bTowerHealth: 6,
@@ -625,26 +613,20 @@ export const initialState: GameState = {
 
 	gameOutcome: undefined,
 
-	pDeck: makeCardInstances([1, 2, 3]),
+	pDeck: [],
 	pHand: [],
 	pPlayed: {},
 	pDiscard: [],
-	hDeck: heroDeck,
-	hDeckRemaining: heroDeck.length,
-	vDeck: makeCardInstances(
-		GetRange('VILLAGER').sort(() => 0.5 - Math.random())
-	),
+	hDeck: [],
+	hDeckRemaining: 0,
+	vDeck: [],
 
-	eEnemyDeck: makeEnemyCardInstances([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+	eEnemyDeck: [],
 	eEnemyRow: [],
 	eEnemyDiscard: [],
 	eEnemyRowMax: 2,
 
-	vRow: makeCardInstances(
-		GetRange('VILLAGER')
-			.sort(() => 0.5 - Math.random())
-			.slice(-4)
-	),
+	vRow: [],
 	vDiscard: [],
 
 	cCoins: 0,
