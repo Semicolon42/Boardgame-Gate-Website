@@ -16,18 +16,8 @@ function convertActionCards(action: GameAction): ReactElement[] {
 				ActionCard(' --- MULTI_ACTION END')
 			]
 		}
-		case 'STACK_ADD_CARDS':
-		case 'STACK_REMOVE_CARDS':
-		case 'STACK_CLEAR_ALL_CARDS':
-		case 'STACK_SHUFFLE':
-		case 'BUILDING_CHANGE_HEALTH':
-		case 'ACTION_LOGS_CLEAR':
-		case 'UPADTE_RESOURCES':
-		case 'UPDATE_GAME_OUTCOME':
-		case 'MARK_CARD_PLAYED':
-			return [ActionCard(JSON.stringify(action))]
 		default:
-			return [ActionCard(`UNHANDLED LOG -- ${JSON.stringify(action)}`)]
+			return [ActionCard(JSON.stringify(action))]
 	}
 }
 

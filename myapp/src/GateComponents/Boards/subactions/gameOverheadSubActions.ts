@@ -275,6 +275,7 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 			type: 'EXECUTE_GAME_STATE_UPDATE',
 			gameStateAction: {type: 'TURN_START_RESET'}
 		},
+		{type: 'ENQ_CHECK_GAME_OVER'},
 		{type: 'ENQ_PLAYER_DRAW_N', count: 3}
 	],
 	ENQ_ADD_FEAR: (action, state: GameState): SubActionType[] => {
@@ -316,6 +317,26 @@ export const expanders: Partial<Record<SubActionType['type'], Expander>> = {
 				gameStateAction: {type: 'UPDATE_GAME_OUTCOME', outcome: 'WIN'}
 			}
 		]
+	},
+	ENQ_CHECK_GAME_OVER: (_action, state: GameState): SubActionType[] => {
+		if (state.gameOutcome !== undefined) return []
+		if (state.bGateHealth <= 0) {
+			return [
+				{
+					type: 'EXECUTE_GAME_STATE_UPDATE',
+					gameStateAction: {type: 'UPDATE_GAME_OUTCOME', outcome: 'LOSS'}
+				}
+			]
+		}
+		if (state.eEnemyRow.length === 0 && state.eEnemyDeck.length === 0) {
+			return [
+				{
+					type: 'EXECUTE_GAME_STATE_UPDATE',
+					gameStateAction: {type: 'UPDATE_GAME_OUTCOME', outcome: 'WIN'}
+				}
+			]
+		}
+		return []
 	}
 }
 
