@@ -41,6 +41,8 @@ export interface TutorialAnnotation {
 
 export interface TutorialSlide {
 	title: string
+	/** Scale applied to the board preview. Larger for simpler slides, smaller for full-board slides. */
+	scale: number
 	/** Receives refs needed by PlayerBaseRow. Return frozen (non-interactive) JSX. */
 	boardContent: (refs: TutorialRefs) => ReactNode
 	annotations: TutorialAnnotation[]
@@ -79,6 +81,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'The Board',
+		scale: 0.55,
 		boardContent: refs => (
 			<div className='flex-1 grid grid-cols-[max-content_1fr]'>
 				<div className='p-[2px] border flex flex-col'>
@@ -154,6 +157,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'Your Hand & Cards',
+		scale: 0.9,
 		boardContent: _refs => (
 			<div id='tutorial-hand-area'>
 				<PlayerHand cards={HAND_CARDS} />
@@ -189,6 +193,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'Recruiting from the Village',
+		scale: 0.8,
 		boardContent: _refs => (
 			<div>
 				<div className='p-[2px] border flex flex-row gap-1'>
@@ -232,6 +237,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'Enemies',
+		scale: 0.8,
 		boardContent: _refs => (
 			<div>
 				<div className='p-[2px] border flex flex-col'>
@@ -274,6 +280,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'Your Base & the Fear Pyramid',
+		scale: 0.85,
 		boardContent: refs => (
 			<div id='tutorial-base'>
 				<PlayerBaseRow
@@ -323,6 +330,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 	// -------------------------------------------------------------------------
 	{
 		title: 'How a Turn Works',
+		scale: 0.55,
 		boardContent: refs => (
 			<div className='flex-1 grid grid-cols-[max-content_1fr]'>
 				<div className='p-[2px] border flex flex-col'>

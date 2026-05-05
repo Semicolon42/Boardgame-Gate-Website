@@ -6,8 +6,6 @@ interface Props {
 	isActive: boolean
 }
 
-const SCALE = 0.6
-
 export function TutorialView({isActive}: Props) {
 	const [slideIndex, setSlideIndex] = useState(0)
 
@@ -35,21 +33,27 @@ export function TutorialView({isActive}: Props) {
 				{TUTORIAL_SLIDES[slideIndex]?.title ?? 'How to Play'}
 			</h2>
 
-			{/*
-			 * --aspect-ratio=unset lets the carousel grow to the explicit height.
-			 * Height chosen to fit ~340px scaled board + description text.
-			 */}
 			<WaCarousel
 				ref={carouselRef as RefObject<null>}
 				style={{
 					['--aspect-ratio' as string]: 'unset',
+					['--scroll-hint' as string]: '3rem',
 					height: '520px'
 				}}
 			>
 				{TUTORIAL_SLIDES.map((slide, i) => (
 					<WaCarouselItem key={i} style={{['--aspect-ratio' as string]: 'unset'}}>
-						<WaCard appearance='outlined' style={{height: '100%', overflowY: 'auto'}}>
-							{/* Scaled board preview */}
+						{/*
+						 * [&::part(body)]:bg-transparent pierces the WaCard shadow DOM to
+						 * clear the default solid surface fill, letting the page background
+						 * show through.
+						 */}
+						<WaCard
+							appearance='outlined'
+							className='[&::part(body)]:bg-transparent'
+							style={{height: '100%', overflowY: 'auto'}}
+						>
+							{/* Scaled board preview — scale comes from the slide data */}
 							<div
 								className='relative overflow-hidden rounded bg-(--color-gameboard-background)'
 								style={{height: '340px'}}
@@ -57,18 +61,18 @@ export function TutorialView({isActive}: Props) {
 								<div
 									className='pointer-events-none'
 									style={{
-										transform: `scale(${SCALE})`,
+										transform: `scale(${slide.scale})`,
 										transformOrigin: 'top left',
-										width: `${(1 / SCALE) * 100}%`
+										width: `${(1 / slide.scale) * 100}%`
 									}}
 								>
 									{slide.boardContent(refs)}
 								</div>
 
 								{/*
-								 * Tooltips only open when this slide is active AND the view is
-								 * visible — prevents portal-rendered popups bleeding through
-								 * when the view is hidden behind another.
+								 * Tooltips only open when this slide is current and the view is
+								 * visible — prevents portal-rendered popups appearing over other
+								 * views.
 								 */}
 								{slide.annotations.map(a => (
 									<WaTooltip
