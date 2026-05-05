@@ -1,5 +1,7 @@
 import type {Dispatch, MutableRefObject, RefObject, SetStateAction} from 'react'
 import type {CardPlayType} from '@/GateComponents/Cards/XCard'
+import type {GameRecordAction} from '../../Stats/gameRecordReducer'
+import type {GameRng} from '../gameRng'
 import type {
 	BuildingType,
 	CardInstance,
@@ -71,6 +73,7 @@ export type SubActionType =
 			consumesGenericAmount: boolean
 	  }
 	| {type: 'ENQ_GAME_OVER'}
+	| {type: 'ENQ_CHECK_GAME_OVER'}
 	| {type: 'EXECUTE_GAME_STATE_UPDATE'; gameStateAction: GameAction}
 	| {type: 'ENQ_VILLAGER_DRAW_SINGLE_CARD'}
 	| {type: 'ENQ_VILLAGER_ROW_CLEAR'; cost?: number}
@@ -135,6 +138,8 @@ export interface AnimatingVillagerRowSpec {
 /** Everything an atomic handler needs to do its work. */
 export interface SubActionContext {
 	dispatch: Dispatch<GameAction>
+	recordDispatch: Dispatch<GameRecordAction>
+	rng: GameRng
 	currentState: GameState
 	setQueue: Dispatch<SetStateAction<SubActionType[]>>
 	setIsAnimating: (v: boolean) => void
@@ -163,7 +168,8 @@ export interface SubActionContext {
 /** An expander turns a high-level (ENQ_*) sub-action into a sequence of atomic ones. */
 export type Expander<T extends SubActionType = SubActionType> = (
 	action: T,
-	state: GameState
+	state: GameState,
+	rng: GameRng
 ) => SubActionType[]
 
 /** An atomic handler directly dispatches actions and/or triggers animations. */

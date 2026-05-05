@@ -10,9 +10,9 @@ export function PlayerDeck(props: {
 	deckRef: RefObject<HTMLDivElement | null>
 	mayDrawCards: number
 	onDrawBonusCard: () => void
-	onVideDeck: () => void
+	onViewDeck: () => void
 }) {
-	const {deck, deckRef, mayDrawCards, onDrawBonusCard, onVideDeck} = props
+	const {deck, deckRef, mayDrawCards, onDrawBonusCard, onViewDeck} = props
 
 	if (deck?.length === 0) {
 		if (mayDrawCards > 0) {
@@ -37,7 +37,7 @@ export function PlayerDeck(props: {
 				{/* Top half — open deck dialog */}
 				<div
 					className='absolute top-0 left-0 right-0 h-1/2 z-10'
-					onClick={onVideDeck}
+					onClick={onViewDeck}
 					role='button'
 				/>
 				{/* Bottom half — draw bonus card; named peer drives text highlight */}
@@ -58,7 +58,7 @@ export function PlayerDeck(props: {
 	return (
 		<div
 			className={containerClass}
-			onClick={() => onVideDeck}
+			onClick={onViewDeck}
 			ref={deckRef}
 			role='button'
 		>
