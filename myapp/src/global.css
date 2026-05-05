@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html,
+body {
+	background-color: var(--color-gameboard-background);
+}
+
 /* All :root custom properties are injected at startup by applyTheme() in src/themes/applyTheme.ts.
    Do not add hardcoded values here — edit the theme files in src/themes/ instead. */
 

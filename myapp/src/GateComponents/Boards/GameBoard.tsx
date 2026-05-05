@@ -1,4 +1,5 @@
 import {WaButton, WaDialog, WaIcon} from '@awesome.me/webawesome/dist/react'
+import {usePostHog} from '@posthog/react'
 import {useEffect, useRef, useState} from 'react'
 import {
 	type CardDialogProps,
@@ -57,6 +58,8 @@ export function GameBoard() {
 		gameVillagerRowClear,
 		gameGainGenericResource
 	} = useGameActions()
+
+	const posthog = usePostHog()
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
 	const buttonClass =
@@ -162,6 +165,14 @@ export function GameBoard() {
 					<WaButton
 						disabled={isProcessing}
 						onClick={() => {
+							posthog?.capture('turn_ended', {
+								coins: gameState.cCoins,
+								attack: gameState.cAttack,
+								repair: gameState.cRepair,
+								calm: gameState.cCalm,
+								fearLevel: gameState.fFear,
+								handSize: gameState.pHand.length
+							})
 							gameEndTurn()
 						}}
 						variant='brand'
@@ -212,7 +223,15 @@ export function GameBoard() {
 						heroCardsRemaining={gameState.hDeckRemaining}
 						isAttackable={!isProcessing && gameState.cAttack > 0}
 						onAnimationEnd={signalAnimationComplete}
-						onAttack={gameAttackEnemy}
+						onAttack={(enemy, damage) => {
+							posthog?.capture('enemy_attacked', {
+								enemyCardId: enemy.cardId,
+								damageDealt: damage,
+								enemyHealthBefore: enemy.health,
+								totalAttack: gameState.cAttack
+							})
+							gameAttackEnemy(enemy, damage)
+						}}
 						onExileAnimationEnd={
 							animatingAttackVisualization?.attackSource.kind === 'ENEMY'
 								? signalExileComplete
@@ -246,7 +265,14 @@ export function GameBoard() {
 						currentCoins={gameState.cCoins + gameState.bFarmBonusRecruitCurrent}
 						isBuyable={!isProcessing}
 						onAnimationEnd={signalAnimationComplete}
-						onBuyCard={gameBuyCard}
+						onBuyCard={card => {
+							posthog?.capture('card_purchased', {
+								cardId: card.cardId,
+								coinsAvailable:
+									gameState.cCoins + gameState.bFarmBonusRecruitCurrent
+							})
+							gameBuyCard(card)
+						}}
 						villageCards={gameState.vRow}
 					/>
 					{/* Third Base and Health */}
@@ -316,9 +342,20 @@ export function GameBoard() {
 						healthTower={gameState.bTowerHealth}
 						healthTowerMax={gameState.bTowerHealthMAX}
 						onCalm={() => {
+							posthog?.capture('fear_calmed', {
+								fearLevelBefore: gameState.fFear,
+								calmAvailable: gameState.cCalm
+							})
 							gameCalmFear(1)
 						}}
 						onRepair={(building: BuildingType) => {
+							posthog?.capture('building_repaired', {
+								building,
+								repairAvailable: gameState.cRepair,
+								farmHealth: gameState.bFarmHealth,
+								gateHealth: gameState.bGateHealth,
+								towerHealth: gameState.bTowerHealth
+							})
 							gameRepairBase(building, 1)
 						}}
 						towerRef={towerRef}
@@ -329,6 +366,12 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
 							onClick={() => {
+								posthog?.capture('resource_converted', {
+									resourceType: 'ATTACK',
+									amount: 1,
+									cost: 2,
+									coinsBefore: gameState.cCoins
+								})
 								gameGainGenericResource('ATTACK', 1, 2)
 							}}
 							type='button'
@@ -342,6 +385,12 @@ export function GameBoard() {
 							className={buttonClass}
 							disabled={gameState.cCoins < 2}
 							onClick={() => {
+								posthog?.capture('resource_converted', {
+									resourceType: 'REPAIR',
+									amount: 1,
+									cost: 2,
+									coinsBefore: gameState.cCoins
+								})
 								gameGainGenericResource('REPAIR', 1, 2)
 							}}
 							type='button'
@@ -356,6 +405,12 @@ export function GameBoard() {
 								gameState.commandUsed.refreshCitizens > 0
 							}
 							onClick={() => {
+								posthog?.capture('resource_converted', {
+									resourceType: 'CALM',
+									amount: 1,
+									cost: 2,
+									coinsBefore: gameState.cCoins
+								})
 								gameGainGenericResource('CALM', 1, 2)
 							}}
 							type='button'
@@ -370,6 +425,10 @@ export function GameBoard() {
 								gameState.commandUsed.refreshCitizens > 0
 							}
 							onClick={() => {
+								posthog?.capture('village_row_refreshed', {
+									coinsBefore: gameState.cCoins,
+									cost: 1
+								})
 								gameVillagerRowClear(1)
 							}}
 							type='button'
@@ -382,7 +441,13 @@ export function GameBoard() {
 						animatingCard={animatingCard}
 						cards={gameState.pHand}
 						onAnimationEnd={signalAnimationComplete}
-						onPlayCard={playCard}
+						onPlayCard={(card, cardPlayType) => {
+							posthog?.capture('card_played', {
+								cardId: card.cardId,
+								cardPlayType
+							})
+							playCard(card, cardPlayType)
+						}}
 						playedInstanceIds={gameState.pPlayed}
 					/>
 				</div>
