@@ -168,12 +168,7 @@ export function GameBoard() {
 					>
 						End Turn
 					</WaButton>
-					<WaButton
-						onClick={() => {
-							setShowStats(true)
-						}}
-						variant='neutral'
-					>
+					<WaButton onClick={() => setShowStats(true)} variant='neutral'>
 						Stats
 					</WaButton>
 				</div>
@@ -428,12 +423,6 @@ export function GameBoard() {
 					spec={animatingHeroToDiscard}
 				/>
 			)}
-			<GameStatsPanel
-				isOpen={showStats}
-				onClose={() => {
-					setShowStats(false)
-				}}
-			/>
 			<PlayerEnemyCardDialog
 				enemyCards={cardDialog?.enemyCards ?? []}
 				genericTrashesAvailable={cardDialog?.genericTrashesAvailable}
@@ -445,6 +434,7 @@ export function GameBoard() {
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
 			/>
+			<GameStatsPanel isOpen={showStats} onClose={() => setShowStats(false)} />
 		</div>
 	)
 }

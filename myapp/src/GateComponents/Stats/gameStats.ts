@@ -10,10 +10,12 @@ export function saveGameRecord(record: GameRecord): void {
 }
 
 export function loadGameRecords(): GameRecord[] {
+	const raw = localStorage.getItem(STORAGE_KEY)
+	if (raw === null) return []
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY)
-		if (raw === null) return []
-		return JSON.parse(raw) as GameRecord[]
+		const parsed: unknown = JSON.parse(raw)
+		if (!Array.isArray(parsed)) return []
+		return parsed as GameRecord[]
 	} catch {
 		return []
 	}
