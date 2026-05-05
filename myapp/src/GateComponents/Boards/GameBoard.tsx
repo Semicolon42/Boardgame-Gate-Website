@@ -12,7 +12,6 @@ import {EnemyRow} from '../Rows/EnemyRow/EnemyRow'
 import {PlayerBaseRow} from '../Rows/PlayerBaseRow/PlayerBaseRow'
 import {PlayerHand} from '../Rows/PlayerHand/PlayerHand'
 import {VillageRow} from '../Rows/VillageRow/VillageRow'
-import {GameStatsPanel} from '../Stats/GameStatsPanel'
 import {saveGameRecord} from '../Stats/gameStats'
 import {ValueBadge} from '../UIComponents/ValueBadge'
 import {AttackLine} from './AttackLine'
@@ -70,8 +69,6 @@ export function GameBoard() {
 	const [cardDialog, setCardDialog] = useState<CardDialogProps | undefined>(
 		undefined
 	)
-	const [showStats, setShowStats] = useState(false)
-
 	const prevOutcomeRef = useRef(gameState.gameOutcome)
 	const gameRecordRef = useRef(gameRecord)
 	gameRecordRef.current = gameRecord
@@ -178,9 +175,6 @@ export function GameBoard() {
 						variant='brand'
 					>
 						End Turn
-					</WaButton>
-					<WaButton onClick={() => setShowStats(true)} variant='neutral'>
-						Stats
 					</WaButton>
 				</div>
 
@@ -499,7 +493,6 @@ export function GameBoard() {
 				playerCards={cardDialog?.playerCards ?? []}
 				title={cardDialog?.title ?? ''}
 			/>
-			<GameStatsPanel isOpen={showStats} onClose={() => setShowStats(false)} />
 		</div>
 	)
 }

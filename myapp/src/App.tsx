@@ -2,7 +2,7 @@ import {lazy, Suspense} from 'react'
 import {ErrorBoundary, type FallbackProps} from 'react-error-boundary'
 import {Route, Routes} from 'react-router'
 import {LoadingOrError} from '@/components/LoadingOrError'
-import {GameBoard} from '@/GateComponents/Boards/GameBoard'
+import {GameLayout} from '@/GateComponents/GameLayout'
 import {Gallery} from '@/pages/Gallery'
 
 const Details = lazy(async () =>
@@ -18,7 +18,7 @@ export function App() {
 		<ErrorBoundary fallbackRender={renderError}>
 			<Suspense fallback={<LoadingOrError />}>
 				<Routes>
-					<Route element={<GameBoard />} index={true} />
+					<Route element={<GameLayout />} index={true} />
 					<Route element={<Gallery />} path='gallery' />
 					<Route element={<Details />} path='gallery/:fruitName' />
 				</Routes>
