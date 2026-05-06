@@ -13,7 +13,7 @@ export function HeroDeck(props: {
 		return <CardSlot />
 	}
 	const cn = [
-		'flex flex-col h-[140px] w-[100px] items-center justify-center gap-2',
+		'flex flex-col h-[140px] w-[100px] items-center justify-center gap-2 relative',
 		'bg-(--color-card-back) text-(--color-card-text) rounded-xl',
 		'outline-4 outline-(--color-outline-normal) hover:outline-(--color-outline-normal-hover)',
 		onViewHeroDeck ? 'cursor-pointer' : ''
@@ -25,7 +25,7 @@ export function HeroDeck(props: {
 			ref={hDeckRef}
 			{...(onViewHeroDeck ? {role: 'button', onClick: onViewHeroDeck} : {})}
 		>
-			<div className={cnStackTitle}>Hero</div>
+			<div className={cnStackTitle}>Heros</div>
 			<WaIcon className='text-6xl' name='dungeon' variant='classic' />
 		</div>
 	)

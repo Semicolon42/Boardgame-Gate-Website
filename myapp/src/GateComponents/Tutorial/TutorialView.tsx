@@ -65,13 +65,12 @@ export function TutorialView({isActive}: Props) {
 						 */}
 						<WaCard
 							appearance='outlined'
-							className='bg-(--color-gameboard-background-secondary)'
+							className='w-full h-full bg-(--color-gameboard-background-secondary)'
 							style={{height: '100%', overflowY: 'auto'}}
 						>
 							{/* Scaled board preview — scale comes from the slide data */}
 							<div
 								className='relative overflow-hidden rounded bg-(--color-gameboard-background)'
-								style={{height: '340px'}}
 							>
 								<div
 									className='pointer-events-none'

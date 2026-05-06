@@ -48,7 +48,7 @@ export function PlayerBaseRow({
 	fearamidAttacking = false
 }: PlayerBaseRowProps) {
 	return (
-		<div className='flex space-x-3 p-[2px]'>
+		<div className='flex flex-1 justify-between p-[2px]'>
 			<PlayerBaseCard
 				canRepair={canRepair}
 				divRef={farmRef}

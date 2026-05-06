@@ -72,7 +72,7 @@ export function Fearamid(props: {
 	const {fear, fearamid, onCalm, canCalm, isUnderAttack, divRef} = props
 	const id = useId()
 	let cn = [
-		'h-[150px] w-[100px] flex flex-col',
+		'relative h-[150px] w-[100px] flex flex-col',
 		'items-center justify-center gap-[3px]',
 		'bg-(--color-base-back-normal) text-(--color-base-text)',
 		'outline-4'
@@ -87,12 +87,12 @@ export function Fearamid(props: {
 	return (
 		<>
 			<div
-				className={`${cn} pb-3`}
+				className={cn}
 				id={id}
 				ref={divRef}
 				{...(onCalm && canCalm ? {role: 'button', onClick: onCalm} : {})}
 			>
-				<div className='top-1 text-2xl'>Fearamid</div>
+				<div className='absolute top-0 text-2xl'>Fearamid</div>
 				{FEARAMID_ROWS.map((rowIndices, rowIdx) => (
 					// biome-ignore lint/suspicious/noArrayIndexKey: stable positional row
 					<div className='flex gap-[2px]' key={rowIdx}>
