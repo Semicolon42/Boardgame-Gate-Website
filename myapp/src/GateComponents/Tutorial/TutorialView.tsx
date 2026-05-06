@@ -1,4 +1,4 @@
-import {WaButton, WaCard, WaCarousel, WaCarouselItem, WaTooltip} from '@awesome.me/webawesome/dist/react'
+import {WaButton, WaCard, WaCarousel, WaCarouselItem, WaIcon, WaTooltip} from '@awesome.me/webawesome/dist/react'
 import {type RefObject, useRef, useState} from 'react'
 import {TUTORIAL_SLIDES, type TutorialRefs} from './tutorialSlides'
 
@@ -28,13 +28,16 @@ export function TutorialView({isActive}: Props) {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 p-4'>
+		<div className='flex flex-col gap-4 p-4 max-w-2xl'>
 			<h2 className='text-lg font-semibold'>
 				{TUTORIAL_SLIDES[slideIndex]?.title ?? 'How to Play'}
 			</h2>
 
 			<WaCarousel
 				ref={carouselRef as RefObject<null>}
+				onWaSlideChange={(e: Event) => {
+					setSlideIndex((e as CustomEvent<{index: number}>).detail.index)
+				}}
 				style={{
 					['--aspect-ratio' as string]: 'unset',
 					['--scroll-hint' as string]: '3rem',
@@ -50,7 +53,7 @@ export function TutorialView({isActive}: Props) {
 						 */}
 						<WaCard
 							appearance='outlined'
-							className='[&::part(body)]:bg-transparent'
+							className='bg-(--color-gameboard-background-secondary)'
 							style={{height: '100%', overflowY: 'auto'}}
 						>
 							{/* Scaled board preview — scale comes from the slide data */}
@@ -81,6 +84,7 @@ export function TutorialView({isActive}: Props) {
 										open={isActive && i === slideIndex}
 										placement={a.placement}
 										trigger='manual'
+										color='orange'
 									>
 										{a.text}
 									</WaTooltip>
@@ -88,7 +92,7 @@ export function TutorialView({isActive}: Props) {
 							</div>
 
 							{/* Description text */}
-							<div className='mt-4 text-sm leading-relaxed text-(--color-card-text)'>
+							<div className='text-sm leading-relaxed text-(--color-card-text)'>
 								{slide.description}
 							</div>
 						</WaCard>
@@ -96,25 +100,23 @@ export function TutorialView({isActive}: Props) {
 				))}
 			</WaCarousel>
 
-			{/* Slide navigation */}
-			<div className='flex items-center gap-2'>
-				<span className='flex-1 text-xs text-gray-400'>
+			<div className='flex items-center justify-center gap-2'>
+				<WaButton	
+					onClick={() => go(slideIndex - 1)}
+					variant={slideIndex <= 0 ? 'neutral' : 'brand'}
+					disabled={slideIndex === 0}
+				>
+					<WaIcon name='arrow-left' />
+				</WaButton>
+				<span className='text-xs text-gray-400 w-12 text-center'>
 					{slideIndex + 1} / {total}
 				</span>
 				<WaButton
-					disabled={slideIndex === 0}
-					onClick={() => go(slideIndex - 1)}
-					variant='neutral'
-				>
-					Previous
-				</WaButton>
-				<WaButton
-					appearance='filled'
-					disabled={slideIndex === total - 1}
 					onClick={() => go(slideIndex + 1)}
-					variant='brand'
+					variant={slideIndex+1 >= TUTORIAL_SLIDES.length ? 'neutral' : 'brand'}
+					disabled={slideIndex+1 >= TUTORIAL_SLIDES.length}
 				>
-					Next
+					<WaIcon name='arrow-right' />
 				</WaButton>
 			</div>
 		</div>

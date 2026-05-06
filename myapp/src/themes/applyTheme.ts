@@ -8,7 +8,12 @@ export function applyTheme(theme: GateTheme): void {
 		'--color-gameboard-background',
 		theme.colors.gameboardBackground
 	)
+	r.style.setProperty(
+		'--color-gameboard-background-secondary',
+		theme.colors.gameboardBackgroundSecondary
+	)
 	r.style.setProperty('--color-card-text', theme.colors.cardText)
+	r.style.setProperty('--color-card-text-keyword', theme.colors.cardKeywordText)
 	r.style.setProperty('--color-card-back', theme.colors.cardBack)
 	r.style.setProperty('--color-card-face', theme.colors.cardFace)
 	r.style.setProperty('--color-enemy-card-back', theme.colors.enemyCardBack)

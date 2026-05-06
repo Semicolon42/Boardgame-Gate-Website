@@ -25,7 +25,7 @@ export function GameLayout() {
 
 	return (
 		<div className='flex flex-col h-dvh'>
-			<GameNav activePanel={activePanel} onSelect={select} />
+			<GameNav onSelect={select} />
 			{/*
 			 * All three views stay mounted so game state is never lost on navigation.
 			 * Switching views is a CSS opacity fade — no layout reflow or resize.

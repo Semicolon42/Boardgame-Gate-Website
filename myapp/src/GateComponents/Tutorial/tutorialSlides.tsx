@@ -26,7 +26,7 @@ export interface TutorialRefs {
 // ---------------------------------------------------------------------------
 
 export function K({children}: {children: ReactNode}) {
-	return <strong className='text-amber-700'>{children}</strong>
+	return <strong className='text-(--color-card-text-keyword)'>{children}</strong>
 }
 
 // ---------------------------------------------------------------------------
@@ -137,10 +137,10 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 			</div>
 		),
 		annotations: [
-			{id: 'tutorial-enemy-row', placement: 'top', text: 'Enemy Row'},
-			{id: 'tutorial-village-row', placement: 'right', text: 'Village Row'},
-			{id: 'tutorial-base-row', placement: 'right', text: 'Your Base & Fear'},
-			{id: 'tutorial-player-hand', placement: 'bottom', text: 'Your Hand'}
+			{id: 'tutorial-enemy-row', placement: 'left', text: 'Enemy Row'},
+			{id: 'tutorial-village-row', placement: 'left', text: 'Village Row'},
+			{id: 'tutorial-base-row', placement: 'left', text: 'Your Base & Fear'},
+			{id: 'tutorial-player-hand', placement: 'left', text: 'Your Hand'}
 		],
 		description: (
 			<>

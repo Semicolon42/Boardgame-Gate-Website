@@ -3,7 +3,9 @@ import type {GateTheme} from './types'
 const theme: GateTheme = {
 	colors: {
 		gameboardBackground: 'rgb(14, 12, 55)',
+		gameboardBackgroundSecondary: 'rgb(24, 22, 80)',
 		cardText: 'white',
+		cardKeywordText: 'rgb(255, 117, 11)',
 		cardBack: 'rgb(23, 23, 23)',
 		cardFace: 'rgb(16, 16, 16)',
 		enemyCardBack: 'rgb(23, 23, 23)',
