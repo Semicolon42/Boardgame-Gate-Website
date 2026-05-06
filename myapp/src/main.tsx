@@ -25,7 +25,7 @@ if (container) {
 		<StrictMode>
 			<PostHogProvider client={posthog}>
 				<PostHogErrorBoundary>
-					<BrowserRouter>
+					<BrowserRouter basename={import.meta.env.BASE_URL}>
 						<App />
 					</BrowserRouter>
 				</PostHogErrorBoundary>
