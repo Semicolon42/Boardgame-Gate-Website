@@ -69,9 +69,7 @@ export function TutorialView({isActive}: Props) {
 							style={{height: '100%', overflowY: 'auto'}}
 						>
 							{/* Scaled board preview — scale comes from the slide data */}
-							<div
-								className='relative overflow-hidden rounded bg-(--color-gameboard-background)'
-							>
+							<div className='relative overflow-hidden rounded bg-(--color-gameboard-background)'>
 								<div
 									className='pointer-events-none'
 									style={{

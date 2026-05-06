@@ -13,7 +13,10 @@ export function applyTheme(theme: GateTheme): void {
 		theme.colors.gameboardBackgroundSecondary
 	)
 	r.style.setProperty('--color-navigation-text', theme.colors.navText)
-	r.style.setProperty('--color-navigation-text-active', theme.colors.navTextActive)
+	r.style.setProperty(
+		'--color-navigation-text-active',
+		theme.colors.navTextActive
+	)
 	r.style.setProperty('--color-navigation-highlight', theme.colors.navHighlight)
 	r.style.setProperty('--color-card-text', theme.colors.cardText)
 	r.style.setProperty('--color-card-text-keyword', theme.colors.cardKeywordText)

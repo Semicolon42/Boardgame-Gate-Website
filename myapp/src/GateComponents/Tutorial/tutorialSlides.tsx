@@ -161,7 +161,7 @@ export const TUTORIAL_SLIDES: TutorialSlide[] = [
 		title: 'Your Hand & Cards',
 		scale: 0.9,
 		boardContent: _refs => (
-			<div id='tutorial-hand-area' className='w-full'>
+			<div className='w-full' id='tutorial-hand-area'>
 				<PlayerHand cards={HAND_CARDS} />
 			</div>
 		),

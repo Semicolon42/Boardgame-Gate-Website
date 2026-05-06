@@ -113,7 +113,11 @@ export function PlayerBaseCard(props: {
 				{...(onRepair && canRepair ? {role: 'button', onClick: onRepair} : {})}
 			>
 				<div className='text-2xl absolute top-0'>{name}</div>
-				<WaIcon className={'text-5xl pt-1'} name={icon.name} variant={icon.variant} />
+				<WaIcon
+					className='text-5xl pt-1'
+					name={icon.name}
+					variant={icon.variant}
+				/>
 				<HealthDice health={health} maxHealth={maxHealth} />
 				<div className='text-xs absolute bottom-0'>{buildingText} </div>
 			</div>

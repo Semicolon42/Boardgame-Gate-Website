@@ -37,7 +37,7 @@ export function PlayerHand({
 	const slots = Array.from({length: slotCount}, (_, i) => cards[i] ?? null)
 
 	return (
-		<div className='justify-left hello flex flex-wrap gap-3 p-[2px]'>
+		<div className='flex flex-wrap justify-between p-[2px]'>
 			{slots.map((card, i) => {
 				if (card === null) {
 					// biome-ignore lint/suspicious/noArrayIndexKey: this is a generic element where he index key is fine to use

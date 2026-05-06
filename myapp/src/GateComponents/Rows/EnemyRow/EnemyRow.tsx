@@ -53,7 +53,7 @@ export function EnemyRow({
 	)
 
 	return (
-		<div className='flex space-x-3 p-[2px]'>
+		<div className='flex justify-between p-[2px]'>
 			{slots.map((card, slotIndex) => {
 				const isDiscarded =
 					card !== null && animatingEnemyRemove === card.instanceId

@@ -1,10 +1,10 @@
+import {WaTab, WaTabGroup, WaTabPanel} from '@awesome.me/webawesome/dist/react'
+import type {WaTabShowEvent} from '@awesome.me/webawesome/dist/react/tab-group/index.js'
 import {usePostHog} from '@posthog/react'
-import {useState, type CSSProperties} from 'react'
+import {type CSSProperties, useState} from 'react'
 import {GameBoard} from './Boards/GameBoard'
 import {GameStatsView} from './Stats/GameStatsView'
 import {TutorialView} from './Tutorial/TutorialView'
-import {WaTab, WaTabGroup, WaTabPanel} from '@awesome.me/webawesome/dist/react'
-import type {WaTabShowEvent} from '@awesome.me/webawesome/dist/react/tab-group/index.js'
 
 export type ActivePanel = 'game' | 'stats' | 'tutorial'
 
@@ -27,7 +27,9 @@ export function GameLayout() {
 		<div className='flex flex-col h-dvh w-full max-w-2xl mx-auto'>
 			<WaTabGroup
 				className='game-nav'
-				onWaTabShow={(e: WaTabShowEvent) => select(e.detail.name as ActivePanel)}
+				onWaTabShow={(e: WaTabShowEvent) =>
+					select(e.detail.name as ActivePanel)
+				}
 				style={navStyle}
 			>
 				<WaTab panel='game' slot='nav'>
@@ -39,13 +41,13 @@ export function GameLayout() {
 				<WaTab panel='tutorial' slot='nav'>
 					How to Play
 				</WaTab>
-				<WaTabPanel name='game' >
+				<WaTabPanel name='game'>
 					<GameBoard />
 				</WaTabPanel>
-				<WaTabPanel name='stats' >
+				<WaTabPanel name='stats'>
 					<GameStatsView isActive={activePanel === 'stats'} />
 				</WaTabPanel>
-				<WaTabPanel name='tutorial' >
+				<WaTabPanel name='tutorial'>
 					<TutorialView isActive={activePanel === 'tutorial'} />
 				</WaTabPanel>
 			</WaTabGroup>
