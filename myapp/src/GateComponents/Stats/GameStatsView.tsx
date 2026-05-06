@@ -54,7 +54,7 @@ export function GameStatsView({isActive}: Props) {
 
 	return (
 		<div className='flex flex-col gap-4 p-4'>
-			<h2 className='text-lg font-semibold'>Game History</h2>
+			<h2 className='text-lg text-(--color-card-text) font-semibold'>Game History</h2>
 			{records.length === 0 ? (
 				<p className='text-center text-gray-500 py-4'>No games yet.</p>
 			) : (
@@ -138,7 +138,7 @@ export function GameStatsView({isActive}: Props) {
 			)}
 			<div>
 				<WaButton
-					appearance='outlined'
+					appearance='filled-outlined'
 					disabled={records.length === 0}
 					onClick={handleClear}
 					variant='danger'

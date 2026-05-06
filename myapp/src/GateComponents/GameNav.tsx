@@ -7,22 +7,32 @@ interface Props {
 	onSelect: (panel: ActivePanel) => void
 }
 
+// updates the colors for the  
 const navStyle: CSSProperties = {
-	'--indicator-color': 'var(--color-outline-active)',
-	'--track-color': 'var(--color-outline-normal)',
-	'--track-width': '2px',
+	'--wa-color-neutral-on-quiet': 'var(--color-navigation-text)',
+	'--indicator-color': 'var(--color-navigation-text-active)',
+	'--track-color': 'var(--color-navigation-highlight)',
+	'--track-width': '2px'
 } as CSSProperties
 
 export function GameNav({onSelect}: Props) {
 	return (
 		<WaTabGroup
 			className='game-nav'
+			onWaTabShow={(e: WaTabShowEvent) =>
+				onSelect(e.detail.name as ActivePanel)
+			}
 			style={navStyle}
-			onWaTabShow={(e: WaTabShowEvent) => onSelect(e.detail.name as ActivePanel)}
 		>
-			<WaTab slot='nav' panel='game'>Game</WaTab>
-			<WaTab slot='nav' panel='stats'>Stats</WaTab>
-			<WaTab slot='nav' panel='tutorial'>How to Play</WaTab>
+			<WaTab panel='game' slot='nav'>
+				Game
+			</WaTab>
+			<WaTab panel='stats' slot='nav'>
+				Stats
+			</WaTab>
+			<WaTab panel='tutorial' slot='nav'>
+				How to Play
+			</WaTab>
 		</WaTabGroup>
 	)
 }

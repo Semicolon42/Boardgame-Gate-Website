@@ -1,4 +1,11 @@
-import {WaButton, WaCard, WaCarousel, WaCarouselItem, WaIcon, WaTooltip} from '@awesome.me/webawesome/dist/react'
+import {
+	WaButton,
+	WaCard,
+	WaCarousel,
+	WaCarouselItem,
+	WaIcon,
+	WaTooltip
+} from '@awesome.me/webawesome/dist/react'
 import {type RefObject, useRef, useState} from 'react'
 import {TUTORIAL_SLIDES, type TutorialRefs} from './tutorialSlides'
 
@@ -10,7 +17,9 @@ export function TutorialView({isActive}: Props) {
 	const [slideIndex, setSlideIndex] = useState(0)
 
 	const carouselRef = useRef<
-		HTMLElement & {goToSlide: (index: number, behavior?: ScrollBehavior) => void}
+		HTMLElement & {
+			goToSlide: (index: number, behavior?: ScrollBehavior) => void
+		}
 	>(null)
 
 	// Dummy refs required by PlayerBaseRow's interface — never read (no animations run)
@@ -34,10 +43,10 @@ export function TutorialView({isActive}: Props) {
 			</h2>
 
 			<WaCarousel
-				ref={carouselRef as RefObject<null>}
 				onWaSlideChange={(e: Event) => {
 					setSlideIndex((e as CustomEvent<{index: number}>).detail.index)
 				}}
+				ref={carouselRef as RefObject<null>}
 				style={{
 					['--aspect-ratio' as string]: 'unset',
 					['--scroll-hint' as string]: '3rem',
@@ -45,7 +54,10 @@ export function TutorialView({isActive}: Props) {
 				}}
 			>
 				{TUTORIAL_SLIDES.map((slide, i) => (
-					<WaCarouselItem key={i} style={{['--aspect-ratio' as string]: 'unset'}}>
+					<WaCarouselItem
+						key={i}
+						style={{['--aspect-ratio' as string]: 'unset'}}
+					>
 						{/*
 						 * [&::part(body)]:bg-transparent pierces the WaCard shadow DOM to
 						 * clear the default solid surface fill, letting the page background
@@ -79,12 +91,12 @@ export function TutorialView({isActive}: Props) {
 								 */}
 								{slide.annotations.map(a => (
 									<WaTooltip
-										key={a.id}
+										color='orange'
 										for={a.id}
+										key={a.id}
 										open={isActive && i === slideIndex}
 										placement={a.placement}
 										trigger='manual'
-										color='orange'
 									>
 										{a.text}
 									</WaTooltip>
@@ -101,10 +113,10 @@ export function TutorialView({isActive}: Props) {
 			</WaCarousel>
 
 			<div className='flex items-center justify-center gap-2'>
-				<WaButton	
+				<WaButton
+					disabled={slideIndex === 0}
 					onClick={() => go(slideIndex - 1)}
 					variant={slideIndex <= 0 ? 'neutral' : 'brand'}
-					disabled={slideIndex === 0}
 				>
 					<WaIcon name='arrow-left' />
 				</WaButton>
@@ -112,9 +124,11 @@ export function TutorialView({isActive}: Props) {
 					{slideIndex + 1} / {total}
 				</span>
 				<WaButton
+					disabled={slideIndex + 1 >= TUTORIAL_SLIDES.length}
 					onClick={() => go(slideIndex + 1)}
-					variant={slideIndex+1 >= TUTORIAL_SLIDES.length ? 'neutral' : 'brand'}
-					disabled={slideIndex+1 >= TUTORIAL_SLIDES.length}
+					variant={
+						slideIndex + 1 >= TUTORIAL_SLIDES.length ? 'neutral' : 'brand'
+					}
 				>
 					<WaIcon name='arrow-right' />
 				</WaButton>
