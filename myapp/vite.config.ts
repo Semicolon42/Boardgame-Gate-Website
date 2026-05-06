@@ -13,7 +13,7 @@ export default defineConfig(() => ({
 			'@': path.resolve(__dirname, './src')
 		}
 	},
-	base: 'Boardgame-Gate-Website',
+	base: '/Boardgame-Gate-Website/',
 	test: {
 		bail: 1,
 		clearMocks: true,
