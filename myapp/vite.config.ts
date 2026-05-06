@@ -13,12 +13,13 @@ export default defineConfig(() => ({
 			'@': path.resolve(__dirname, './src')
 		}
 	},
+	base: '/Boardgame-Gate-Website/',
 	test: {
 		bail: 1,
 		clearMocks: true,
 		coverage: {
 			enabled: true,
-			exclude: ['src/main.tsx', 'src/mocks/browser.ts'],
+			exclude: ['src/main.tsx'],
 			include: ['src/**/*'],
 			reporter: ['text', 'lcov'],
 			reportsDirectory: 'coverage',

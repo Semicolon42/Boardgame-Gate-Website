@@ -1,7 +1,12 @@
 export interface GateTheme {
 	colors: {
+		navText: string
+		navTextActive: string
+		navHighlight: string
 		gameboardBackground: string
+		gameboardBackgroundSecondary: string
 		cardText: string
+		cardKeywordText: string
 		cardBack: string
 		cardFace: string
 		enemyCardBack: string

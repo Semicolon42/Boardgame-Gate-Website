@@ -18,10 +18,10 @@ function HealthDice({health, maxHealth}: {health: number; maxHealth: number}) {
 		}
 	}
 	return (
-		<div className='flex gap-[2px]'>
+		<div className='flex gap-0'>
 			{dice.map(({name, variant, color}) => (
 				<WaIcon
-					className={`text-3xl h-[20px] w-[20px] m-1 ${color}`}
+					className={`text-3xl h-[20px] w-[20px] m-0.5 ${color}`}
 					name={name}
 					variant={variant}
 				/>
@@ -74,7 +74,6 @@ export function PlayerBaseCard(props: {
 	const id = useId()
 	let icon = {name: 'question', variant: 'classic'}
 	let buildingText = ''
-	const cnIcon = 'text-5xl'
 	switch (image) {
 		case 'farm':
 			icon = {name: 'house', variant: 'regular'}
@@ -92,7 +91,8 @@ export function PlayerBaseCard(props: {
 	const tooltipRepair = canRepair ? 'Repair 1' : undefined
 
 	let cn = [
-		'h-[150px] w-[100px] flex flex-col gap-1',
+		'relative justify-between',
+		'h-[150px] w-[100px] flex flex-col',
 		'items-center justify-center',
 		'bg-(--color-base-back-normal) text-(--color-base-text)',
 		'outline-4 outline-color:var(--color-red)'
@@ -112,10 +112,14 @@ export function PlayerBaseCard(props: {
 				ref={divRef}
 				{...(onRepair && canRepair ? {role: 'button', onClick: onRepair} : {})}
 			>
-				<div className='text-2xl'>{name}</div>
-				<WaIcon className={cnIcon} name={icon.name} variant={icon.variant} />
+				<div className='text-2xl absolute top-0'>{name}</div>
+				<WaIcon
+					className='text-5xl pt-1'
+					name={icon.name}
+					variant={icon.variant}
+				/>
 				<HealthDice health={health} maxHealth={maxHealth} />
-				<div className='text-xs'>{buildingText} </div>
+				<div className='text-xs absolute bottom-0'>{buildingText} </div>
 			</div>
 			{tooltipRepair && (
 				<WaTooltip for={id} placement='top'>

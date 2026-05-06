@@ -38,7 +38,7 @@ pnpm validate     # Full pipeline: lint + test:ci + test:e2e:ci
 pnpm vitest src/utils/useMediaQuery.test.ts
 ```
 
-**Coverage** is always enabled and enforced at 100% (excluding `src/main.tsx` and `src/mocks/browser.ts`).
+**Coverage** is always enabled and enforced at 100% (excluding `src/main.tsx`).
 
 ---
 
@@ -47,39 +47,22 @@ pnpm vitest src/utils/useMediaQuery.test.ts
 #### Two distinct domains in one app
 
 1. **Gate Board Game** (`/`) — `src/GateComponents/` — deck-building game UI with local `useState`, no server state
-2. **Fruit Gallery** (`/gallery`, `/:fruitName`) — `src/pages/` — data fetched from `/fruits` API via React Query
 
 #### Provider stack (`src/main.tsx`)
 
 ```
 StrictMode
-  QueryClientProvider      ← React Query client
-    ReactQueryDevtools
-    BrowserRouter
-        App
+  BrowserRouter
+    App
 ```
 
-MSW starts before React renders. Currently runs in all environments (a TODO marks it to be restricted to dev-only).
+Currently runs in all environments (a TODO marks it to be restricted to dev-only).
 
 #### Routing (`src/App.tsx`)
 
 ```
 /             → <GameBoard />       (eager)
-/gallery      → <Gallery />         (eager)
-/:fruitName   → <Details />         (lazy, code-split)
 ```
-
-Global `ErrorBoundary` + `Suspense` wrap all routes. `<LoadingOrError>` handles both states.
-
-#### Data fetching pattern
-
-All API calls follow this pattern (see `src/api/fruits.ts`):
-1. Define a Valibot schema
-2. Export the inferred TypeScript type via `v.InferOutput<typeof Schema>`
-3. Fetch with `fetch()`, throw on non-ok, then `v.parse(Schema, await res.json())`
-4. Consume with `useSuspenseQuery` in components — no loading/error states needed in the component
-
-MSW intercepts `/fruits` in development (`src/mocks/handlers.ts`, mock data in `src/mocks/data/fruits.json`).
 
 ---
 
@@ -121,8 +104,7 @@ Path alias `@/` maps to `src/`.
 
 - **Unit:** Vitest 3 with `happy-dom`, globals enabled (no need to import `describe`/`it`/`expect`)
 - **E2E:** Playwright 1.55 targeting Desktop Chrome + Mobile Chrome (Pixel 5), dev server auto-started
-- MSW server lifecycle managed in `src/test-setup.ts`
-- Test utilities in `src/test-utils.tsx` (custom render wrapper with `QueryClientProvider` + `BrowserRouter`)
+- Test utilities in `src/test-utils.tsx` (custom render wrapper with `BrowserRouter`)
 - Bail at first failure (`bail: 1`)
 
 ---
@@ -148,13 +130,10 @@ Tests use Jest (`jest.config.js`).
 |---|---|---|
 | react | 19.1.1 | UI framework |
 | react-router | 7.8.2 | Routing |
-| @tanstack/react-query | 5.85.6 | Server state |
-| valibot | 1.1.0 | Runtime validation |
 | @awesome.me/webawesome | 3.0.0-beta.5 | Web components |
 | tailwindcss | 4 | Styling |
 | vite | 7 | Build tool |
 | vitest | 3.2.4 | Unit testing |
 | @playwright/test | 1.55.0 | E2E testing |
-| msw | 2 | API mocking |
 | @biomejs/biome | 2.2.2 | Lint + format |
 | typescript | 5.9.2 | Type checking |
