@@ -59,6 +59,8 @@ export function GameBoard() {
 	} = useGameActions()
 
 	const posthog = usePostHog()
+	const capture = (event: string, props?: Record<string, unknown>) =>
+		capture(event, {turn: gameRecord.turnCount, ...props})
 
 	const statusBarClass = 'p-[2px] border flex flex-col'
 	const buttonClass =
@@ -161,7 +163,7 @@ export function GameBoard() {
 				<WaButton
 					disabled={isProcessing}
 					onClick={() => {
-						posthog?.capture('turn_ended', {
+						capture('turn_ended', {
 							coins: gameState.cCoins,
 							attack: gameState.cAttack,
 							repair: gameState.cRepair,
@@ -217,7 +219,7 @@ export function GameBoard() {
 					isAttackable={!isProcessing && gameState.cAttack > 0}
 					onAnimationEnd={signalAnimationComplete}
 					onAttack={(enemy, damage) => {
-						posthog?.capture('enemy_attacked', {
+						capture('enemy_attacked', {
 							enemyCardId: enemy.cardId,
 							damageDealt: damage,
 							enemyHealthBefore: enemy.health,
@@ -259,7 +261,7 @@ export function GameBoard() {
 					isBuyable={!isProcessing}
 					onAnimationEnd={signalAnimationComplete}
 					onBuyCard={card => {
-						posthog?.capture('card_purchased', {
+						capture('card_purchased', {
 							cardId: card.cardId,
 							coinsAvailable:
 								gameState.cCoins + gameState.bFarmBonusRecruitCurrent
@@ -334,14 +336,14 @@ export function GameBoard() {
 					healthTower={gameState.bTowerHealth}
 					healthTowerMax={gameState.bTowerHealthMAX}
 					onCalm={() => {
-						posthog?.capture('fear_calmed', {
+						capture('fear_calmed', {
 							fearLevelBefore: gameState.fFear,
 							calmAvailable: gameState.cCalm
 						})
 						gameCalmFear(1)
 					}}
 					onRepair={(building: BuildingType) => {
-						posthog?.capture('building_repaired', {
+						capture('building_repaired', {
 							building,
 							repairAvailable: gameState.cRepair,
 							farmHealth: gameState.bFarmHealth,
@@ -358,7 +360,7 @@ export function GameBoard() {
 						className={buttonClass}
 						disabled={gameState.cCoins < 2}
 						onClick={() => {
-							posthog?.capture('resource_converted', {
+							capture('resource_converted', {
 								resourceType: 'ATTACK',
 								amount: 1,
 								cost: 2,
@@ -377,7 +379,7 @@ export function GameBoard() {
 						className={buttonClass}
 						disabled={gameState.cCoins < 2}
 						onClick={() => {
-							posthog?.capture('resource_converted', {
+							capture('resource_converted', {
 								resourceType: 'REPAIR',
 								amount: 1,
 								cost: 2,
@@ -396,7 +398,7 @@ export function GameBoard() {
 							gameState.cCoins < 2 || gameState.commandUsed.refreshCitizens > 0
 						}
 						onClick={() => {
-							posthog?.capture('resource_converted', {
+							capture('resource_converted', {
 								resourceType: 'CALM',
 								amount: 1,
 								cost: 2,
@@ -415,7 +417,7 @@ export function GameBoard() {
 							gameState.cCoins < 1 || gameState.commandUsed.refreshCitizens > 0
 						}
 						onClick={() => {
-							posthog?.capture('village_row_refreshed', {
+							capture('village_row_refreshed', {
 								coinsBefore: gameState.cCoins,
 								cost: 1
 							})
@@ -432,7 +434,7 @@ export function GameBoard() {
 					cards={gameState.pHand}
 					onAnimationEnd={signalAnimationComplete}
 					onPlayCard={(card, cardPlayType) => {
-						posthog?.capture('card_played', {
+						capture('card_played', {
 							cardId: card.cardId,
 							cardPlayType
 						})
